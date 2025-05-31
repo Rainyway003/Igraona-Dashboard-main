@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Russo+One&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    color-scheme: dark;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-family: "Russo One", sans-serif;
+}
+
+.russo {
+    font-family: "Russo One", sans-serif;
+    font-style: normal;
+}
+
+.roboto {
+    font-family: "Roboto", sans-serif;
+    font-style: normal;
+}
+
+.border-gradient {
+    border-image: linear-gradient(to right, #8D151F, #5c0d15) 1;
+}
+
+.image-gradient {
+    background: linear-gradient(to bottom, rgba(22, 22, 22, 0) 0%, #161616 100%), url('./assets/izaslika.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.image2-gradient {
+    background: url('./assets/new.jpg');
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.image3-gradient {
+    background: linear-gradient(to bottom, rgba(22, 22, 22, 0) 0%, #000000 100%), url('assets/footer.avif');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+.button {
+    position: relative;
+    width: 400px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: transparent;
+}
+
+.text {
+    position: absolute;
+    top: 39%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgb(255, 255, 255);
+    font-size: 1.5rem;
+    transition: all 0.3s;
+}
+
+.img-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: url('./assets/batn.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: all 0.3s;
+}
+
+.button:hover {
+    cursor: pointer;
+}
+
+.button:hover .img-back {
+    background: url('./assets/batn2.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.button:hover>.text {
+    color: #ebaaaa;
+}
