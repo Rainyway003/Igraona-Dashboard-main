@@ -42,8 +42,7 @@ function Playstation() {
               id: newId,
               name: values.name,
               number: values.number,
-              startingAt: date.startOf('day').toDate(),
-              endingAt: date.endOf('day').toDate(),
+              vrijeme: date.startOf('day').toDate(),
               accepted: true,
             },
           });
@@ -104,7 +103,7 @@ function Playstation() {
                 />
               </ConfigProvider>
 
-              <button type="submit" className="button sm:!w-[300px] sm:!h-[75px] max-sm:!w-[200px] max-sm:!h-[50px] mt-8">
+              <button type="submit" className="button sm:!w-[300px] sm:!h-[75px] max-sm:!w-[200px] max-sm:!h-[50px]">
                 <div className="img-back !w-full !h-full"></div>
                 <div className="text max-sm:!text-xs russo">PRIJAVI SE</div>
               </button>

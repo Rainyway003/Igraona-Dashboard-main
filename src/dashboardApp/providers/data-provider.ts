@@ -56,6 +56,21 @@ const dataProvider: DataProvider = {
       });
     }
 
+    if (resource === "reserve" && meta?.id) {
+      const rezervaDoc = collection(db, resource)
+      const rezervaSnap = await getDocs(rezervaDoc)
+
+      console.log('evo', rezervaSnap)
+
+      const reserves = rezervaSnap.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }))
+
+      console.log(reserves)
+
+      return {data: reserves, total: reserves.length}
+    }
 
     const turnirSnap = await getDocs(turnirQuery)
 
