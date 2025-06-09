@@ -4,6 +4,9 @@ import {
   HomeOutlined,
   AimOutlined,
   DeleteOutlined,
+  CustomerServiceOutlined,
+  ContainerOutlined,
+  ExceptionOutlined
 } from '@ant-design/icons';
 import {Layout, Menu, Button} from 'antd';
 import {useLocation, useNavigate} from 'react-router';
@@ -116,19 +119,19 @@ const Sidebar = () => {
           },
           {
             key: '5',
-            icon: <DeleteOutlined/>,
+            icon: <CustomerServiceOutlined />,
             label: 'Plejke',
             onClick: () => handleNavigation('5')
           },
           {
             key: '6',
-            icon: <DeleteOutlined/>,
+            icon: <ContainerOutlined />,
             label: 'Blog',
             onClick: () => handleNavigation('6')
           },
           {
             key: '7',
-            icon: <DeleteOutlined/>,
+            icon: <ExceptionOutlined />,
             label: 'Pravila',
             onClick: () => handleNavigation('7')
           },

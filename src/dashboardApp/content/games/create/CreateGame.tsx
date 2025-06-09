@@ -39,6 +39,27 @@ const CreateGame: FC = () => {
     return (
         <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
             <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
+                <Form layout="vertical" onFinish={onFinish}>
+                    <Form.Item>
+                        <div className='sticky pt-2 pr-6 pl-6 z-10 flex justify-between'>
+                            <CreateButton
+                              type="primary"
+                              className="antbutton"
+                              onClick={() => navigate('/games')}
+                              icon={<ArrowLeftOutlined/>}
+                            >
+                                Back
+                            </CreateButton>
+                            <Button
+                              type="primary"
+                              htmlType="submit"
+                              className="antbutton"
+                              icon={<PlusSquareOutlined/>}
+                            >
+                                Submit
+                            </Button>
+                        </div>
+                    </Form.Item>
                 <Content
                     style={{
                         margin: '24px 16px',
@@ -48,29 +69,6 @@ const CreateGame: FC = () => {
                         borderRadius: borderRadiusLG,
                     }}
                 >
-                    <Form layout="vertical" onFinish={onFinish}>
-                        <Form.Item>
-                            <div className="flex justify-between w-full">
-                                <CreateButton
-                                    type="primary"
-                                    className="antbutton"
-                                    onClick={() => navigate('/games')}
-                                    icon={<ArrowLeftOutlined/>}
-                                >
-                                    Back
-                                </CreateButton>
-
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    className="antbutton"
-                                    icon={<PlusSquareOutlined/>}
-                                >
-                                    Submit
-                                </Button>
-
-                            </div>
-                        </Form.Item>
                         <Form.Item
                             label={"Ime igre"}
                             name={'name'}
@@ -86,8 +84,8 @@ const CreateGame: FC = () => {
                             <Input type={'file'} onChange={uploadFile}/>
                         </Form.Item>
                         <Avatar src={imageUrl} size={100}/>
-                    </Form>
                 </Content>
+               </Form>
             </Layout>
         </Layout>
     )

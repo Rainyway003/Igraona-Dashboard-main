@@ -10,7 +10,7 @@ import {
   addDoc,
   collection,
   deleteDoc,
-  deleteField,
+  setDoc,
   doc,
   DocumentData,
   getDoc,
@@ -69,6 +69,16 @@ const dataProvider: DataProvider = {
 
       console.log(reserves)
 
+      const reserveDoc = collection(db, resource)
+
+      let reserveQuery = query(reserveDoc)
+
+      if (sorters && sorters.length > 0) {
+        sorters.forEach((sorter: any) => {
+          reserveQuery = query(reserveQuery, orderBy(sorter.field, sorter.order || 'asc'));
+        });
+      }
+
       return {data: reserves, total: reserves.length}
     }
 
@@ -86,7 +96,7 @@ const dataProvider: DataProvider = {
     }
   },
   create: async <TData = any, TVariables = DocumentData>(
-    {resource, variables}: CreateParams<TVariables>
+    {resource, variables, meta}: CreateParams<TVariables>
   ): Promise<CreateResponse<TData>> => {
     if (resource === "tournaments") {
       console.log(variables)
@@ -129,14 +139,13 @@ const dataProvider: DataProvider = {
         } as TData,
       };
     } else if (resource === "reserve") {
-      const docRef = await addDoc(
-        collection(db, resource),
-        variables as WithFieldValue<DocumentData>
-      );
+      const id = meta?.id || (variables as any).id;
+
+      await setDoc(doc(db, resource, id), variables as WithFieldValue<DocumentData>);
 
       return {
         data: {
-          id: docRef.id,
+          id,
           ...variables,
         } as TData,
       };
@@ -196,7 +205,7 @@ const dataProvider: DataProvider = {
   deleteOne: async <TData = any, TVariables = {}>(
     {resource, id, meta}: DeleteOneParams<TVariables>
   ): Promise<DeleteOneResponse<TData>> => {
-    if (resource === "tournaments" || resource === "games" || resource === "banned") {
+    if (resource === "tournaments" || resource === "games" || resource === "banned" || resource === "reserve") {
       const docRef = doc(db, resource, id as string);
       await deleteDoc(docRef);
 

@@ -64,7 +64,10 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
       fullscreen={true}
       onSelect={onSelect}
       value={undefined}
-      disabledDate={(date) => date.isBefore(now.startOf('day'))}
+      disabledDate={(date) => {
+        const formatted = date.startOf('day').format('YYYY-MM-DD');
+        return date.isBefore(now.startOf('day')) || reservedDates.includes(formatted);
+      }}
       dateCellRender={(date) => {
         const formatted = date.startOf("day").format("YYYY-MM-DD");
         const isReserved = reservedDates.includes(formatted);

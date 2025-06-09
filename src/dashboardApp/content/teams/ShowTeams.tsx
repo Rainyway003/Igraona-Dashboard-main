@@ -52,8 +52,6 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
       key: 'actions',
       render: (_: any, record: any) => (
         <Space>
-          <EditButton hideText size="small" resource="tournaments" icon={<EyeOutlined/>}
-                      recordItemId={record.id} onClick={() => handleEdit(record)}></EditButton>
           {/*<EditButton hideText size='small' resource="participants" recordItemId={record.id}/>*/}
           <DeleteButton hideText size="small" resource="participants" recordItemId={record.id} meta={{
             id: id

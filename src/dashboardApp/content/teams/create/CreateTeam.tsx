@@ -80,7 +80,7 @@ const CreateTeam = () => {
         >
           <Form layout="vertical" onFinish={onFinish}>
             <Form.Item>
-              <div className="flex justify-between w-full">
+              <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-end'>
                 <CreateButton
                   type="primary"
                   className="antbutton"

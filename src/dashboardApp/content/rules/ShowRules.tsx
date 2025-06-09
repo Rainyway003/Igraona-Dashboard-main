@@ -24,25 +24,28 @@ const ShowRules: FC = () => {
 
   return (
     <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
+
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
+
+        <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-end'>
+          <CreateButton
+            type="primary"
+            className="antbutton"
+            onClick={() => navigate('/rules/new')}
+          >
+            Create
+          </CreateButton>
+        </div>
+
         <Content
           style={{
-            margin: '24px 16px',
+            margin: '14px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}
         >
-          <div style={{marginBottom: 16}} className='text-right'>
-            <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/rules/new')}
-            >
-              Create
-            </CreateButton>
-          </div>
 
           <List
             itemLayout="horizontal"

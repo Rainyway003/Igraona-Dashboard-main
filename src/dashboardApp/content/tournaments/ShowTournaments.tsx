@@ -125,6 +125,15 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
   return (
     <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
+
+        <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-end'>
+        <CreateButton
+          className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
+          resource="tournaments"
+          onClick={() => navigate('/tournaments/new')}
+        />
+      </div>
+
         <Content
           style={{
             margin: '14px 14px',
@@ -134,13 +143,6 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
             borderRadius: borderRadiusLG,
           }}
         >
-          <div style={{marginBottom: 16}} className='text-right'>
-            <CreateButton
-              className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
-              resource="tournaments"
-              onClick={() => navigate('/tournaments/new')}
-            />
-          </div>
 
           <Table
             loading={isLoading}

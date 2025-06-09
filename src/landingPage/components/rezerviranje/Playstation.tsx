@@ -21,7 +21,7 @@ function Playstation() {
   const [form] = Form.useForm();
 
   const generateUniqueId = (date: Dayjs) => {
-    return `res-${date.format('YYYYMMDD')}`;
+    return date.format('YYYY-MM-DD');
   };
 
   const onFinish = async (values: { name: string; number: string }) => {
@@ -36,16 +36,22 @@ function Playstation() {
       await Promise.all(
         sortedDates.map(async (date) => {
           const newId = generateUniqueId(date);
-          await mutate({
-            resource: 'reserve',
-            values: {
-              id: newId,
-              name: values.name,
-              number: values.number,
-              vrijeme: date.startOf('day').toDate(),
-              accepted: true,
+          await mutate(
+            {
+              resource: 'reserve',
+              values: {
+                id: newId,
+                name: values.name,
+                number: values.number,
+                vrijeme: date.startOf('day').toDate(),
+              },
             },
-          });
+            {
+              meta: {
+                id: newId,
+              },
+            }
+          );
         })
       );
 

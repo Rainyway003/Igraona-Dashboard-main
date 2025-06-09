@@ -12,22 +12,18 @@ const {Content} = Layout;
 const ShowReserve: FC = () => {
   const navigate = useNavigate()
 
+  const [sorters, setSorters] = useState([]);
+
   const {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
 
   const {data, isLoading} = useList({
     resource: "reserve",
+    sorters: sorters,
   })
 
-
-  const Accept = async (record: any) => {
-    const docRef = doc(db, "reserve", record.id);
-    await updateDoc(docRef, {
-      accepted: !record.accepted
-    })
-    window.location.reload();
-  }
+  console.log("Sorteri:", sorters);
 
   const columns = [
     {
@@ -41,26 +37,30 @@ const ShowReserve: FC = () => {
       key: 'number',
     },
     {
-      title: 'Početak',
-      dataIndex: 'startingAt',
-      key: 'startingAt',
-    },
-    {
-      title: 'Zasvršetak',
-      dataIndex: 'endingAt',
-      key: 'endingAt',
+      title: 'Vrijeme',
+      dataIndex: 'vrijeme',
+      key: 'vrijeme',
+      sorter: true,
+      render: (_: any, record: any) => (
+        <Space>
+          {record.vrijeme.toDate().toLocaleString()}
+        </Space>
+      ),
     },
     {
       title: 'Akcije',
       key: 'actions',
       render: (_: any, record: any) => (
         <Space>
-          <EditButton hideText size="small" resource="reserve" icon={<CheckOutlined/>}
-                      className={record.accepted === false ? 'bg-red-200' : 'bg-green-200'} recordItemId={record.id}
-                      onClick={() => Accept(record)}/>
-          <DeleteButton hideText size="small" resource="reserve" recordItemId={record.id}></DeleteButton>
+          <DeleteButton
+            hideText
+            size="small"
+            resource="reserve"
+            recordItemId={record.id}
+            onClick={() => console.log("Deleting record ID:", record.id)}
+          />
         </Space>
-      ),
+      )
     },
   ];
 
@@ -69,7 +69,7 @@ const ShowReserve: FC = () => {
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
         <Content
           style={{
-            margin: '24px 16px',
+            margin: '14px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,
@@ -81,6 +81,17 @@ const ShowReserve: FC = () => {
             dataSource={data?.data}
             columns={columns}
             rowKey="id"
+            onChange={(_, __, sorter) => {
+              const sorterArray = Array.isArray(sorter) ? sorter : [sorter];
+              const formattedSorters = sorterArray
+                .filter((s) => s.order)
+                .map((s) => ({
+                  field: s.field,
+                  order: s.order === "ascend" ? "asc" : "desc",
+                }));
+              setSorters(formattedSorters);
+            }}
+
             pagination={{
               pageSize: 5,
               position: ['bottomCenter'],

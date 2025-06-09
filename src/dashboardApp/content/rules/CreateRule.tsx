@@ -44,6 +44,29 @@ const CreateRule = () => {
   return (
     <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
+
+        <Form layout="vertical" onFinish={onFinish}>
+      <Form.Item>
+        <div className='sticky pt-2 pr-6 pl-6 z-10 flex justify-between'>
+          <CreateButton
+            type="primary"
+            className="antbutton"
+            onClick={() => navigate('/rules')}
+            icon={<ArrowLeftOutlined/>}
+          >
+            Back
+          </CreateButton>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="antbutton"
+            icon={<PlusSquareOutlined/>}
+          >
+            Submit
+          </Button>
+        </div>
+      </Form.Item>
+
         <Content
           style={{
             margin: '24px 16px',
@@ -53,28 +76,6 @@ const CreateRule = () => {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Form layout="vertical" onFinish={onFinish}>
-            <Form.Item>
-              <div className="flex justify-between w-full">
-                <CreateButton
-                  type="primary"
-                  className="antbutton"
-                  onClick={() => navigate('/rules')}
-                  icon={<ArrowLeftOutlined/>}
-                >
-                  Back
-                </CreateButton>
-
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  className="antbutton"
-                  icon={<PlusSquareOutlined/>}
-                >
-                  Submit
-                </Button>
-              </div>
-            </Form.Item>
             <Form.Item label={'Ime pravila'} name="name" rules={[{required: true}]}>
               <Input placeholder="Ime pravila"/>
             </Form.Item>
@@ -83,8 +84,8 @@ const CreateRule = () => {
                 style={{height: '300px', minWidth: '100%'}}
                 theme="snow" value={value} onChange={setValue} modules={modules}/>
             </Form.Item>
-          </Form>
         </Content>
+        </Form>
       </Layout>
     </Layout>
   )
