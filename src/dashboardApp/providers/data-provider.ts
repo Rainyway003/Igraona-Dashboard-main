@@ -19,7 +19,7 @@ import {
   orderBy,
   updateDoc,
   WithFieldValue,
-  increment
+  increment, where
 } from "firebase/firestore";
 import {db} from "./firebase";
 
@@ -34,8 +34,6 @@ const dataProvider: DataProvider = {
       const teamsDoc = collection(db, "tournaments", String(meta.id), resource)
       const teamsSnap = await getDocs(teamsDoc)
 
-      console.log('evo', teamsSnap)
-
       const teams = teamsSnap.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
@@ -48,13 +46,27 @@ const dataProvider: DataProvider = {
 
     const turnirDoc = collection(db, resource)
 
-    let turnirQuery = query(turnirDoc)
+    let constraints: any[] = []
+    if (filters && filters.length > 0) {
+      filters.forEach((filter: any) => {
+        const {field, operator, value} = filter
+        if (operator === "contains") {
+          constraints.push(where(field, ">=", value))
+          constraints.push(where(field, "<=", value + "\uf8ff"))
+        } else if (operator === "eq") {
+          constraints.push(where(field, "==", value))
+        }
+      })
+    }
 
     if (sorters && sorters.length > 0) {
       sorters.forEach((sorter: any) => {
-        turnirQuery = query(turnirQuery, orderBy(sorter.field, sorter.order || 'asc'));
-      });
+        constraints.push(orderBy(sorter.field, sorter.order || "asc"))
+      })
     }
+
+    const turnirQuery = query(turnirDoc, ...constraints)
+    const turnirSnap = await getDocs(turnirQuery)
 
     if (resource === "reserve" && meta?.id) {
       const rezervaDoc = collection(db, resource)
@@ -81,8 +93,6 @@ const dataProvider: DataProvider = {
 
       return {data: reserves, total: reserves.length}
     }
-
-    const turnirSnap = await getDocs(turnirQuery)
 
     const data = turnirSnap.docs.map((doc) => ({
       id: doc.id,

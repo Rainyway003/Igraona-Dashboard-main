@@ -1,8 +1,9 @@
 import React from 'react'
-import {Layout, List, theme, Typography} from "antd";
+import {Layout, List, Space, Table, theme, Typography} from "antd";
 import {useNavigate} from "react-router";
-import {CreateButton} from "@refinedev/antd";
+import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useList} from "@refinedev/core";
+import {EyeOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;
 const {Title} = Typography;
@@ -22,6 +23,27 @@ const ShowBlogs = () => {
   if (isLoading) {
     return <div>...Loading</div>;
   }
+
+  const columns = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
+    },
+    {
+      title: 'Akcije',
+      key: 'actions',
+      render: (_: any, record: any) => (
+        <Space>
+          <EditButton hideText size="small" resource="blog" icon={<EyeOutlined/>}
+                      recordItemId={record.id}
+                      onClick={() => navigate(`/blog/${record.id}`)}></EditButton>
+          <EditButton hideText size="small" resource="blog" recordItemId={record.id}/>
+          <DeleteButton hideText size="small" resource="blog" recordItemId={record.id}></DeleteButton>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
@@ -47,30 +69,15 @@ const ShowBlogs = () => {
           }}
         >
 
-          <List
-            itemLayout="horizontal"
+          <Table
             loading={isLoading}
             dataSource={data?.data}
-            renderItem={(blog, index) => (
-              <List.Item
-                style={{
-                  cursor: 'pointer',
-                  borderRadius: '8px',
-                  marginBottom: '10px',
-                  backgroundColor: 'lightgray',
-                  transition: 'background-color 0.3s ease',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'darkgray')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'lightgray')}
-                onClick={() => navigate(`/blog/${blog.id}`)}
-              >
-                <List.Item.Meta
-                  title={<span style={{color: '#8D151F', fontWeight: "bold"}}>{blog.title}</span>}
-                  description={<span style={{color: '#a83a44'}}><BlogPost blog={blog.blog}/></span>}
-                  className="text-center"
-                />
-              </List.Item>
-            )}
+            columns={columns}
+            rowKey="id"
+            pagination={{
+              pageSize: 5,
+              position: ['bottomCenter'],
+            }}
           />
         </Content>
       </Layout>

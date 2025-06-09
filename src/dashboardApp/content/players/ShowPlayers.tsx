@@ -8,7 +8,7 @@ import {useParams} from 'react-router';
 
 import BanPlayer from './BanPlayer';
 import {CreateButton, useForm} from "@refinedev/antd";
-import {ArrowLeftOutlined, PlusSquareOutlined, StarOutlined} from "@ant-design/icons";
+import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
 
 const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
   const {id} = useParams();
@@ -20,8 +20,8 @@ const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
     id: id ?? "",
   })
   const tournament = tData?.data
-  console.log(id)
-  console.log(teamId)
+
+
   const {formProps, saveButtonProps, query} = useForm({
     resource: "participants",
     id: id,
@@ -34,11 +34,12 @@ const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
     }
   });
 
+
   const {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
 
-  console.log(teamId)
+
   const {data, isLoading} = useOne({
     resource: "participants",
     id: id,
@@ -53,16 +54,98 @@ const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
   const handleEditClick = () => {
     setIsEdit(!isEdit)
   }
-  console.log(isEdit)
-
-  const cleanObject = (obj: Record<string, any>) =>
-    Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
 
   const onFinish = async (values: any) => {
-    const cleanValues = cleanObject(values);
+    const numberOfPlayers = Number(tournament?.teamSizeOptional ?? 0) + Number(tournament?.teamSizeRequired ?? 0);
 
-    await formProps.onFinish?.(cleanValues);
+    const players = Array.from({length: numberOfPlayers}, (_, i) => {
+      const key = `player${i + 1}`;
+      return values[key] || "";
+    });
+
+    const teamValues = {
+      name: values?.name,
+      number: values?.number,
+      players
+    };
+
+    await formProps.onFinish?.(teamValues)
   }
+
+  const columns = [
+    {
+      title: isEdit ?
+        <Form.Item className={'m-0'} name="name" initialValue={team?.name}>
+          <Input placeholder={'Ime tima'}/>
+        </Form.Item>
+        :
+        <div>{team?.name}</div>,
+      render: (_: any, record: any, index: number) => (
+        isEdit ?
+          <Form.Item className={'m-0'} name={`player${index + 1}`} initialValue={record}>
+            <Input placeholder={`${index + 1}`}/>
+          </Form.Item>
+          :
+          <Space>
+            {record}
+          </Space>
+      ),
+    },
+    {
+      title: isEdit ?
+        <Form.Item className={'m-0'} name={'number'} initialValue={team?.number}>
+          <Input placeholder={'Kontakt'}/>
+        </Form.Item>
+        :
+        <div>{team?.number}</div>,
+      dataIndex: 'number',
+      key: 'number',
+    },
+    {
+      title: <Form.Item className={'flex justify-end m-0'}>
+        {isEdit ?
+          <div className="flex gap-2">
+            <CreateButton
+              type="primary"
+              className="antbutton"
+              onClick={handleEditClick}
+              icon={null}
+            >
+              Cancel
+            </CreateButton>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="antbutton"
+            >
+              Submit
+            </Button>
+          </div>
+          :
+          <CreateButton
+            type="primary"
+            className="antbutton"
+            onClick={handleEditClick}
+            icon={null}
+          >
+            Edit
+          </CreateButton>
+        }
+      </Form.Item>,
+      key: 'actions',
+      render: (_: any, record: any) => (
+        <Space>
+          {/* <DeleteButton hideText size="small" resource="tournaments" recordItemId={record.id} /> */}
+          {isEdit ?
+            null
+            :
+            <BanPlayer player={record}></BanPlayer>
+          }
+        </Space>
+      ),
+    },
+  ];
+
 
   return (
     <Form {...formProps} layout="vertical" onFinish={onFinish}>
@@ -77,79 +160,36 @@ const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Form.Item>
-            <div className="flex justify-end w-full p-2">
-              {isEdit ?
-                <div className="flex gap-1">
-                  <CreateButton
-                    type="primary"
-                    className="antbutton"
-                    onClick={handleEditClick}
-                    icon={<ArrowLeftOutlined/>}
-                  >
-                    Cancel
-                  </CreateButton>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="antbutton"
-                    icon={<PlusSquareOutlined/>}
-                  >
-                    Submit
-                  </Button>
-                </div>
-                :
-                <CreateButton
-                  type="primary"
-                  className="antbutton"
-                  onClick={handleEditClick}
-                  icon={<ArrowLeftOutlined/>}
-                >
-                  Edit
-                </CreateButton>
-              }
 
-            </div>
-          </Form.Item>
-
-          {isEdit ?
-            <div className={'flex flex-col'}>
-              {Array.from({length: tournament?.teamSizeRequired || 0}).map((_, index) => (
-                <Form.Item
-                  key={index}
-                  name={`player${index + 1}`}
-                  rules={[{required: true}]}
-                >
-                  <Input placeholder={`Igrač ${index + 1} Faceit link`}
-                         prefix={<StarOutlined className={'text-red-500'}/>}/>
-                </Form.Item>
-              ))}
-              {Array.from({length: tournament?.teamSizeOptional || 0}).map((_, index) => (
-                <Form.Item
-                  key={index}
-                  name={`player${index + 1 + Number(tournament?.teamSizeRequired)}`}
-                >
-                  <Input
-                    placeholder={`Rezerva ${index + 1 + Number(tournament?.teamSizeRequired)} Faceit link`}/>
-                </Form.Item>
-              ))}
-            </div>
-            :
-            <div>
-              {team && Object.entries(team)
-                .filter(([key, value]) => key.startsWith('player') && value)
-                .map(([key, value], index) => (
-                  <p key={key} id={key}>
-                    <StarOutlined className="text-red-500"/> {value}
-                  </p>
-                ))}
-            </div>
-          }
+          <Table
+            loading={isLoading}
+            dataSource={isEdit ? data?.data.players : data?.data.players.filter((player) => !isBlank(player))}
+            columns={columns}
+            rowKey="id"
+            pagination={false}
+            onRow={(record) => ({
+              onClick: (event) => {
+                const target = event.target as HTMLElement;
+                if (
+                  target.closest('button') ||
+                  target.closest('input') ||
+                  target.closest('.ant-modal')
+                ) {
+                  return;
+                }
+                window.location.replace(`${record.name}`)
+              },
+            })}
+          />
           {children}
         </Content>
       </Layout>
     </Form>
   );
 };
+
+function isBlank(str) {
+  return (!str || /^\s*$/.test(str));
+}
 
 export default ShowPlayers;

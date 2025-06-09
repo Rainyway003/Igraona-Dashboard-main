@@ -38,6 +38,9 @@ import ViewBlog from "./dashboardApp/content/blog/ViewBlog";
 import ShowReserve from "./dashboardApp/content/reserve/ShowReserve";
 import ShowRules from "./dashboardApp/content/rules/ShowRules";
 import CreateRule from "./dashboardApp/content/rules/CreateRule";
+import EditGame from "./dashboardApp/content/games/EditGame";
+import EditRule from "./dashboardApp/content/rules/EditRule";
+import EditBlog from "./dashboardApp/content/blog/EditBlog";
 
 function App() {
   return (
@@ -68,6 +71,7 @@ function App() {
                   <Route index element={<ShowBlogs/>}/>
                   <Route path='new' element={<CreateBlog/>}/>
                   <Route path=':id' element={<ViewBlog/>}/>
+                  <Route path='edit/:id' element={<EditBlog/>}/>
                 </Route>
                 <Route path="/tournaments">
                   <Route index element={<ShowTournaments/>}/>
@@ -86,10 +90,12 @@ function App() {
                 <Route path="/games">
                   <Route index element={<ShowGames/>}/>
                   <Route path={'new'} element={<CreateGame/>}/>
+                  <Route path={'edit/:id'} element={<EditGame/>}/>
                 </Route>
                 <Route path="/rules">
                   <Route index element={<ShowRules/>}/>
                   <Route path={'new'} element={<CreateRule/>}/>
+                  <Route path={'edit/:id'} element={<EditRule/>}/>
                 </Route>
                 <Route path="/banned">
                   <Route index element={<ShowBanned/>}/>

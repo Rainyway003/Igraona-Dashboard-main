@@ -1,5 +1,5 @@
 import React, {PropsWithChildren, useState} from 'react';
-import {Layout, theme, Table, Avatar, Space, Progress, Select} from 'antd';
+import {Layout, theme, Table, Avatar, Space, Progress, Select, Input} from 'antd';
 import {AntDesignOutlined, EyeOutlined} from '@ant-design/icons';
 
 const {Content} = Layout;
@@ -13,6 +13,7 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
 
   const [selectedGame, setSelectedGame] = useState<string | undefined>(undefined);
   const [sorters, setSorters] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const {selectProps} = useSelect({
     resource: 'games',
@@ -31,11 +32,15 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
     meta: {
       tournamentId,
     },
-    filters: selectedGame
-      ? [{field: "game", operator: "contains", value: selectedGame}]
-      : [],
+    filters: [
+      ...(selectedGame ? [{field: "game", operator: "contains", value: selectedGame}] : []),
+      ...(searchTerm ? [{field: "name", operator: "contains", value: searchTerm}] : []),
+    ],
     sorters: sorters,
-  })
+    queryOptions: {
+      queryKey: ["tournaments", selectedGame, searchTerm, sorters],
+    },
+  });
 
   console.log("Sorteri:", sorters);
   console.log('ev', selectProps)
@@ -126,7 +131,15 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
     <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
-        <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-end'>
+        <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-between'>
+            <Input
+              rootClassName={'w-96'}
+              placeholder="Search tournaments"
+              allowClear
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{marginBottom: 16}}
+            />
         <CreateButton
           className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
           resource="tournaments"
@@ -169,7 +182,7 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
         </Content>
       </Layout>
     </Layout>
-  );
-};
+  )
+}
 
 export default ShowTournaments;
