@@ -129,27 +129,28 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
 
   return (
     <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
+
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
-        <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-between'>
-            <Input
-              rootClassName={'w-96'}
-              placeholder="Search tournaments"
-              allowClear
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{marginBottom: 16}}
-            />
-        <CreateButton
-          className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
-          resource="tournaments"
-          onClick={() => navigate('/tournaments/new')}
-        />
-      </div>
+        <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
+          <Input
+            rootClassName={'w-96'}
+            placeholder="Search tournaments"
+            allowClear
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{marginBottom: 16}}
+          />
+          <CreateButton
+            className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
+            resource="tournaments"
+            onClick={() => navigate('/tournaments/new')}
+          />
+        </div>
 
         <Content
           style={{
-            margin: '14px 14px',
+            margin: '0px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,

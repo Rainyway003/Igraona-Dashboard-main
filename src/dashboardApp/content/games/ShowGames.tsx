@@ -1,6 +1,6 @@
 import React, {FC} from 'react'
 import {Avatar, Layout, Space, Table, theme} from "antd";
-import {CreateButton, DeleteButton} from "@refinedev/antd";
+import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useNavigate} from 'react-router';
 import {useList} from "@refinedev/core";
 
@@ -39,7 +39,7 @@ const ShowGames: FC = () => {
             key: 'actions',
             render: (_: any, record: any) => (
                 <Space>
-                    {/*<EditButton hideText size="small" resource="tournaments" recordItemId={record.id}/>*/}
+                    <EditButton hideText size="small" resource="games" recordItemId={record.id}/>
                     <DeleteButton hideText size="small" resource="games" recordItemId={record.id}/>
                 </Space>
             ),
@@ -50,7 +50,7 @@ const ShowGames: FC = () => {
         <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
             <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
-                <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-end'>
+                <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-end mb-4'>
                     <CreateButton
                       type="primary"
                       className="antbutton"
@@ -64,9 +64,9 @@ const ShowGames: FC = () => {
 
                 <Content
                     style={{
-                        margin: '14px 14px',
+                        margin: '0px 14px',
                         padding: 24,
-                        minHeight: 280,
+                        minHeight: 360,
                         background: colorBgContainer,
                         borderRadius: borderRadiusLG,
                     }}

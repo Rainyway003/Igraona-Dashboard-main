@@ -40,9 +40,8 @@ const CreateGame: FC = () => {
         <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
             <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
                 <Form layout="vertical" onFinish={onFinish}>
-                    <Form.Item>
-                        <div className='sticky pt-2 pr-6 pl-6 z-10 flex justify-between'>
-                            <CreateButton
+                  <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
+                  <CreateButton
                               type="primary"
                               className="antbutton"
                               onClick={() => navigate('/games')}
@@ -59,11 +58,11 @@ const CreateGame: FC = () => {
                                 Submit
                             </Button>
                         </div>
-                    </Form.Item>
                 <Content
                     style={{
-                        margin: '24px 16px',
+                        margin: '0px 14px',
                         padding: 24,
+                      paddingBottom: 730,
                         minHeight: 280,
                         background: colorBgContainer,
                         borderRadius: borderRadiusLG,

@@ -30,38 +30,39 @@ const EditGame = () => {
   return (
     <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
+
+        <Form layout="vertical" {...formProps}>
+          <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
+            <CreateButton
+              type="primary"
+              className="antbutton"
+              onClick={() => navigate('/games')}
+              icon={<ArrowLeftOutlined/>}
+            >
+              Back
+            </CreateButton>
+
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="antbutton"
+              icon={<PlusSquareOutlined/>}
+            >
+              Submit
+            </Button>
+
+          </div>
+
         <Content
           style={{
-            margin: '24px 16px',
+            margin: '0px 14px',
             padding: 24,
+            paddingBottom: 730,
             minHeight: 280,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}
         >
-          <Form layout="vertical" {...formProps}>
-            <Form.Item>
-              <div className="flex justify-between w-full">
-                <CreateButton
-                  type="primary"
-                  className="antbutton"
-                  onClick={() => navigate('/games')}
-                  icon={<ArrowLeftOutlined/>}
-                >
-                  Back
-                </CreateButton>
-
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  className="antbutton"
-                  icon={<PlusSquareOutlined/>}
-                >
-                  Submit
-                </Button>
-
-              </div>
-            </Form.Item>
             <Form.Item
               label={"Ime igre"}
               name={'name'}
@@ -75,8 +76,8 @@ const EditGame = () => {
               <Input type={'file'} onChange={uploadFile}/>
             </Form.Item>
             <Avatar src={imageUrl} size={100}/>
-          </Form>
         </Content>
+        </Form>
       </Layout>
     </Layout>
   );

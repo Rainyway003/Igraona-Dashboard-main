@@ -90,7 +90,7 @@ const Sidebar = () => {
       <Menu
         theme="dark"
         mode="inline"
-        className="pt-4 p-1 bg-[#161616] h-[80%]"
+        className="pt-4 p-1 bg-[#161616] h-[86%]"
         selectedKeys={[getSelectedKey()]}
         items={[
           {

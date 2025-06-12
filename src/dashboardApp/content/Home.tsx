@@ -14,9 +14,10 @@ const Home: React.FC = () => {
             <Layout style={{ flex: 1, backgroundColor: '#f0f2f5' }}>
                 <Content
                     style={{
-                        margin: '24px 16px',
+                        margin: '0px 14px',
+                      marginTop: '48px',
                         padding: 24,
-                        minHeight: 280,
+                        minHeight: 360,
                         background: colorBgContainer,
                         borderRadius: borderRadiusLG,
                     }}

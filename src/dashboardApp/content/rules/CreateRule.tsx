@@ -46,9 +46,8 @@ const CreateRule = () => {
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
         <Form layout="vertical" onFinish={onFinish}>
-      <Form.Item>
-        <div className='sticky pt-2 pr-6 pl-6 z-10 flex justify-between'>
-          <CreateButton
+        <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
+        <CreateButton
             type="primary"
             className="antbutton"
             onClick={() => navigate('/rules')}
@@ -65,25 +64,24 @@ const CreateRule = () => {
             Submit
           </Button>
         </div>
-      </Form.Item>
-
         <Content
           style={{
-            margin: '24px 16px',
+            margin: '0px 14px',
             padding: 24,
+            paddingBottom: 600,
             minHeight: 280,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}
         >
-            <Form.Item label={'Ime pravila'} name="name" rules={[{required: true}]}>
-              <Input placeholder="Ime pravila"/>
-            </Form.Item>
-            <Form.Item name="rule" rules={[{required: true}]}>
-              <ReactQuill
-                style={{height: '300px', minWidth: '100%'}}
-                theme="snow" value={value} onChange={setValue} modules={modules}/>
-            </Form.Item>
+          <Form.Item label={'Ime pravila'} name="name" rules={[{required: true}]}>
+            <Input placeholder="Ime pravila"/>
+          </Form.Item>
+          <Form.Item name="rule" rules={[{required: true}]}>
+            <ReactQuill
+              style={{height: '300px', minWidth: '100%'}}
+              theme="snow" value={value} onChange={setValue} modules={modules}/>
+          </Form.Item>
         </Content>
         </Form>
       </Layout>

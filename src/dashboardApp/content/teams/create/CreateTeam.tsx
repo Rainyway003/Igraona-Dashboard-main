@@ -69,38 +69,38 @@ const CreateTeam = () => {
   return (
     <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
+
+        <Form layout="vertical" onFinish={onFinish}>
+            <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
+              <CreateButton
+                type="primary"
+                className="antbutton"
+                onClick={() => navigate(`/tournaments/${id}`)}
+                icon={<ArrowLeftOutlined/>}
+              >
+                Back
+              </CreateButton>
+
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="antbutton"
+                icon={<PlusSquareOutlined/>}
+              >
+                Submit
+              </Button>
+            </div>
+
         <Content
           style={{
-            margin: '24px 16px',
+            margin: '0px 14px',
             padding: 24,
+            paddingBottom: 556,
             minHeight: 280,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}
         >
-          <Form layout="vertical" onFinish={onFinish}>
-            <Form.Item>
-              <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-end'>
-                <CreateButton
-                  type="primary"
-                  className="antbutton"
-                  onClick={() => navigate('/tournaments')}
-                  icon={<ArrowLeftOutlined/>}
-                >
-                  Back
-                </CreateButton>
-
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  className="antbutton"
-                  icon={<PlusSquareOutlined/>}
-                >
-                  Submit
-                </Button>
-
-              </div>
-            </Form.Item>
             <Form.Item
               label={"Ime tima"}
               name={'name'}
@@ -136,8 +136,8 @@ const CreateTeam = () => {
                 </Form.Item>
               ))}
             </div>
-          </Form>
         </Content>
+          </Form>
       </Layout>
     </Layout>
   )

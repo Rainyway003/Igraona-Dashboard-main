@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import FormInput from '../forms/FormInput';
 import CalendarComponent from '../Calendar';
 import { ConfigProvider } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 
 function Playstation() {
   const { mutate, isLoading: loading } = useCreate();

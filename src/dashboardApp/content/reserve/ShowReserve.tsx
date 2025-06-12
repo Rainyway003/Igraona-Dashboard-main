@@ -1,11 +1,10 @@
 import React, {FC, useState} from 'react'
-import {Avatar, Layout, Space, Table, theme} from "antd";
-import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
+import {ConfigProvider, Layout, Space, Table, theme} from "antd";
+import {DeleteButton} from "@refinedev/antd";
 import {useNavigate} from 'react-router';
 import {useList} from "@refinedev/core";
-import {AntDesignOutlined, ArrowLeftOutlined, CheckOutlined} from "@ant-design/icons";
-import {doc, getDoc, updateDoc} from 'firebase/firestore';
-import {db} from "../../providers/firebase";
+import CalendarSmall from "./CalendarSmall";
+import {Dayjs} from "dayjs";
 
 const {Content} = Layout;
 
@@ -13,6 +12,7 @@ const ShowReserve: FC = () => {
   const navigate = useNavigate()
 
   const [sorters, setSorters] = useState([]);
+  const [selectedDates, setSelectedDates] = useState<Dayjs[]>([]);
 
   const {
     token: {colorBgContainer, borderRadiusLG},
@@ -65,13 +65,14 @@ const ShowReserve: FC = () => {
   ];
 
   return (
-    <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
+    <Layout style={{height: '100vh', overflowX: 'hidden', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
         <Content
           style={{
-            margin: '14px 14px',
+            margin: '0px 14px',
+            marginTop: '48px',
             padding: 24,
-            minHeight: 280,
+            minHeight: 1235,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}
@@ -97,6 +98,36 @@ const ShowReserve: FC = () => {
               position: ['bottomCenter'],
             }}
           />
+
+          <div
+className='pb-10'
+            >
+          <ConfigProvider
+            theme={{
+              token: {
+                colorBgBase: '#000000',
+                colorBgContainer: '#2a2929',
+                colorPrimary: '#8D151F',
+                controlItemBgActive: '#000000',
+                colorText: '#ffffff',
+                colorBgTextActive: '#ffffff',
+                colorBgDisabled: '#ffffff',
+                colorTextDisabled: '#605e5e',
+                textsecondary: '#ffffff',
+              },
+              components: {
+                Calendar: {
+                  fullBg: '#000000', fullPanelBg: '#2a2929'
+                }
+              }
+            }}
+          >
+            <CalendarSmall
+              selectedDates={selectedDates}
+              setSelectedDates={setSelectedDates}
+            />
+          </ConfigProvider>
+          </div>
         </Content>
       </Layout>
     </Layout>

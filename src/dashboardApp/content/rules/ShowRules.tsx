@@ -1,18 +1,21 @@
-import React, {FC} from 'react'
+import React, {FC, useState} from 'react'
 import {Avatar, Layout, List, Space, Table, theme} from "antd";
-import {CreateButton, DeleteButton} from "@refinedev/antd";
+import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useNavigate} from 'react-router';
 import {useList} from "@refinedev/core";
+import ShowRuleView from "./ShowRuleView";
 
 const {Content} = Layout;
 
 const ShowRules: FC = () => {
   const navigate = useNavigate();
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   const {data, isLoading} = useList({
     resource: "rules",
   });
 
+  const rule = data?.data;
 
   const {
     token: {colorBgContainer, borderRadiusLG},
@@ -22,12 +25,45 @@ const ShowRules: FC = () => {
     return <div>...Loading</div>;
   }
 
+  const columns = [
+    {
+      title: 'Ime pravila',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Akcije',
+      key: 'actions',
+      render: (_: any, record: any) => (
+        <Space>
+          <EditButton hideText size="small" resource="rules" recordItemId={record.id}/>
+          <DeleteButton hideText size="small" resource="reserve" recordItemId={record.id}></DeleteButton>
+        </Space>
+      ),
+    },
+  ];
+
+  const handleExpand = (expanded: boolean, record: any) => {
+    const keys = expanded ? [record.id] : [];
+    setExpandedRowKeys(keys)
+  }
+
+  const expandable = {
+    expandedRowRender: (record: any, expanded: any) => (
+      <div style={{margin: 0}}>
+        <ShowRuleView rule={rule}/>
+      </div>
+    ),
+    expandedRowKeys,
+    onExpand: handleExpand,
+  };
+
   return (
     <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
 
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
-        <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-end'>
+        <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-end mb-4'>
           <CreateButton
             type="primary"
             className="antbutton"
@@ -39,7 +75,7 @@ const ShowRules: FC = () => {
 
         <Content
           style={{
-            margin: '14px 14px',
+            margin: '0px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,
@@ -47,29 +83,16 @@ const ShowRules: FC = () => {
           }}
         >
 
-          <List
-            itemLayout="horizontal"
+          <Table
             loading={isLoading}
             dataSource={data?.data}
-            renderItem={(rule, index) => (
-              <List.Item
-                style={{
-                  cursor: 'pointer',
-                  borderRadius: '8px',
-                  marginBottom: '10px',
-                  backgroundColor: 'lightgray',
-                  transition: 'background-color 0.3s ease',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'darkgray')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'lightgray')}
-              >
-                <List.Item.Meta
-                  title={<span style={{color: '#8D151F', fontWeight: "bold"}}>{rule.name}</span>}
-                  description={<span style={{color: '#a83a44'}}><BlogPost rule={rule.rule}/></span>}
-                  className="text-center"
-                />
-              </List.Item>
-            )}
+            columns={columns}
+            rowKey="id"
+            pagination={{
+              pageSize: 5,
+              position: ['bottomCenter'],
+            }}
+            expandable={expandable}
           />
         </Content>
       </Layout>

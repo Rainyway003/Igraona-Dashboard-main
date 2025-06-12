@@ -35,16 +35,10 @@ const ShowBanned: FC = () => {
             key: 'reason',
         },
         {
-            title: 'Id',
-            dataIndex: 'id',
-            key: 'id',
-        },
-        {
             title: 'Akcije',
             key: 'actions',
             render: (_: any, record: any) => (
                 <Space>
-                    {/*<EditButton hideText size="small" resource="tournaments" recordItemId={record.id}/>*/}
                     <DeleteButton hideText size="small" resource="banned" recordItemId={record.id}></DeleteButton>
                 </Space>
             ),
@@ -55,7 +49,7 @@ const ShowBanned: FC = () => {
         <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
             <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
-                <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-end'>
+                <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-end mb-4'>
                     <CreateButton
                       type="primary"
                       className="antbutton"
@@ -67,7 +61,7 @@ const ShowBanned: FC = () => {
 
                 <Content
                     style={{
-                        margin: '14px 14px',
+                        margin: '0px 14px',
                         padding: 24,
                         minHeight: 280,
                         background: colorBgContainer,

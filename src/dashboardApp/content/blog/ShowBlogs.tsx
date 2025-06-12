@@ -49,7 +49,7 @@ const ShowBlogs = () => {
     <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
-        <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-end'>
+        <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-end mb-4'>
           <CreateButton
             type="primary"
             className="antbutton"
@@ -61,7 +61,7 @@ const ShowBlogs = () => {
 
         <Content
           style={{
-            margin: '14px 14px',
+            margin: '0px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,

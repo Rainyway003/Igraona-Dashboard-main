@@ -1,7 +1,6 @@
 import React from "react";
 import {
     Button,
-    Checkbox,
     Form,
     Grid,
     Input,
@@ -17,7 +16,7 @@ import {useNavigate} from "react-router";
 
 const {useToken} = theme;
 const {useBreakpoint} = Grid;
-const {Text, Title} = Typography;
+const {Title} = Typography;
 
 export default function Login() {
     const {mutate, isLoading} = useLogin();

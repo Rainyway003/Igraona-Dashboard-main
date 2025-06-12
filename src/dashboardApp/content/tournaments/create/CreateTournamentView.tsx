@@ -58,8 +58,8 @@ const CreateTournamentView = () => {
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
         <Form layout="vertical" onFinish={onFinish}>
-        <Form.Item>
-        <div className='sticky pt-2 pr-6 pl-6 z-10 flex justify-between'>
+
+          <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
           <CreateButton
             type="primary"
             className="antbutton"
@@ -77,13 +77,14 @@ const CreateTournamentView = () => {
             Submit
           </Button>
         </div>
-      </Form.Item>
+
 
         <Content
           style={{
-            margin: '14px 14px',
+            margin: '0px 14px',
             padding: 24,
-            minHeight: 280,
+            paddingBottom: 406,
+            minHeight: 360,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}

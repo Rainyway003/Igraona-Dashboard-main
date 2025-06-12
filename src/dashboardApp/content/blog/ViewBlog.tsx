@@ -1,7 +1,9 @@
 import React from 'react';
-import {Layout, theme, Typography} from "antd";
+import {Button, Layout, theme, Typography} from "antd";
 import {useNavigate, useParams} from "react-router";
 import {useOne} from "@refinedev/core";
+import {CreateButton} from "@refinedev/antd";
+import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;
 const {Title} = Typography;
@@ -26,9 +28,21 @@ const ViewBlog = () => {
   return (
     <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
+
+          <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-start mb-4'>
+            <CreateButton
+              type="primary"
+              className="antbutton"
+              onClick={() => navigate('/blog')}
+              icon={<ArrowLeftOutlined/>}
+            >
+              Back
+            </CreateButton>
+          </div>
+
         <Content
           style={{
-            margin: '24px 16px',
+            margin: '0px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,

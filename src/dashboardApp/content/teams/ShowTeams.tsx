@@ -84,8 +84,8 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
         height: expandedRowKeys.length === 1 ? '145vh' : '10vh',
         background: '#f0f2f5'
       }}>
-        <div className='sticky top-[7px] pr-6 pl-6 z-10 flex justify-between'>
-          <CreateButton
+        <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
+        <CreateButton
             type="primary"
             className="antbutton"
             onClick={() => navigate('/tournaments')}
@@ -101,7 +101,7 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
         </div>
         <Content
           style={{
-            margin: '14px 14px',
+            margin: '0px 14px',
             marginBottom: '13px',
             padding: 24,
             background: colorBgContainer,
