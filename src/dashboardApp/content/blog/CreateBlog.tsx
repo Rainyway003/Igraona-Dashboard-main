@@ -23,7 +23,7 @@ const modules = {
 };
 
 const CreateBlog = () => {
-  const {mutate, isLoading, isSuccess, error} = useCreate();
+  const {mutate} = useCreate();
 
   const navigate = useNavigate();
   const [value, setValue] = useState('');
@@ -47,35 +47,35 @@ const CreateBlog = () => {
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
         <Form layout="vertical" onFinish={onFinish}>
-            <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
-              <CreateButton
-                type="primary"
-                className="antbutton"
-                onClick={() => navigate('/blog')}
-                icon={<ArrowLeftOutlined/>}
-              >
-                Back
-              </CreateButton>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="antbutton"
-                icon={<PlusSquareOutlined/>}
-              >
-                Submit
-              </Button>
-            </div>
+          <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
+            <CreateButton
+              type="primary"
+              className="antbutton"
+              onClick={() => navigate('/blog')}
+              icon={<ArrowLeftOutlined/>}
+            >
+              Back
+            </CreateButton>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="antbutton"
+              icon={<PlusSquareOutlined/>}
+            >
+              Submit
+            </Button>
+          </div>
 
-        <Content
-          style={{
-            margin: '0px 14px',
-            padding: 24,
-            paddingBottom: 600,
-            minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
+          <Content
+            style={{
+              margin: '0px 14px',
+              padding: 24,
+              paddingBottom: 600,
+              minHeight: 280,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
             <Form.Item label={'Title'} name="title" rules={[{required: true}]}>
               <Input placeholder="Title"/>
             </Form.Item>
@@ -84,8 +84,8 @@ const CreateBlog = () => {
                 style={{height: '300px', minWidth: '100%'}}
                 theme="snow" value={value} onChange={setValue} modules={modules}/>
             </Form.Item>
-        </Content>
-    </Form>
+          </Content>
+        </Form>
       </Layout>
     </Layout>
   )

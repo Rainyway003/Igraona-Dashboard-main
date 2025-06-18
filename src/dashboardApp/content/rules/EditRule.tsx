@@ -4,7 +4,6 @@ import {CreateButton, useForm} from "@refinedev/antd";
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router";
 import ReactQuill from "react-quill";
-import {useCreate} from "@refinedev/core";
 
 const {Content} = Layout
 
@@ -21,7 +20,7 @@ const modules = {
 };
 
 const EditRule = () => {
-  const {formProps, saveButtonProps, query} = useForm();
+  const {formProps} = useForm();
 
   const navigate = useNavigate()
   const [value, setValue] = useState('');
@@ -62,16 +61,16 @@ const EditRule = () => {
             </Button>
           </div>
 
-        <Content
-          style={{
-            margin: '0px 14px',
-            padding: 24,
-            paddingBottom: 600,
-            minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
+          <Content
+            style={{
+              margin: '0px 14px',
+              padding: 24,
+              paddingBottom: 600,
+              minHeight: 280,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
             <Form.Item label={'Ime pravila'} name="name" rules={[{required: true}]}>
               <Input placeholder="Ime pravila"/>
             </Form.Item>
@@ -80,8 +79,8 @@ const EditRule = () => {
                 style={{height: '300px', minWidth: '100%'}}
                 theme="snow" value={value} onChange={setValue} modules={modules}/>
             </Form.Item>
-        </Content>
-          </Form>
+          </Content>
+        </Form>
       </Layout>
     </Layout>
   )

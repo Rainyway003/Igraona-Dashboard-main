@@ -1,5 +1,5 @@
 import React, {PropsWithChildren, useState} from 'react';
-import {Layout, theme, Table, Avatar, Space} from 'antd';
+import {Layout, theme, Table, Avatar, Space, Input} from 'antd';
 import {EyeOutlined, ArrowLeftOutlined} from '@ant-design/icons';
 
 const {Content} = Layout;
@@ -10,14 +10,15 @@ import {useNavigate, useParams} from 'react-router';
 import ShowPlayers from "../players/ShowPlayers";
 
 interface ShowPlayersProps {
-  teamId: any;
+  children?: React.ReactNode;
 }
 
 const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
   const {id} = useParams();
 
   const [teamId, setTeamId] = React.useState<any | undefined>(undefined);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('')
 
   const navigate = useNavigate()
 
@@ -25,16 +26,15 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
 
-  const {data, isLoading} = useList({
+  const {data, isLoading} = useList<any>({
     resource: "participants",
     meta: {
       tournamentId: id,
     },
+    filters: [
+      ...(searchTerm ? [{field: "name", operator: "contains" as const, value: searchTerm}] : []),
+    ]
   })
-
-  const handleEdit = (record: any) => {
-    setTeamId(record.id)
-  };
 
   const columns = [
     {
@@ -52,7 +52,6 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
       key: 'actions',
       render: (_: any, record: any) => (
         <Space>
-          {/*<EditButton hideText size='small' resource="participants" recordItemId={record.id}/>*/}
           <DeleteButton hideText size="small" resource="participants" recordItemId={record.id} meta={{
             id: id
           }}/>
@@ -62,7 +61,7 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
   ];
 
   const handleExpand = (expanded: boolean, record: any) => {
-    const keys = expanded ? [record.id] : [];
+    const keys = expanded ? [record.id] : [] as string[];
     setExpandedRowKeys(keys)
   }
 
@@ -85,14 +84,24 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
         background: '#f0f2f5'
       }}>
         <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
-        <CreateButton
-            type="primary"
-            className="antbutton"
-            onClick={() => navigate('/tournaments')}
-            icon={<ArrowLeftOutlined/>}
-          >
-            Back
-          </CreateButton>
+          <div className={'flex gap-4'}>
+            <CreateButton
+              type="primary"
+              className="antbutton"
+              onClick={() => navigate('/tournaments')}
+              icon={<ArrowLeftOutlined/>}
+            >
+              Back
+            </CreateButton>
+            <Input
+              rootClassName={'w-96'}
+              placeholder="Search tournaments"
+              allowClear
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{marginBottom: 16}}
+            />
+          </div>
           <CreateButton
             resource="tournaments"
             className='antbutton'

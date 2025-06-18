@@ -8,12 +8,16 @@ import {useParams} from 'react-router';
 
 import BanPlayer from './BanPlayer';
 import {CreateButton, useForm} from "@refinedev/antd";
-import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
 
-const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
+interface ShowPlayersProps {
+  teamId: string;
+}
+
+const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, teamId}) => {
   const {id} = useParams();
   const [isEdit, setIsEdit] = useState<boolean>(false);
 
+  console.log(teamId, 'JPOO')
 
   const {data: tData,} = useOne({
     resource: 'tournaments',
@@ -22,16 +26,16 @@ const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
   const tournament = tData?.data
 
 
-  const {formProps, saveButtonProps, query} = useForm({
+  const {formProps} = useForm({
     resource: "participants",
-    id: id,
+    id: teamId,
     action: "edit",
     meta: {
-      teamId: teamId
+      tournamentId: id,
     },
     onMutationSuccess: () => {
-      setIsEdit(!isEdit)
-    }
+      setIsEdit(!isEdit);
+    },
   });
 
 
@@ -42,47 +46,68 @@ const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
 
   const {data, isLoading} = useOne({
     resource: "participants",
-    id: id,
+    id: teamId,
     meta: {
-      teamId: teamId,
+      tournamentId: id,
     },
-  })
-  const team = data?.data
+  });
 
-  console.log(team)
+  function getPlayersArray(teamData: any, tournament?: any) {
+    if (!teamData) return [];
+
+    const numberOfPlayers = Number(tournament?.teamSizeOptional ?? 0) + Number(tournament?.teamSizeRequired ?? 0);
+
+    const playersArray = [];
+
+    for (let i = 1; i <= numberOfPlayers; i++) {
+      const key = `player${i}`;
+      if (teamData[key]) {
+        playersArray.push(teamData[key]);
+      }
+    }
+
+    return playersArray;
+  }
+
+  const team = data?.data
 
   const handleEditClick = () => {
     setIsEdit(!isEdit)
   }
 
   const onFinish = async (values: any) => {
+    console.log("onFinish values:", values);
+    console.log("tournament:", tournament);
+
     const numberOfPlayers = Number(tournament?.teamSizeOptional ?? 0) + Number(tournament?.teamSizeRequired ?? 0);
 
-    const players = Array.from({length: numberOfPlayers}, (_, i) => {
-      const key = `player${i + 1}`;
-      return values[key] || "";
-    });
+    const playerFields: Record<string, string> = {};
+    for (let i = 0; i < numberOfPlayers; i++) {
+      playerFields[`player${i + 1}`] = values[`player${i + 1}`] || "";
+    }
 
     const teamValues = {
       name: values?.name,
       number: values?.number,
-      players
+      ...playerFields,
     };
 
-    await formProps.onFinish?.(teamValues)
+    formProps.onFinish?.(teamValues)
   }
+
+
 
   const columns = [
     {
       title: isEdit ?
-        <Form.Item className={'m-0'} name="name" initialValue={team?.name}>
+        <Form.Item className={'m-0'} name="name">
           <Input placeholder={'Ime tima'}/>
         </Form.Item>
         :
         <div>{team?.name}</div>,
       render: (_: any, record: any, index: number) => (
         isEdit ?
-          <Form.Item className={'m-0'} name={`player${index + 1}`} initialValue={record}>
+          <Form.Item className={'m-0'} name={`player${index + 1}`}>
             <Input placeholder={`${index + 1}`}/>
           </Form.Item>
           :
@@ -133,16 +158,17 @@ const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
         }
       </Form.Item>,
       key: 'actions',
-      render: (_: any, record: any) => (
+      render: (_: any, record: any, index: number) => (
         <Space>
-          {/* <DeleteButton hideText size="small" resource="tournaments" recordItemId={record.id} /> */}
-          {isEdit ?
-            null
-            :
-            <BanPlayer player={record}></BanPlayer>
-          }
+          {!isEdit && (
+            <BanPlayer
+              player={record}
+              teamId={teamId}
+              tournamentId={id}
+            />
+          )}
         </Space>
-      ),
+      )
     },
   ];
 
@@ -163,8 +189,11 @@ const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
 
           <Table
             loading={isLoading}
-            dataSource={isEdit ? data?.data.players : data?.data.players.filter((player) => !isBlank(player))}
-            columns={columns}
+            dataSource={
+              isEdit
+                ? getPlayersArray(data?.data, tournament)
+                : getPlayersArray(data?.data, tournament).filter((p) => !isBlank(p))
+            }            columns={columns}
             rowKey="id"
             pagination={false}
             onRow={(record) => ({
@@ -188,7 +217,7 @@ const ShowPlayers: React.FC<PropsWithChildren<{}>> = ({children, teamId}) => {
   );
 };
 
-function isBlank(str) {
+function isBlank(str: string) {
   return (!str || /^\s*$/.test(str));
 }
 

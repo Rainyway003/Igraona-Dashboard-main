@@ -14,8 +14,8 @@ import {BrowserRouter, Route, Routes} from "react-router";
 import dataProvider from './dashboardApp/providers/data-provider'
 import ShowTournaments from "./dashboardApp/content/tournaments/ShowTournaments";
 import Home from "./dashboardApp/content/Home";
-import CreateTournamentView from "./dashboardApp/content/tournaments/create/CreateTournamentView";
-import EditTournament from "./dashboardApp/content/tournaments/edit/EditT";
+import CreateTournamentView from "./dashboardApp/content/tournaments/CreateTournamentView";
+import EditTournament from "./dashboardApp/content/tournaments/EditT";
 import {resources} from "./dashboardApp/config/resources";
 import AppLayout from "./dashboardApp/components/AppLayout/AppLayout";
 import ShowTeams from "./dashboardApp/content/teams/ShowTeams";
@@ -25,12 +25,12 @@ import LandingApp from "./landingPage/LandingApp"
 import SignUpScreen from "./landingPage/landingTournaments/SignUpScreen";
 import ShowTLanding from "./landingPage/landingTournaments/ShowTLanding";
 import ShowPlayers from "./dashboardApp/content/players/ShowPlayers";
-import CreateTeam from "./dashboardApp/content/teams/create/CreateTeam";
-import EditTeam from "./dashboardApp/content/teams/edit/EditTeam";
+import CreateTeam from "./dashboardApp/content/teams/CreateTeam";
+import EditTeam from "./dashboardApp/content/teams/EditTeam";
 import ShowGames from "./dashboardApp/content/games/ShowGames";
-import CreateGame from "./dashboardApp/content/games/create/CreateGame";
+import CreateGame from "./dashboardApp/content/games/CreateGame";
 import ShowBanned from "./dashboardApp/content/banned/ShowBanned";
-import CreateBan from "./dashboardApp/content/banned/create/CreateBan";
+import CreateBan from "./dashboardApp/content/banned/CreateBan";
 import Playstation from "./landingPage/components/rezerviranje/Playstation";
 import ShowBlogs from "./dashboardApp/content/blog/ShowBlogs";
 import CreateBlog from "./dashboardApp/content/blog/CreateBlog";

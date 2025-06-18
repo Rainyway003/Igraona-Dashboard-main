@@ -8,10 +8,10 @@ import {useList} from "@refinedev/core"
 import {CreateButton, DeleteButton, EditButton, useSelect} from '@refinedev/antd';
 import {useNavigate} from 'react-router';
 
-const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
+const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
   const navigate = useNavigate()
 
-  const [selectedGame, setSelectedGame] = useState<string | undefined>(undefined);
+  const [selectedGame] = useState<string | undefined>(undefined);
   const [sorters, setSorters] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -27,14 +27,14 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
 
-  const {data, isLoading} = useList({
+  const {data, isLoading} = useList<any>({
     resource: "tournaments",
     meta: {
       tournamentId,
     },
     filters: [
-      ...(selectedGame ? [{field: "game", operator: "contains", value: selectedGame}] : []),
-      ...(searchTerm ? [{field: "name", operator: "contains", value: searchTerm}] : []),
+      ...(selectedGame ? [{field: "game", operator: "contains" as const, value: selectedGame}] : []),
+      ...(searchTerm ? [{field: "name", operator: "contains" as const, value: searchTerm}] : []),
     ],
     sorters: sorters,
     queryOptions: {
@@ -68,7 +68,7 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
         value: option.value,
       })),
       filterMultiple: false,
-      onFilter: (value, record) => record.game === value,
+      onFilter: (value: any, record: { game: any; }) => record.game === value,
     },
     {
       title: 'Prijave',
@@ -109,6 +109,28 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
       render: (_: any, record: any) => (
         <Space>
           {record.endingAt.toDate().toLocaleString()}
+        </Space>
+      ),
+    },
+    {
+      title: 'Početak Prijava',
+      dataIndex: 'signUpStartingAt',
+      key: 'signUpStartingAt',
+      sorter: true,
+      render: (_: any, record: any) => (
+        <Space>
+          {record.signUpStartingAt.toDate().toLocaleString()}
+        </Space>
+      ),
+    },
+    {
+      title: 'Kraj Prijava',
+      dataIndex: 'signUpEndingAt',
+      key: 'signUpEndingAt',
+      sorter: true,
+      render: (_: any, record: any) => (
+        <Space>
+          {record.signUpEndingAt.toDate().toLocaleString()}
         </Space>
       ),
     },
@@ -164,7 +186,7 @@ const ShowTournaments: React.FC<PropsWithChildren<{}>> = ({children}) => {
             columns={columns}
             rowKey="id"
             pagination={{
-              pageSize: 5,
+              pageSize: 10,
               position: ['bottomCenter'],
             }}
             onChange={(pagination, filters, sorter) => {

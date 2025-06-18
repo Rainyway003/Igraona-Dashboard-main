@@ -1,18 +1,21 @@
-import React from 'react'
-import {Layout, List, Space, Table, theme, Typography} from "antd";
+import React, {useState} from 'react'
+import {Input, Layout, Space, Table, theme} from "antd";
 import {useNavigate} from "react-router";
 import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useList} from "@refinedev/core";
 import {EyeOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;
-const {Title} = Typography;
 
 const ShowBlogs = () => {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const {data, isLoading} = useList({
+  const {data, isLoading} = useList<any>({
     resource: "blog",
+    filters: [
+      ...(searchTerm ? [{field: "title", operator: "contains" as const, value: searchTerm}] : []),
+    ]
   });
 
 
@@ -49,14 +52,20 @@ const ShowBlogs = () => {
     <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
-        <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-end mb-4'>
+        <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
+          <Input
+            rootClassName={'w-96'}
+            placeholder="Search tournaments"
+            allowClear
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{marginBottom: 16}}
+          />
           <CreateButton
-            type="primary"
-            className="antbutton"
+            className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
+            resource="tournaments"
             onClick={() => navigate('/blog/new')}
-          >
-            Create
-          </CreateButton>
+          />
         </div>
 
         <Content
@@ -83,12 +92,6 @@ const ShowBlogs = () => {
       </Layout>
     </Layout>
   )
-}
-
-function BlogPost({blog}) {
-  return (
-    <div dangerouslySetInnerHTML={{__html: blog}}/>
-  );
 }
 
 export default ShowBlogs

@@ -1,5 +1,5 @@
 import React, {FC, useState} from 'react'
-import {Avatar, Layout, List, Space, Table, theme} from "antd";
+import {Input, Layout, Space, Table, theme} from "antd";
 import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useNavigate} from 'react-router';
 import {useList} from "@refinedev/core";
@@ -9,10 +9,14 @@ const {Content} = Layout;
 
 const ShowRules: FC = () => {
   const navigate = useNavigate();
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const {data, isLoading} = useList({
+  const {data, isLoading} = useList<any>({
     resource: "rules",
+    filters: [
+      ...(searchTerm ? [{field: "name", operator: "contains" as const, value: searchTerm}] : []),
+    ]
   });
 
   const rule = data?.data;
@@ -43,7 +47,7 @@ const ShowRules: FC = () => {
     },
   ];
 
-  const handleExpand = (expanded: boolean, record: any) => {
+  const handleExpand = (expanded: boolean, record: { id: number }) => {
     const keys = expanded ? [record.id] : [];
     setExpandedRowKeys(keys)
   }
@@ -63,14 +67,20 @@ const ShowRules: FC = () => {
 
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
-        <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-end mb-4'>
+        <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
+          <Input
+            rootClassName={'w-96'}
+            placeholder="Search tournaments"
+            allowClear
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{marginBottom: 16}}
+          />
           <CreateButton
-            type="primary"
-            className="antbutton"
+            className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
+            resource="tournaments"
             onClick={() => navigate('/rules/new')}
-          >
-            Create
-          </CreateButton>
+          />
         </div>
 
         <Content
@@ -98,12 +108,6 @@ const ShowRules: FC = () => {
       </Layout>
     </Layout>
   )
-}
-
-function BlogPost({rule}) {
-  return (
-    <div dangerouslySetInnerHTML={{__html: rule}}/>
-  );
 }
 
 export default ShowRules

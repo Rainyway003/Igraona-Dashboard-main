@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { useCreate } from '@refinedev/core';
-import { Form } from 'antd';
+import {useState} from "react";
+import {useCreate} from '@refinedev/core';
+import {Form} from 'antd';
 import Pozadina from '../../assets/10i.png';
 import '../../../App.css';
 import '../../index.css';
-import { CircularProgress, IconButton } from '@mui/material';
+import {CircularProgress, IconButton} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FormInput from '../forms/FormInput';
-import CalendarComponent from '../Calendar';
-import { ConfigProvider } from 'antd';
-import { Dayjs } from 'dayjs';
+import {ConfigProvider} from 'antd';
+import {Dayjs} from 'dayjs';
+import CalendarComponent from '../Calendar'
 
 function Playstation() {
-  const { mutate, isLoading: loading } = useCreate();
+  const {mutate, isLoading: loading} = useCreate();
 
   const [rules, setRules] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,13 +75,14 @@ function Playstation() {
           }}>
           <div className={'flex flex-col items-center justify-center'}>
             <h1 className='text-4xl md:text-6xl font-[1000] text-[#8D151F] uppercase mb-2'>Rezerviraj Plejku</h1>
-            <button className='text-2xl md:text-4xl mb-8 underline text-white' onClick={() => setRules(true)}>Pravila</button>
+            <button className='text-2xl md:text-4xl mb-8 underline text-white' onClick={() => setRules(true)}>Pravila
+            </button>
             {error && <p className='w-screen px-4 text-2xl text-amber-300 mb-4 text-center'>{error}</p>}
 
             <Form form={form} className='flex flex-col items-center w-[50%] gap-3' onFinish={onFinish}>
               <div className='mt-40'>A</div>
-              <FormInput placeholder={'Ime i Prezime'} name={'name'} type={'text'} required={true} />
-              <FormInput placeholder={'Kontakt'} name={'number'} type={'number'} required={true} />
+              <FormInput placeholder={'Ime i Prezime'} name={'name'} type={'text'} required={true}/>
+              <FormInput placeholder={'Kontakt'} name={'number'} type={'number'} required={true}/>
 
               <ConfigProvider
                 theme={{
@@ -121,7 +122,7 @@ function Playstation() {
       {/* Modal loading i complete */}
       {loading && (
         <div className='fixed top-0 left-0 w-screen h-svh z-50 bg-black flex flex-col justify-center items-center'>
-          <CircularProgress className='!text-[#8D151F] !h-12 !w-12 md:!h-24 md:!w-24' />
+          <CircularProgress className='!text-[#8D151F] !h-12 !w-12 md:!h-24 md:!w-24'/>
           <h4 className='text-4xl md:text-6xl font-[1000] text-[#8D151F] mt-8 text-center'>Rezervirate Plejku...</h4>
         </div>
       )}
@@ -131,7 +132,7 @@ function Playstation() {
           <h4 className='text-4xl md:text-6xl font-[1000] text-[#8D151F] text-center mb-8'>Rezervirali ste Plejku</h4>
           <h4 className='text-2xl md:text-4xl text-white text-center'>Očekujte poziv za potvrdu.</h4>
           <IconButton className='!mt-8' onClick={() => setComplete(null)}>
-            <CloseIcon className='!text-white' />
+            <CloseIcon className='!text-white'/>
           </IconButton>
         </div>
       )}

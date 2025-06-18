@@ -1,19 +1,17 @@
 import React, {useState} from 'react'
 import {Avatar, Button, Form, Input, Layout, theme} from 'antd'
 import {CreateButton} from "@refinedev/antd";
-import {ArrowLeftOutlined, PlusSquareOutlined, SaveOutlined} from "@ant-design/icons";
-import {useNavigate, useParams} from "react-router";
+import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
+import {useNavigate} from "react-router";
 import {useForm} from "@refinedev/antd";
 
 const {Content} = Layout;
 
 const EditGame = () => {
-  const {formProps, saveButtonProps, query, formLoading} = useForm({
+  const {formProps} = useForm({
     resource: 'games',
   });
-  console.log(formProps)
   const navigate = useNavigate();
-  const {id} = useParams();
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined)
 
   const uploadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,16 +51,16 @@ const EditGame = () => {
 
           </div>
 
-        <Content
-          style={{
-            margin: '0px 14px',
-            padding: 24,
-            paddingBottom: 730,
-            minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
+          <Content
+            style={{
+              margin: '0px 14px',
+              padding: 24,
+              paddingBottom: 730,
+              minHeight: 280,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
             <Form.Item
               label={"Ime igre"}
               name={'name'}
@@ -76,7 +74,7 @@ const EditGame = () => {
               <Input type={'file'} onChange={uploadFile}/>
             </Form.Item>
             <Avatar src={imageUrl} size={100}/>
-        </Content>
+          </Content>
         </Form>
       </Layout>
     </Layout>

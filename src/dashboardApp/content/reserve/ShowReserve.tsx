@@ -1,7 +1,6 @@
 import React, {FC, useState} from 'react'
-import {ConfigProvider, Layout, Space, Table, theme} from "antd";
+import {ConfigProvider, Input, Layout, Space, Table, theme} from "antd";
 import {DeleteButton} from "@refinedev/antd";
-import {useNavigate} from 'react-router';
 import {useList} from "@refinedev/core";
 import CalendarSmall from "./CalendarSmall";
 import {Dayjs} from "dayjs";
@@ -9,18 +8,21 @@ import {Dayjs} from "dayjs";
 const {Content} = Layout;
 
 const ShowReserve: FC = () => {
-  const navigate = useNavigate()
 
   const [sorters, setSorters] = useState([]);
   const [selectedDates, setSelectedDates] = useState<Dayjs[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
 
-  const {data, isLoading} = useList({
+  const {data, isLoading} = useList<any>({
     resource: "reserve",
     sorters: sorters,
+    filters: [
+      ...(searchTerm ? [{field: "name", operator: "contains" as const, value: searchTerm}] : []),
+    ]
   })
 
   console.log("Sorteri:", sorters);
@@ -67,10 +69,20 @@ const ShowReserve: FC = () => {
   return (
     <Layout style={{height: '100vh', overflowX: 'hidden', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
+        <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
+          <Input
+            rootClassName={'w-96'}
+            placeholder="Search tournaments"
+            allowClear
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{marginBottom: 16}}
+          />
+        </div>
         <Content
           style={{
             margin: '0px 14px',
-            marginTop: '48px',
+            marginTop: '0px',
             padding: 24,
             minHeight: 1235,
             background: colorBgContainer,
@@ -100,33 +112,33 @@ const ShowReserve: FC = () => {
           />
 
           <div
-className='pb-10'
-            >
-          <ConfigProvider
-            theme={{
-              token: {
-                colorBgBase: '#000000',
-                colorBgContainer: '#2a2929',
-                colorPrimary: '#8D151F',
-                controlItemBgActive: '#000000',
-                colorText: '#ffffff',
-                colorBgTextActive: '#ffffff',
-                colorBgDisabled: '#ffffff',
-                colorTextDisabled: '#605e5e',
-                textsecondary: '#ffffff',
-              },
-              components: {
-                Calendar: {
-                  fullBg: '#000000', fullPanelBg: '#2a2929'
-                }
-              }
-            }}
+            className='pb-10'
           >
-            <CalendarSmall
-              selectedDates={selectedDates}
-              setSelectedDates={setSelectedDates}
-            />
-          </ConfigProvider>
+            <ConfigProvider
+              theme={{
+                token: {
+                  colorBgBase: '#000000',
+                  colorBgContainer: '#2a2929',
+                  colorPrimary: '#8D151F',
+                  controlItemBgActive: '#000000',
+                  colorText: '#ffffff',
+                  colorBgTextActive: '#ffffff',
+                  colorBgContainerDisabled: '#ffffff',
+                  colorTextDisabled: '#605e5e',
+                  colorTextSecondary: '#ffffff',
+                },
+                components: {
+                  Calendar: {
+                    fullBg: '#000000', fullPanelBg: '#2a2929'
+                  }
+                }
+              }}
+            >
+              <CalendarSmall
+                selectedDates={selectedDates}
+                setSelectedDates={setSelectedDates}
+              />
+            </ConfigProvider>
           </div>
         </Content>
       </Layout>

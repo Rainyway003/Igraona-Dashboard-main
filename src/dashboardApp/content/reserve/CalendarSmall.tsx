@@ -1,8 +1,8 @@
 import {Calendar, Tooltip} from 'antd';
-import type { Dayjs } from 'dayjs';
+import type {Dayjs} from 'dayjs';
 import dayjs from 'dayjs';
-import { useEffect, useMemo } from 'react';
-import { useList } from '@refinedev/core';
+import {useEffect, useMemo} from 'react';
+import {useList} from '@refinedev/core';
 
 interface CalendarComponentProps {
   selectedDates: Dayjs[];
@@ -10,10 +10,10 @@ interface CalendarComponentProps {
 }
 
 const CalendarSmall: React.FC<CalendarComponentProps> = ({
-                                                               selectedDates,
-                                                               setSelectedDates,
-                                                             }) => {
-  const { data: reservedData } = useList({
+                                                           selectedDates,
+                                                           setSelectedDates,
+                                                         }) => {
+  const {data: reservedData} = useList({
     resource: 'reserve',
   });
 
@@ -49,7 +49,6 @@ const CalendarSmall: React.FC<CalendarComponentProps> = ({
   };
 
 
-
   console.log(reservedData?.data);
 
 
@@ -61,16 +60,16 @@ const CalendarSmall: React.FC<CalendarComponentProps> = ({
 
   return (
     <Calendar
-        style={{
-          width: '100%',
-          maxWidth: '1000px',
-          height: '20%',
-          margin: '0 auto',
-          padding: '16px',
-          borderRadius: '10px',
-          paddingRight: '100px',
-          marginTop: '16px',
-        }}
+      style={{
+        width: '100%',
+        maxWidth: '1000px',
+        height: '20%',
+        margin: '0 auto',
+        padding: '16px',
+        borderRadius: '10px',
+        paddingRight: '100px',
+        marginTop: '16px',
+      }}
 
       fullscreen={true}
       onSelect={onSelect}
@@ -84,7 +83,7 @@ const CalendarSmall: React.FC<CalendarComponentProps> = ({
         const isReserved = reservedDates.includes(formatted);
         const isSelected = selectedDates.some((d) => d.isSame(date, 'day'));
 
-        let style: React.CSSProperties = {
+        const style: React.CSSProperties = {
           width: '50%',
           height: '40%',
           display: 'flex',

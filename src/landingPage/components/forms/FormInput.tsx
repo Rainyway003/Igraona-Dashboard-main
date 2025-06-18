@@ -45,8 +45,10 @@ const FormInput: React.FC<FormInputProps> = ({
       >
         <div className="bg-[#181818] rounded flex items-center w-full  focus-within:ring-2 focus-within:ring-[#8D151F]">
           <Input
+            name={name}
             type={type}
             placeholder={placeholder}
+            onChange={handleChange}
             className="bg-[#181818] w-[512px] text-[#9CA3AF] placeholder:text-[#9CA3AF] px-4 py-3 rounded russo "
             variant="borderless"
             size="large"

@@ -5,7 +5,6 @@ import 'react-quill/dist/quill.snow.css';
 import {CreateButton, useForm} from "@refinedev/antd";
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import {useNavigate} from 'react-router';
-import {useCreate} from "@refinedev/core";
 import '../../../App.css'
 
 const {Content} = Layout;
@@ -23,7 +22,7 @@ const modules = {
 };
 
 const EditBlog = () => {
-  const {formProps, saveButtonProps, query} = useForm();
+  const {formProps} = useForm();
 
   const navigate = useNavigate();
   const [value, setValue] = useState('');
@@ -65,16 +64,16 @@ const EditBlog = () => {
 
           </div>
 
-        <Content
-          style={{
-            margin: '0px 14px',
-            padding: 24,
-            paddingBottom: 600,
-            minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
+          <Content
+            style={{
+              margin: '0px 14px',
+              padding: 24,
+              paddingBottom: 600,
+              minHeight: 280,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
             <Form.Item label={'Title'} name="title" rules={[{required: true}]}>
               <Input placeholder="Title"/>
             </Form.Item>
@@ -83,7 +82,7 @@ const EditBlog = () => {
                 style={{height: '300px', minWidth: '100%'}}
                 theme="snow" value={value} onChange={setValue} modules={modules}/>
             </Form.Item>
-        </Content>
+          </Content>
         </Form>
       </Layout>
     </Layout>
