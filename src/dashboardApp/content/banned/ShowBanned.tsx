@@ -54,7 +54,7 @@ const ShowBanned: FC = () => {
         <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
           <Input
             rootClassName={'w-96'}
-            placeholder="Search tournaments"
+            placeholder="Search bans"
             allowClear
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

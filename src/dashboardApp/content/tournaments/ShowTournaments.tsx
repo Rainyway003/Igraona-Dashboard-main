@@ -42,9 +42,6 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
     },
   });
 
-  console.log("Sorteri:", sorters);
-  console.log('ev', selectProps)
-
   const columns = [
     {
       title: 'Avatar',
@@ -157,22 +154,24 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
         <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
           <Input
             rootClassName={'w-96'}
+            className='shadow-md'
             placeholder="Search tournaments"
             allowClear
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{marginBottom: 16}}
+            style={{marginBottom: 12, marginTop: 12}}
           />
           <CreateButton
             className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
             resource="tournaments"
             onClick={() => navigate('/tournaments/new')}
+            style={{marginBottom: 12, marginTop: 12}}
           />
         </div>
 
         <Content
           style={{
-            margin: '0px 14px',
+            margin: '14px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,

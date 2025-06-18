@@ -149,12 +149,10 @@ const dataProvider: DataProvider = {
           if (existingBans.empty) {
             await addDoc(bannedRef, {
               faceit: oldData[key],
-              reason: "Automatski banovan kroz update",
               timestamp: new Date()
             });
           }
 
-          // Obriši polje skroz, ne postavljaj ""
           updates[key] = deleteField();
         }
       }
@@ -188,7 +186,6 @@ const dataProvider: DataProvider = {
     if (
       resource === "tournaments" ||
       resource === "games" ||
-      resource === "banned" ||
       resource === "rules" ||
       resource === "blog"
     ) {
@@ -200,21 +197,25 @@ const dataProvider: DataProvider = {
       };
     }
 
-    if (resource === "participants") {
-      const docRef = doc(db, "tournaments", String(meta?.id), resource, String(id));
-      const documentRef = doc(db, "tournaments", String(meta?.id));
-
-      await updateDoc(documentRef, {
-        numberOfParticipants: increment(-1),
+    if (resource === "participants" && meta?.fieldToDelete && meta?.tournamentId) {
+      const docRef = doc(db, "tournaments", String(meta.tournamentId), resource, String(id));
+      await updateDoc(docRef, {
+        [meta.fieldToDelete]: deleteField(),
       });
-
-      await deleteDoc(docRef);
-
-      return {
-        data: {id} as TData,
-      };
+      return { data: null };
     }
+
+    if (resource === "participants") {
+      const docRef = doc(db, "tournaments", String(meta.tournamentId), resource, String(id));
+      await deleteDoc(docRef);
+      return {data: {id} as TData};
+    }
+
+    const docRef = doc(db, resource, String(id));
+    await deleteDoc(docRef);
+    return { data: null };
   },
+
 
   getOne: async ({
                    resource,

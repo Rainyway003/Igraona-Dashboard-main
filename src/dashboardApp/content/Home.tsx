@@ -14,7 +14,7 @@ const Home: React.FC = () => {
         <Content
           style={{
             margin: '0px 14px',
-            marginTop: '48px',
+            marginTop: '70px',
             padding: 24,
             minHeight: 360,
             background: colorBgContainer,

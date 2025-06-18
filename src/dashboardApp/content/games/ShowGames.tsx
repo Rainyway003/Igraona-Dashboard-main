@@ -34,11 +34,6 @@ const ShowGames: FC = () => {
       key: 'name',
     },
     {
-      title: 'Id',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
       title: 'Akcije',
       key: 'actions',
       render: (_: any, record: any) => (
@@ -57,7 +52,7 @@ const ShowGames: FC = () => {
         <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
           <Input
             rootClassName={'w-96'}
-            placeholder="Search tournaments"
+            placeholder="Search games"
             allowClear
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

@@ -195,20 +195,6 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
                 : getPlayersArray(data?.data, tournament).filter((p) => !isBlank(p))
             }            columns={columns}
             rowKey="id"
-            pagination={false}
-            onRow={(record) => ({
-              onClick: (event) => {
-                const target = event.target as HTMLElement;
-                if (
-                  target.closest('button') ||
-                  target.closest('input') ||
-                  target.closest('.ant-modal')
-                ) {
-                  return;
-                }
-                window.location.replace(`${record.name}`)
-              },
-            })}
           />
           {children}
         </Content>

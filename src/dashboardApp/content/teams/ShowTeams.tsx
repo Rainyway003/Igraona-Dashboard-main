@@ -16,7 +16,6 @@ interface ShowPlayersProps {
 const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
   const {id} = useParams();
 
-  const [teamId, setTeamId] = React.useState<any | undefined>(undefined);
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -52,8 +51,12 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
       key: 'actions',
       render: (_: any, record: any) => (
         <Space>
-          <DeleteButton hideText size="small" resource="participants" recordItemId={record.id} meta={{
-            id: id
+          <DeleteButton   hideText
+                          size="small"
+                          resource="participants"
+                          recordItemId={record.id}
+                          meta={{
+                            tournamentId: id
           }}/>
         </Space>
       ),
@@ -90,28 +93,29 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
               className="antbutton"
               onClick={() => navigate('/tournaments')}
               icon={<ArrowLeftOutlined/>}
+              style={{marginBottom: 10, marginTop: 10}}
             >
               Back
             </CreateButton>
             <Input
               rootClassName={'w-96'}
-              placeholder="Search tournaments"
+              placeholder="Search teams"
               allowClear
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{marginBottom: 16}}
+              style={{marginBottom: 10, marginTop: 10}}
             />
           </div>
           <CreateButton
             resource="tournaments"
             className='antbutton'
             onClick={() => navigate(`/tournaments/${id}/new`)}
+            style={{marginBottom: 10, marginTop: 10}}
           />
         </div>
         <Content
           style={{
-            margin: '0px 14px',
-            marginBottom: '13px',
+            margin: '2px 14px',
             padding: 24,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
