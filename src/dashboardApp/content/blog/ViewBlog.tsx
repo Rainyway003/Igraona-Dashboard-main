@@ -29,12 +29,13 @@ const ViewBlog = () => {
     <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
-        <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-start mb-4'>
+        <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-start'>
           <CreateButton
             type="primary"
             className="antbutton"
             onClick={() => navigate('/blog')}
             icon={<ArrowLeftOutlined/>}
+            style={{marginBottom: 12, marginTop: 12}}
           >
             Back
           </CreateButton>
@@ -42,7 +43,7 @@ const ViewBlog = () => {
 
         <Content
           style={{
-            margin: '0px 14px',
+            margin: '14px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,

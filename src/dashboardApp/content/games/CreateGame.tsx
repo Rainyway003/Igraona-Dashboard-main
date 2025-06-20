@@ -1,9 +1,11 @@
 import React, {FC} from 'react'
 import {Avatar, Button, Form, Input, Layout, theme} from 'antd'
-import {useCreate} from "@refinedev/core";
-import {useNavigate} from "react-router";
-import {CreateButton} from "@refinedev/antd";
-import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
+import {useCreate} from "@refinedev/core"
+import {useNavigate} from "react-router"
+import {CreateButton} from "@refinedev/antd"
+import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons"
+import {storage} from '../../providers/firebase'
+import {ref, uploadBytes, getDownloadURL} from 'firebase/storage'
 
 const {Content} = Layout
 
@@ -13,34 +15,48 @@ const CreateGame: FC = () => {
 
   const {
     token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
+  } = theme.useToken()
 
   const [imageUrl, setImageUrl] = React.useState<string | undefined>(undefined)
+  const [imageFile, setImageFile] = React.useState<File | undefined>(undefined)
 
   const uploadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setImageUrl(URL.createObjectURL(event.target.files[0]))
+      const file = event.target.files[0]
+      setImageFile(file)
+      setImageUrl(URL.createObjectURL(file))
     }
   }
-  console.log(imageUrl)
 
-  const onFinish = (values: { name: string; imageUrl: string }) => {
-    mutate({
+  const onFinish = async (values: { name: string }) => {
+    try {
+      if (!imageFile) {
+        throw new Error("Image file is required")
+      }
+
+      const storageRef = ref(storage, `games/${Date.now()}_${imageFile.name}`)
+      await uploadBytes(storageRef, imageFile)
+      const downloadURL = await getDownloadURL(storageRef)
+
+      mutate({
         resource: 'games',
         values: {
           name: values.name,
-          imageUrl: values.imageUrl,
+          imageUrl: downloadURL,
         },
-      }
-    )
-    navigate('/games')
+      })
+
+      navigate('/games')
+    } catch (error) {
+      console.error("Upload failed:", error)
+    }
   }
 
   return (
-    <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
+    <Layout className="h-screen overflow-y-hidden" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
         <Form layout="vertical" onFinish={onFinish}>
-          <div className='sticky top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
+          <div className='sticky top-[19px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
             <CreateButton
               type="primary"
               className="antbutton"
@@ -63,6 +79,7 @@ const CreateGame: FC = () => {
               margin: '0px 14px',
               padding: 24,
               paddingBottom: 730,
+              marginTop: 38,
               minHeight: 280,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
@@ -77,12 +94,11 @@ const CreateGame: FC = () => {
             </Form.Item>
             <Form.Item
               label={"Slika igre"}
-              name={'imageUrl'}
               rules={[{required: true}]}
             >
               <Input type={'file'} onChange={uploadFile}/>
             </Form.Item>
-            <Avatar src={imageUrl} size={100}/>
+            {imageUrl && <Avatar src={imageUrl} size={100}/>}
           </Content>
         </Form>
       </Layout>

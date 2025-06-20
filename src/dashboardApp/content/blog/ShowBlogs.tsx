@@ -56,21 +56,23 @@ const ShowBlogs = () => {
           <Input
             rootClassName={'w-96'}
             placeholder="Search blogs"
+            className='shadow-md'
             allowClear
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{marginBottom: 16}}
+            style={{marginBottom: 12, marginTop: 12}}
           />
           <CreateButton
             className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
             resource="tournaments"
             onClick={() => navigate('/blog/new')}
+            style={{marginBottom: 12, marginTop: 12}}
           />
         </div>
 
         <Content
           style={{
-            margin: '0px 14px',
+            margin: '14px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,

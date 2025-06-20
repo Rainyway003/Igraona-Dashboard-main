@@ -23,7 +23,7 @@ const CreateTournamentView = () => {
   const {selectProps} = useSelect({
     resource: 'games',
     optionLabel: "name",
-    optionValue: "name",
+    optionValue: "id",
   })
 
   const {selectProps: ruleProps} = useSelect({
@@ -46,6 +46,9 @@ const CreateTournamentView = () => {
       resource: 'tournaments',
       values: cleanObject({
         ...values,
+        teamSizeRequired: Number(values.teamSizeRequired),
+        teamSizeOptional: Number(values.teamSizeOptional),
+        maxNumberOfParticipants: Number(values.maxNumberOfParticipants),
         startingAt: values.startingAt[0].$d,
         endingAt: values.startingAt[1].$d,
         signUpStartingAt: values.signUpStartingAt[0].$d,
@@ -58,12 +61,12 @@ const CreateTournamentView = () => {
 
 
   return (
-    <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
+    <Layout className="h-screen overflow-y-hidden" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
         <Form layout="vertical" onFinish={onFinish}>
 
-          <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
+          <div className='sticky w-full top-[19px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
             <CreateButton
               type="primary"
               className="antbutton"
@@ -96,9 +99,10 @@ const CreateTournamentView = () => {
 
           <Content
             style={{
-              margin: '0px 14px',
+              margin: '0px 14px 14px',
               padding: 24,
               paddingBottom: 406,
+              marginTop: 38,
               minHeight: 360,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,

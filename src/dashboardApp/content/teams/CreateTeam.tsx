@@ -55,7 +55,7 @@ const CreateTeam = () => {
       values: cleanObject({
         ...values,
         ...playerFields,
-        id: tournament?.id,
+        tournamentId: id,
       })
     });
     navigate(`/tournaments/${id}`);

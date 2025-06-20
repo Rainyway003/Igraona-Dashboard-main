@@ -25,7 +25,6 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
   })
   const tournament = tData?.data
 
-
   const {formProps} = useForm({
     resource: "participants",
     id: teamId,
@@ -61,14 +60,14 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
 
     for (let i = 1; i <= numberOfPlayers; i++) {
       const key = `player${i}`;
-      if (teamData[key]) {
-        playersArray.push(teamData[key]);
-      }
+      playersArray.push(teamData[key] ?? null); // Use null if the field doesn't exist
     }
 
     return playersArray;
   }
 
+
+  console.log(getPlayersArray(data?.data, tournament))
   const team = data?.data
 
   const handleEditClick = () => {
@@ -94,7 +93,6 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
 
     formProps.onFinish?.(teamValues)
   }
-
 
 
   const columns = [
@@ -193,7 +191,8 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
               isEdit
                 ? getPlayersArray(data?.data, tournament)
                 : getPlayersArray(data?.data, tournament).filter((p) => !isBlank(p))
-            }            columns={columns}
+            }
+            columns={columns}
             rowKey="id"
           />
           {children}

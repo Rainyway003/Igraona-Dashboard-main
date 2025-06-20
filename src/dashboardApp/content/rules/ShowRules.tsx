@@ -63,7 +63,7 @@ const ShowRules: FC = () => {
   };
 
   return (
-    <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
+    <Layout className="h-screen overflow-hidden" style={{display: 'flex', flexDirection: 'row'}}>
 
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
@@ -71,21 +71,23 @@ const ShowRules: FC = () => {
           <Input
             rootClassName={'w-96'}
             placeholder="Search rules"
+            className='shadow-md'
             allowClear
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{marginBottom: 16}}
+            style={{marginBottom: 12, marginTop: 12}}
           />
           <CreateButton
             className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
             resource="tournaments"
             onClick={() => navigate('/rules/new')}
+            style={{marginBottom: 12, marginTop: 12}}
           />
         </div>
 
         <Content
           style={{
-            margin: '0px 14px',
+            margin: '14px 14px',
             padding: 24,
             minHeight: 280,
             background: colorBgContainer,

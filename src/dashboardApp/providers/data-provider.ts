@@ -38,18 +38,34 @@ const dataProvider: DataProvider = {
     filters?: any
   }): Promise<{ data: any, total: number }> => {
     if (resource === "participants" && meta?.id) {
-      const teamsDoc = collection(db, "tournaments", String(meta.id), resource);
-      const teamsSnap = await getDocs(teamsDoc);
+      const teamsCollection = collection(db, "tournaments", String(meta.id), resource);
+
+      const constraints: any[] = [];
+
+      if (filters && filters.length > 0) {
+        filters.forEach((filter: any) => {
+          const {field, operator, value} = filter;
+
+          if (operator === "contains") {
+            constraints.push(where(field, ">=", value));
+            constraints.push(where(field, "<=", value + "\uf8ff"));
+          } else if (operator === "eq") {
+            constraints.push(where(field, "==", value));
+          }
+        });
+      }
+
+      const teamsQuery = constraints.length > 0 ? query(teamsCollection, ...constraints) : teamsCollection;
+      const teamsSnap = await getDocs(teamsQuery);
 
       const teams = teamsSnap.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       }));
 
-      console.log(teams, 'eo dragi')
-
       return {data: teams, total: teams.length};
     }
+
 
     const turnirDoc = collection(db, resource);
 
@@ -111,11 +127,11 @@ const dataProvider: DataProvider = {
 
     if (resource === "participants") {
       const docRef = await addDoc(
-        collection(db, "tournaments", variables.id, resource),
+        collection(db, "tournaments", variables.tournamentId, resource),
         variables as WithFieldValue<DocumentData>
       );
 
-      const turnirDoc = doc(db, "tournaments", variables.id);
+      const turnirDoc = doc(db, "tournaments", variables.tournamentId);
       await updateDoc(turnirDoc, {
         numberOfParticipants: increment(1),
       });
@@ -132,10 +148,11 @@ const dataProvider: DataProvider = {
   },
 
   update: async <TData = any, TVariables = DocumentData>(
-    { resource, id, variables, meta }: UpdateParams<TVariables>
+    {resource, id, variables, meta}: UpdateParams<TVariables>
   ): Promise<CreateResponse<TData>> => {
     if (resource === "participants") {
-      const teamRef = doc(db, "tournaments", String(id), "participants", String(meta?.teamId));
+      console.log(meta)
+      const teamRef = doc(db, "tournaments", String(meta?.tournamentId), "participants", String(id));
       const teamSnap = await getDoc(teamRef);
       const oldData = teamSnap.data();
 
@@ -170,7 +187,7 @@ const dataProvider: DataProvider = {
     }
 
     const docRef = doc(db, resource, String(id));
-    await updateDoc(docRef, { ...variables });
+    await updateDoc(docRef, {...variables});
 
     return {
       data: {
@@ -202,18 +219,22 @@ const dataProvider: DataProvider = {
       await updateDoc(docRef, {
         [meta.fieldToDelete]: deleteField(),
       });
-      return { data: null };
+      return {data: null};
     }
 
     if (resource === "participants") {
-      const docRef = doc(db, "tournaments", String(meta.tournamentId), resource, String(id));
+      const docRef = doc(db, "tournaments", String(meta?.tournamentId), resource, String(id));
+      const tournamentRef = doc(db, "tournaments", String(meta?.tournamentId));
+      await updateDoc(tournamentRef, {
+        numberOfParticipants: increment(-1),
+      })
       await deleteDoc(docRef);
       return {data: {id} as TData};
     }
 
     const docRef = doc(db, resource, String(id));
     await deleteDoc(docRef);
-    return { data: null };
+    return {data: null};
   },
 
 
@@ -235,7 +256,7 @@ const dataProvider: DataProvider = {
 
       const teamSnap = await getDoc(teamRef);
 
-      console.log(id,'zim')
+      console.log(id, 'zim')
 
       const data = {
         id: teamSnap.id,

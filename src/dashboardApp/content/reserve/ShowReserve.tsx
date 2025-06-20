@@ -73,16 +73,16 @@ const ShowReserve: FC = () => {
           <Input
             rootClassName={'w-96'}
             placeholder="Search tournaments"
+            className='shadow-md'
             allowClear
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{marginBottom: 16}}
+            style={{marginBottom: 12, marginTop: 12}}
           />
         </div>
         <Content
           style={{
-            margin: '0px 14px',
-            marginTop: '0px',
+            margin: '14px 14px',
             padding: 24,
             minHeight: 1235,
             background: colorBgContainer,

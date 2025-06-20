@@ -4,7 +4,7 @@ import {AntDesignOutlined, EyeOutlined} from '@ant-design/icons';
 
 const {Content} = Layout;
 
-import {useList} from "@refinedev/core"
+import {useList, useOne} from "@refinedev/core"
 import {CreateButton, DeleteButton, EditButton, useSelect} from '@refinedev/antd';
 import {useNavigate} from 'react-router';
 
@@ -42,6 +42,18 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
     },
   });
 
+  const {data: allGamesData} = useList({
+    resource: "games",
+    pagination: {
+      mode: "off",
+    },
+  });
+
+  const gameIdToNameMap = allGamesData?.data.reduce((acc: any, game: any) => {
+    acc[game.id] = game.name;
+    return acc;
+  }, {}) || {};
+
   const columns = [
     {
       title: 'Avatar',
@@ -60,12 +72,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       title: 'Igra',
       dataIndex: 'game',
       key: 'game',
-      filters: selectProps.options?.map((option: any) => ({
-        text: option.label,
-        value: option.value,
-      })),
-      filterMultiple: false,
-      onFilter: (value: any, record: { game: any; }) => record.game === value,
+      render: (gameId: string) => gameIdToNameMap[gameId] || "Nepoznata igra",
     },
     {
       title: 'Prijave',

@@ -51,13 +51,13 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
       key: 'actions',
       render: (_: any, record: any) => (
         <Space>
-          <DeleteButton   hideText
-                          size="small"
-                          resource="participants"
-                          recordItemId={record.id}
-                          meta={{
-                            tournamentId: id
-          }}/>
+          <DeleteButton hideText
+                        size="small"
+                        resource="participants"
+                        recordItemId={record.id}
+                        meta={{
+                          tournamentId: id
+                        }}/>
         </Space>
       ),
     },
@@ -100,6 +100,7 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
             <Input
               rootClassName={'w-96'}
               placeholder="Search teams"
+              className='shadow-md'
               allowClear
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
