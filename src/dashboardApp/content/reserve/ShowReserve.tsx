@@ -82,7 +82,8 @@ const ShowReserve: FC = () => {
         </div>
         <Content
           style={{
-            margin: '14px 14px',
+            margin: '0px 14px',
+            marginTop: '14px',
             padding: 24,
             minHeight: 1235,
             background: colorBgContainer,

@@ -63,7 +63,7 @@ const ShowRules: FC = () => {
   };
 
   return (
-    <Layout className="h-screen overflow-hidden" style={{display: 'flex', flexDirection: 'row'}}>
+    <Layout className="h-screen overflow-y-hidden" style={{display: 'flex', flexDirection: 'row'}}>
 
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 

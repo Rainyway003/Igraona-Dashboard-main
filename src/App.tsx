@@ -15,7 +15,7 @@ import dataProvider from './dashboardApp/providers/data-provider'
 import ShowTournaments from "./dashboardApp/content/tournaments/ShowTournaments";
 import Home from "./dashboardApp/content/Home";
 import CreateTournamentView from "./dashboardApp/content/tournaments/CreateTournamentView";
-import EditTournament from "./dashboardApp/content/tournaments/EditT";
+import EditTournament from "./dashboardApp/content/tournaments/EditTournamentView";
 import {resources} from "./dashboardApp/config/resources";
 import AppLayout from "./dashboardApp/components/AppLayout/AppLayout";
 import ShowTeams from "./dashboardApp/content/teams/ShowTeams";
@@ -74,7 +74,7 @@ function App() {
                   <Route path='edit/:id' element={<EditBlog/>}/>
                 </Route>
                 <Route path="/tournaments">
-                  <Route index element={<ShowTournaments/>}/>
+                  <Route index element={<ShowTournaments/>} />
                   <Route path="new" element={<CreateTournamentView/>}/>
                   <Route path="edit/:id" element={<EditTournament/>}/>
                 </Route>

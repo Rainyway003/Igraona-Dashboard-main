@@ -1,19 +1,42 @@
 import React, {PropsWithChildren, useState} from 'react';
-import {Layout, theme, Table, Avatar, Space, Progress, Select, Input} from 'antd';
+import { Table, Avatar, Space, Progress, Input} from 'antd';
 import {AntDesignOutlined, EyeOutlined} from '@ant-design/icons';
 
-const {Content} = Layout;
-
-import {useList, useOne} from "@refinedev/core"
+import {useList} from "@refinedev/core"
 import {CreateButton, DeleteButton, EditButton, useSelect} from '@refinedev/antd';
-import {useNavigate} from 'react-router';
+import {useNavigate, useOutletContext} from 'react-router';
 
 const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
   const navigate = useNavigate()
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+  React.useEffect(() => {
+    setHeaderActions(
+      <div className="flex justify-between w-full">
+        <Input
+          placeholder="Search tournaments"
+          allowClear
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-96 shadow-md"
+        />
+        <CreateButton
+          resource="tournaments"
+          onClick={() => navigate('/tournaments/new')}
+          className="antbutton"
+        />
+      </div>
+    );
+
+    return () => setHeaderActions(null);
+  }, [searchTerm]);
+
 
   const [selectedGame] = useState<string | undefined>(undefined);
   const [sorters, setSorters] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+
 
   const {selectProps} = useSelect({
     resource: 'games',
@@ -22,10 +45,6 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
   })
 
   const tournamentId = window.location.pathname.split('/')[2]
-
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
 
   const {data, isLoading} = useList<any>({
     resource: "tournaments",
@@ -154,38 +173,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
   ];
 
   return (
-    <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
-
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
-
-        <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
-          <Input
-            rootClassName={'w-96'}
-            className='shadow-md'
-            placeholder="Search tournaments"
-            allowClear
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{marginBottom: 12, marginTop: 12}}
-          />
-          <CreateButton
-            className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
-            resource="tournaments"
-            onClick={() => navigate('/tournaments/new')}
-            style={{marginBottom: 12, marginTop: 12}}
-          />
-        </div>
-
-        <Content
-          style={{
-            margin: '14px 14px',
-            padding: 24,
-            minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
-
+    <>
           <Table
             loading={isLoading}
             dataSource={data?.data}
@@ -208,9 +196,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
           />
 
           {children}
-        </Content>
-      </Layout>
-    </Layout>
+    </>
   )
 }
 

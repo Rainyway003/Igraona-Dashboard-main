@@ -7,20 +7,47 @@ import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import {useNavigate} from 'react-router';
 import {useCreate} from "@refinedev/core";
 import '../../../App.css'
+import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
+import {storage} from '../../providers/firebase';
 
 const {Content} = Layout;
 
 const modules = {
-  toolbar: [
-    [{header: [1, 2, 3, false]}],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{color: []}, {background: []}],
-    [{list: 'ordered'}, {list: 'bullet'}],
-    [{align: []}],
-    ['link', 'image', 'code-block'],
-    ['clean'],
-  ],
+  toolbar: {
+    container: [
+      [{header: [1, 2, 3, false]}],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{color: []}, {background: []}],
+      [{list: 'ordered'}, {list: 'bullet'}],
+      [{align: []}],
+      ['link', 'image', 'code-block'],
+      ['clean'],
+    ],
+    handlers: {
+      image: imageHandler,
+    },
+  },
 };
+
+function imageHandler(this: any) {
+  const input = document.createElement("input");
+  input.setAttribute("type", "file");
+  input.setAttribute("accept", "image/*");
+  input.click();
+
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const storageRef = ref(storage, `blog/${Date.now()}-${file.name}`);
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+
+    const quill = this.quill;
+    const range = quill.getSelection();
+    quill.insertEmbed(range.index, "image", downloadURL);
+  };
+}
 
 const CreateBlog = () => {
   const {mutate} = useCreate();
@@ -40,6 +67,7 @@ const CreateBlog = () => {
         ...values
       },
     })
+    navigate('/blog')
   }
 
   return (

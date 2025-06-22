@@ -1,5 +1,5 @@
 import {Button, DatePicker, Form, Input, Layout, Select, Space, theme} from 'antd'
-import {useNavigate} from 'react-router'
+import {useNavigate, useOutletContext} from 'react-router'
 import React, {useState} from 'react';
 import {useCreate} from '@refinedev/core';
 import {CreateButton, useSelect} from "@refinedev/antd";
@@ -33,9 +33,34 @@ const CreateTournamentView = () => {
   })
 
 
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
+  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+  React.useEffect(() => {
+    setHeaderActions(
+      <div className="flex justify-between w-full">
+        <CreateButton
+          type="primary"
+          className="antbutton"
+          onClick={() => navigate('/tournaments')}
+          icon={<ArrowLeftOutlined/>}
+        >
+          Back
+        </CreateButton>
+        <div className={'flex gap-2'}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="antbutton"
+            icon={<PlusSquareOutlined/>}
+          >
+            Submit
+          </Button>
+        </div>
+      </div>
+    );
+
+    return () => setHeaderActions(null);
+  });
 
   const cleanObject = (obj: Record<string, any>) =>
     Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
@@ -61,53 +86,9 @@ const CreateTournamentView = () => {
 
 
   return (
-    <Layout className="h-screen overflow-y-hidden" style={{display: 'flex', flexDirection: 'row'}}>
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
-
         <Form layout="vertical" onFinish={onFinish}>
 
-          <div className='sticky w-full top-[19px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
-            <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/tournaments')}
-              icon={<ArrowLeftOutlined/>}
-            >
-              Back
-            </CreateButton>
-            <div className={'flex gap-2'}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="antbutton"
-                icon={<PlusSquareOutlined/>}
-              >
-                Submit
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="antbutton"
-                icon={<PlusSquareOutlined/>}
-                onClick={() => setVisible(true)}
-              >
-                Submit and Publish
-              </Button>
-            </div>
-          </div>
 
-
-          <Content
-            style={{
-              margin: '0px 14px 14px',
-              padding: 24,
-              paddingBottom: 406,
-              marginTop: 38,
-              minHeight: 360,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
             <Form.Item
               label="Ime turnira"
               name={'name'}
@@ -145,7 +126,7 @@ const CreateTournamentView = () => {
                       <MinusCircleOutlined onClick={() => remove(name)}/>
                     </Space>
                   ))}
-                  <Form.Item label={"Nagrade"}>
+                  <Form.Item label={"Nagrade"} className={' w-48'}>
                     <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
                       Add field
                     </Button>
@@ -207,10 +188,7 @@ const CreateTournamentView = () => {
                 }
               />
             </Form.Item>
-          </Content>
         </Form>
-      </Layout>
-    </Layout>
   )
 }
 

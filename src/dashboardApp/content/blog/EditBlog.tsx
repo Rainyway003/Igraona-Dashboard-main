@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Button, Form, Input, Layout, theme} from "antd";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -6,20 +6,47 @@ import {CreateButton, useForm} from "@refinedev/antd";
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import {useNavigate} from 'react-router';
 import '../../../App.css'
+import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
+import {storage} from '../../providers/firebase';
 
 const {Content} = Layout;
 
 const modules = {
-  toolbar: [
-    [{header: [1, 2, 3, false]}],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{color: []}, {background: []}],
-    [{list: 'ordered'}, {list: 'bullet'}],
-    [{align: []}],
-    ['link', 'image', 'code-block'],
-    ['clean'],
-  ],
+  toolbar: {
+    container: [
+      [{header: [1, 2, 3, false]}],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{color: []}, {background: []}],
+      [{list: 'ordered'}, {list: 'bullet'}],
+      [{align: []}],
+      ['link', 'image', 'code-block'],
+      ['clean'],
+    ],
+    handlers: {
+      image: imageHandler,
+    },
+  },
 };
+
+function imageHandler(this: any) {
+  const input = document.createElement("input");
+  input.setAttribute("type", "file");
+  input.setAttribute("accept", "image/*");
+  input.click();
+
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const storageRef = ref(storage, `blog/${Date.now()}-${file.name}`);
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+
+    const quill = this.quill;
+    const range = quill.getSelection();
+    quill.insertEmbed(range.index, "image", downloadURL);
+  };
+}
 
 const EditBlog = () => {
   const {formProps} = useForm();
@@ -27,15 +54,23 @@ const EditBlog = () => {
   const navigate = useNavigate();
   const [value, setValue] = useState('');
 
+  useEffect(() => {
+    if (formProps.initialValues?.blog) {
+      setValue(formProps.initialValues.blog);
+    }
+  }, [formProps.initialValues?.blog]);
+
   const {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
 
   const onFinish = async (values: any) => {
-
-    await formProps.onFinish?.(values)
-    navigate('/blog')
-  }
+    await formProps.onFinish?.({
+      ...values,
+      blog: value,
+    });
+    navigate('/blog');
+  };
 
 
   return (

@@ -3,7 +3,7 @@ import {Layout, theme, Table, Space, Form, Button, Input} from 'antd';
 
 const {Content} = Layout;
 
-import {useOne} from "@refinedev/core"
+import {useDelete, useOne} from "@refinedev/core"
 import {useParams} from 'react-router';
 
 import BanPlayer from './BanPlayer';
@@ -11,11 +11,16 @@ import {CreateButton, useForm} from "@refinedev/antd";
 
 interface ShowPlayersProps {
   teamId: string;
+  create: boolean;
+  children?: React.ReactNode;
 }
 
-const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, teamId}) => {
+const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, teamId, create}) => {
   const {id} = useParams();
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [isCreate, setIsCreate] = useState<boolean>(create);
+
+  const {mutate} = useDelete()
 
   console.log(teamId, 'JPOO')
 
@@ -33,7 +38,8 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
       tournamentId: id,
     },
     onMutationSuccess: () => {
-      setIsEdit(!isEdit);
+      setIsEdit(false);
+      setIsCreate(false);
     },
   });
 
@@ -60,18 +66,33 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
 
     for (let i = 1; i <= numberOfPlayers; i++) {
       const key = `player${i}`;
-      playersArray.push(teamData[key] ?? null); // Use null if the field doesn't exist
+      playersArray.push(teamData[key] ?? null);
     }
 
     return playersArray;
   }
 
-
-  console.log(getPlayersArray(data?.data, tournament))
   const team = data?.data
-
+  console.log(team?.player1)
   const handleEditClick = () => {
-    setIsEdit(!isEdit)
+    if (isCreate && team?.player1 === "") {
+      mutate({
+        resource: "participants",
+        id: teamId,
+        meta: {
+          tournamentId: id,
+        },
+        successNotification: () => false,
+      })
+      setIsCreate(false);
+      setIsEdit(false);
+    } else if (isEdit || isCreate) {
+      setIsEdit(false);
+      setIsCreate(false);
+    } else {
+      setIsEdit(true);
+      setIsCreate(true)
+    }
   }
 
   const onFinish = async (values: any) => {
@@ -97,14 +118,14 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
 
   const columns = [
     {
-      title: isEdit ?
+      title: isEdit || isCreate ?
         <Form.Item className={'m-0'} name="name">
           <Input placeholder={'Ime tima'}/>
         </Form.Item>
         :
         <div>{team?.name}</div>,
       render: (_: any, record: any, index: number) => (
-        isEdit ?
+        isEdit || isCreate ?
           <Form.Item className={'m-0'} name={`player${index + 1}`}>
             <Input placeholder={`${index + 1}`}/>
           </Form.Item>
@@ -115,7 +136,7 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
       ),
     },
     {
-      title: isEdit ?
+      title: isEdit || isCreate ?
         <Form.Item className={'m-0'} name={'number'} initialValue={team?.number}>
           <Input placeholder={'Kontakt'}/>
         </Form.Item>
@@ -126,7 +147,7 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
     },
     {
       title: <Form.Item className={'flex justify-end m-0'}>
-        {isEdit ?
+        {isEdit || isCreate ?
           <div className="flex gap-2">
             <CreateButton
               type="primary"
@@ -158,7 +179,7 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
       key: 'actions',
       render: (_: any, record: any, index: number) => (
         <Space>
-          {!isEdit && (
+          {!isEdit && !isCreate && (
             <BanPlayer
               player={record}
               teamId={teamId}
@@ -187,8 +208,9 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
 
           <Table
             loading={isLoading}
+            pagination={false}
             dataSource={
-              isEdit
+              isEdit || isCreate
                 ? getPlayersArray(data?.data, tournament)
                 : getPlayersArray(data?.data, tournament).filter((p) => !isBlank(p))
             }

@@ -31,7 +31,7 @@ const CreateGame: FC = () => {
   const onFinish = async (values: { name: string }) => {
     try {
       if (!imageFile) {
-        throw new Error("Image file is required")
+        throw new Error("Treba slika")
       }
 
       const storageRef = ref(storage, `games/${Date.now()}_${imageFile.name}`)
@@ -48,7 +48,7 @@ const CreateGame: FC = () => {
 
       navigate('/games')
     } catch (error) {
-      console.error("Upload failed:", error)
+      console.error(error)
     }
   }
 

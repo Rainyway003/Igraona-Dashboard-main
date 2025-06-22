@@ -1,11 +1,11 @@
-import React, {PropsWithChildren, useState} from 'react';
-import {Layout, theme, Table, Avatar, Space, Input} from 'antd';
-import {EyeOutlined, ArrowLeftOutlined} from '@ant-design/icons';
+import React, {PropsWithChildren, useEffect, useState} from 'react';
+import {Layout, theme, Table, Avatar, Space, Input, Form, Button} from 'antd';
+import {EyeOutlined, ArrowLeftOutlined, PlusSquareOutlined} from '@ant-design/icons';
 
 const {Content} = Layout;
 
-import {useList} from "@refinedev/core"
-import {CreateButton, DeleteButton, EditButton} from '@refinedev/antd';
+import {useCreate, useList, useOne} from "@refinedev/core"
+import {CreateButton, DeleteButton} from '@refinedev/antd';
 import {useNavigate, useParams} from 'react-router';
 import ShowPlayers from "../players/ShowPlayers";
 
@@ -15,15 +15,25 @@ interface ShowPlayersProps {
 
 const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
   const {id} = useParams();
+  const {mutate} = useCreate()
 
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('')
+  const [isCreate, setIsCreate] = useState(false);
 
   const navigate = useNavigate()
 
   const {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
+
+  const {data: tournamentData} = useOne({
+    resource: "tournaments",
+    id: id,
+  })
+
+  const tournament = tournamentData?.data;
+  console.log(tournament)
 
   const {data, isLoading} = useList<any>({
     resource: "participants",
@@ -34,6 +44,34 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
       ...(searchTerm ? [{field: "name", operator: "contains" as const, value: searchTerm}] : []),
     ]
   })
+
+  const onFinish = async () => {
+    const totalPlayers = tournament?.teamSizeRequired + tournament?.teamSizeOptional;
+
+    const players: Record<string, string> = {};
+    for (let i = 1; i <= totalPlayers; i++) {
+      players[`player${i}`] = "";
+    }
+
+    mutate({
+      resource: "participants",
+      values: {
+        tournamentId: tournament?.id,
+        ...players,
+      },
+      successNotification: false,
+      errorNotification: false,
+    }, {
+      onSuccess: (response) => {
+        const newTeamId = response?.data?.id;
+        if (newTeamId) {
+          console.log(newTeamId, "expanded")
+          console.log(expandedRowKeys)
+          setExpandedRowKeys([newTeamId]);
+        }
+      }
+    });
+  };
 
   const columns = [
     {
@@ -47,7 +85,17 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
       key: 'number',
     },
     {
-      title: 'Akcije',
+      title: <Form className={'flex justify-end'} onFinish={onFinish}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className="antbutton"
+          onClick={() => setIsCreate(true)}
+          icon={<PlusSquareOutlined/>}
+        >
+          Dodaj tim
+        </Button>
+      </Form>,
       key: 'actions',
       render: (_: any, record: any) => (
         <Space>
@@ -71,14 +119,13 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
   const expandable = {
     expandedRowRender: (record: any, expanded: any) => (
       <div style={{margin: 0}}>
-        <ShowPlayers teamId={record.id}/>
+        <ShowPlayers teamId={record.id} create={isCreate}/>
       </div>
     ),
     expandedRowKeys,
     onExpand: handleExpand,
   };
 
-  console.log('expand!', expandedRowKeys)
 
   return (
     <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row', overflowX: "hidden"}}>
@@ -107,12 +154,6 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
               style={{marginBottom: 10, marginTop: 10}}
             />
           </div>
-          <CreateButton
-            resource="tournaments"
-            className='antbutton'
-            onClick={() => navigate(`/tournaments/${id}/new`)}
-            style={{marginBottom: 10, marginTop: 10}}
-          />
         </div>
         <Content
           style={{

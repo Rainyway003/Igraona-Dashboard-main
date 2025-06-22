@@ -138,7 +138,7 @@ const dataProvider: DataProvider = {
 
       return {
         data: {
-          id: turnirDoc.id,
+          id: docRef.id,
           ...variables,
         } as TData,
       };

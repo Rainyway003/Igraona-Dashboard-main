@@ -49,7 +49,7 @@ const ShowBlogs = () => {
   ];
 
   return (
-    <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
+    <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
 
         <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
