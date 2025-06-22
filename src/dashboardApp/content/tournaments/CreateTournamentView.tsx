@@ -1,13 +1,12 @@
-import {Button, DatePicker, Form, Input, Layout, Select, Space, theme} from 'antd'
-import {useNavigate, useOutletContext} from 'react-router'
+import {Button, DatePicker, Form, Input, Select, Space} from 'antd'
+import {useNavigate, useOutletContext} from 'react-router-dom'
 import React, {useState} from 'react';
 import {useCreate} from '@refinedev/core';
-import {CreateButton, useSelect} from "@refinedev/antd";
+import { useSelect} from "@refinedev/antd";
 import dayjs from 'dayjs'
 import {MinusCircleOutlined, PlusOutlined, ArrowLeftOutlined, PlusSquareOutlined} from '@ant-design/icons';
 
 const {RangePicker} = DatePicker;
-const {Content} = Layout
 
 const CreateTournamentView = () => {
   const {mutate} = useCreate();
@@ -38,20 +37,21 @@ const CreateTournamentView = () => {
   React.useEffect(() => {
     setHeaderActions(
       <div className="flex justify-between w-full">
-        <CreateButton
+        <Button
           type="primary"
           className="antbutton"
-          onClick={() => navigate('/tournaments')}
+          onClick={() => navigate("/tournaments")}
           icon={<ArrowLeftOutlined/>}
         >
           Back
-        </CreateButton>
+        </Button>
         <div className={'flex gap-2'}>
           <Button
             type="primary"
             htmlType="submit"
             className="antbutton"
             icon={<PlusSquareOutlined/>}
+            form="create"
           >
             Submit
           </Button>
@@ -59,8 +59,8 @@ const CreateTournamentView = () => {
       </div>
     );
 
-    return () => setHeaderActions(null);
-  });
+      return () => setHeaderActions(null);
+  }, [setHeaderActions, navigate]);
 
   const cleanObject = (obj: Record<string, any>) =>
     Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
@@ -86,7 +86,7 @@ const CreateTournamentView = () => {
 
 
   return (
-        <Form layout="vertical" onFinish={onFinish}>
+        <Form layout="vertical" onFinish={onFinish} id="create">
 
 
             <Form.Item

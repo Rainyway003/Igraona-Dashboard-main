@@ -1,21 +1,37 @@
 import React, {FC, useState} from 'react'
 import {ConfigProvider, Input, Layout, Space, Table, theme} from "antd";
-import {DeleteButton} from "@refinedev/antd";
+import {CreateButton, DeleteButton} from "@refinedev/antd";
 import {useList} from "@refinedev/core";
 import CalendarSmall from "./CalendarSmall";
 import {Dayjs} from "dayjs";
+import {useNavigate, useOutletContext} from "react-router";
 
 const {Content} = Layout;
 
 const ShowReserve: FC = () => {
 
+  const navigate = useNavigate()
+
   const [sorters, setSorters] = useState([]);
   const [selectedDates, setSelectedDates] = useState<Dayjs[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
+  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+  React.useEffect(() => {
+    setHeaderActions(
+        <div className="flex justify-between w-full">
+          <Input
+              rootClassName={'w-96'}
+              placeholder="Search tournaments"
+              className='shadow-md'
+              allowClear
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+    );
+  }, [navigate, searchTerm, setHeaderActions ]);
 
   const {data, isLoading} = useList<any>({
     resource: "reserve",
@@ -67,29 +83,7 @@ const ShowReserve: FC = () => {
   ];
 
   return (
-    <Layout style={{height: '100vh', overflowX: 'hidden', flexDirection: 'row'}}>
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
-        <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
-          <Input
-            rootClassName={'w-96'}
-            placeholder="Search tournaments"
-            className='shadow-md'
-            allowClear
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{marginBottom: 12, marginTop: 12}}
-          />
-        </div>
-        <Content
-          style={{
-            margin: '0px 14px',
-            marginTop: '14px',
-            padding: 24,
-            minHeight: 1235,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
+    <>
           <Table
             loading={isLoading}
             dataSource={data?.data}
@@ -141,9 +135,7 @@ const ShowReserve: FC = () => {
               />
             </ConfigProvider>
           </div>
-        </Content>
-      </Layout>
-    </Layout>
+    </>
   )
 }
 

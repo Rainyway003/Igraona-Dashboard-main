@@ -9,7 +9,7 @@ import {
   ExceptionOutlined
 } from '@ant-design/icons';
 import {Layout, Menu, Button} from 'antd';
-import {useLocation, useNavigate} from 'react-router';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 import logo from '../items/logo.png'
 

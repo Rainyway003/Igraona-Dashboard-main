@@ -6,6 +6,7 @@ import {useNavigate} from "react-router";
 import ReactQuill from "react-quill";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage} from "../../providers/firebase";
+import {useOutletContext} from "react-router-dom";
 
 const {Content} = Layout
 
@@ -52,15 +53,38 @@ const EditRule = () => {
   const navigate = useNavigate()
   const [value, setValue] = useState('');
 
+  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+  React.useEffect(() => {
+    setHeaderActions(
+        <div className="flex justify-between w-full">
+          <CreateButton
+              type="primary"
+              className="antbutton"
+              onClick={() => navigate('/rules')}
+              icon={<ArrowLeftOutlined/>}
+          >
+            Back
+          </CreateButton>
+
+          <Button
+              type="primary"
+              htmlType="submit"
+              className="antbutton"
+              form='edit'
+              icon={<PlusSquareOutlined/>}
+          >
+            Submit
+          </Button>
+        </div>
+    );
+  }, [navigate, setHeaderActions ]);
+
   useEffect(() => {
     if (formProps.initialValues?.rule) {
       setValue(formProps.initialValues.rule);
     }
   }, [formProps.initialValues?.rule]);
-
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
 
   const onFinish = async (values: any) => {
     await formProps.onFinish?.({
@@ -72,41 +96,9 @@ const EditRule = () => {
 
 
   return (
-    <Layout className="h-screen overflow-y-auto" style={{display: 'flex', flexDirection: 'row'}}>
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
+    <>
+        <Form layout="vertical" {...formProps} onFinish={onFinish} id='edit'>
 
-        <Form layout="vertical" {...formProps} onFinish={onFinish}>
-          <div className='sticky top-[19px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
-            <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/rules')}
-              icon={<ArrowLeftOutlined/>}
-            >
-              Back
-            </CreateButton>
-
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="antbutton"
-              icon={<PlusSquareOutlined/>}
-            >
-              Submit
-            </Button>
-          </div>
-
-          <Content
-            style={{
-              margin: '0px 14px',
-              padding: 24,
-              paddingBottom: 600,
-              marginTop: 38,
-              minHeight: 280,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
             <Form.Item label={'Ime pravila'} name="name" rules={[{required: true}]}>
               <Input placeholder="Ime pravila"/>
             </Form.Item>
@@ -115,10 +107,8 @@ const EditRule = () => {
                 style={{height: '300px', minWidth: '100%'}}
                 theme="snow" value={value} onChange={setValue} modules={modules}/>
             </Form.Item>
-          </Content>
         </Form>
-      </Layout>
-    </Layout>
+    </>
   )
 }
 

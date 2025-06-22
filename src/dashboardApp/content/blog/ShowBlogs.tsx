@@ -1,15 +1,37 @@
 import React, {useState} from 'react'
 import {Input, Layout, Space, Table, theme} from "antd";
-import {useNavigate} from "react-router";
+import {useNavigate, useOutletContext} from "react-router";
 import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useList} from "@refinedev/core";
-import {EyeOutlined} from "@ant-design/icons";
+import {ArrowLeftOutlined, EyeOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;
 
 const ShowBlogs = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+
+    const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+    React.useEffect(() => {
+        setHeaderActions(
+            <div className="flex justify-between w-full">
+                <Input
+                    rootClassName={'w-96'}
+                    placeholder="Search blogs"
+                    className='shadow-md'
+                    allowClear
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <CreateButton
+                    className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
+                    resource="tournaments"
+                    onClick={() => navigate('/blog/new')}
+                />
+            </div>
+        );
+    }, [navigate, searchTerm, setHeaderActions ]);
 
   const {data, isLoading} = useList<any>({
     resource: "blog",
@@ -49,37 +71,7 @@ const ShowBlogs = () => {
   ];
 
   return (
-    <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row'}}>
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
-
-        <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
-          <Input
-            rootClassName={'w-96'}
-            placeholder="Search blogs"
-            className='shadow-md'
-            allowClear
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{marginBottom: 12, marginTop: 12}}
-          />
-          <CreateButton
-            className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
-            resource="tournaments"
-            onClick={() => navigate('/blog/new')}
-            style={{marginBottom: 12, marginTop: 12}}
-          />
-        </div>
-
-        <Content
-          style={{
-            margin: '14px 14px',
-            padding: 24,
-            minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
-
+    <>
           <Table
             loading={isLoading}
             dataSource={data?.data}
@@ -90,9 +82,7 @@ const ShowBlogs = () => {
               position: ['bottomCenter'],
             }}
           />
-        </Content>
-      </Layout>
-    </Layout>
+    </>
   )
 }
 

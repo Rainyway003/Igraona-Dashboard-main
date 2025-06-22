@@ -9,7 +9,7 @@ import routerBindings, {
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
 import {App as AntdApp} from "antd";
-import {BrowserRouter, Route, Routes} from "react-router";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 import dataProvider from './dashboardApp/providers/data-provider'
 import ShowTournaments from "./dashboardApp/content/tournaments/ShowTournaments";

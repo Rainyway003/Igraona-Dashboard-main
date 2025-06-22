@@ -1,17 +1,47 @@
-import {CreateButton, useForm, useSelect} from "@refinedev/antd";
+import {useForm, useSelect} from "@refinedev/antd";
 import {Button, DatePicker, Form, Input, Layout, Select, Space, theme} from "antd";
 import {ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import React from "react";
 import {useNavigate} from "react-router";
 import dayjs from "dayjs";
+import {useOutletContext} from "react-router-dom";
 
 const {RangePicker} = DatePicker;
-const {Content} = Layout
 
 const EditTournament = () => {
+  const navigate = useNavigate();
+
+  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+  React.useEffect(() => {
+    setHeaderActions(
+        <div className="flex justify-between w-full">
+          <Button
+              type="primary"
+              className="antbutton"
+              onClick={() => navigate("/tournaments")}
+              icon={<ArrowLeftOutlined/>}
+          >
+            Back
+          </Button>
+          <div className={'flex gap-2'}>
+            <Button
+                type="primary"
+                htmlType="submit"
+                className="antbutton"
+                icon={<PlusSquareOutlined/>}
+                form="edit"
+            >
+              Submit
+            </Button>
+          </div>
+        </div>
+    );
+
+    return () => setHeaderActions(null);
+  }, [setHeaderActions, navigate]);
 
   const {formProps, query} = useForm();
-  const navigate = useNavigate();
 
   const tournament = query?.data?.data;
   const [range, setRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
@@ -45,11 +75,6 @@ const EditTournament = () => {
     optionValue: "id",
   })
 
-
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
-
   const onFinish = async (values: any) => {
     if (!range || !signUpRange) {
       return;
@@ -68,42 +93,9 @@ const EditTournament = () => {
 
 
   return (
-    <Layout className="h-screen overflow-hidden" style={{display: 'flex', flexDirection: 'row'}}>
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
-        <Form layout="vertical" {...formProps} onFinish={onFinish}>
+ <>
+        <Form layout="vertical" {...formProps} onFinish={onFinish} id='edit'>
 
-          <div className='sticky w-full top-[19px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
-            <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/tournaments')}
-              icon={<ArrowLeftOutlined/>}
-            >
-              Back
-            </CreateButton>
-
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="antbutton"
-              icon={<PlusSquareOutlined/>}
-            >
-              Submit
-            </Button>
-
-          </div>
-
-          <Content
-            style={{
-              margin: '0px 14px',
-              padding: 24,
-              paddingBottom: 406,
-              marginTop: 38,
-              minHeight: 360,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
             <Form.Item
               label="Ime turnira"
               name={'name'}
@@ -208,10 +200,8 @@ const EditTournament = () => {
               />
             </Form.Item>
 
-          </Content>
         </Form>
-      </Layout>
-    </Layout>
+</>
   );
 };
 

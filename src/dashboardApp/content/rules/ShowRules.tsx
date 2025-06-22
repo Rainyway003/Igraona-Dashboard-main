@@ -4,6 +4,7 @@ import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useNavigate} from 'react-router';
 import {useList} from "@refinedev/core";
 import ShowRuleView from "./ShowRuleView";
+import {useOutletContext} from "react-router-dom";
 
 const {Content} = Layout;
 
@@ -21,9 +22,27 @@ const ShowRules: FC = () => {
 
   const rule = data?.data;
 
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
+  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+  React.useEffect(() => {
+    setHeaderActions(
+        <div className="flex justify-between w-full">
+          <Input
+              rootClassName={'w-96'}
+              placeholder="Search rules"
+              className='shadow-md'
+              allowClear
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <CreateButton
+              className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
+              resource="tournaments"
+              onClick={() => navigate('/rules/new')}
+          />
+        </div>
+    );
+  }, [navigate, searchTerm, setHeaderActions ]);
 
   if (isLoading) {
     return <div>...Loading</div>;
@@ -63,38 +82,7 @@ const ShowRules: FC = () => {
   };
 
   return (
-    <Layout className="h-screen overflow-y-hidden" style={{display: 'flex', flexDirection: 'row'}}>
-
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
-
-        <div className='sticky w-full top-[7px] pr-[14px] pl-[14px] z-10 flex justify-between'>
-          <Input
-            rootClassName={'w-96'}
-            placeholder="Search rules"
-            className='shadow-md'
-            allowClear
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{marginBottom: 12, marginTop: 12}}
-          />
-          <CreateButton
-            className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
-            resource="tournaments"
-            onClick={() => navigate('/rules/new')}
-            style={{marginBottom: 12, marginTop: 12}}
-          />
-        </div>
-
-        <Content
-          style={{
-            margin: '14px 14px',
-            padding: 24,
-            minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
-
+    <>
           <Table
             loading={isLoading}
             dataSource={data?.data}
@@ -106,9 +94,7 @@ const ShowRules: FC = () => {
             }}
             expandable={expandable}
           />
-        </Content>
-      </Layout>
-    </Layout>
+    </>
   )
 }
 

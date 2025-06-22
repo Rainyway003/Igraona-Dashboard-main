@@ -6,6 +6,7 @@ import {CreateButton} from "@refinedev/antd"
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons"
 import {storage} from '../../providers/firebase'
 import {ref, uploadBytes, getDownloadURL} from 'firebase/storage'
+import {useOutletContext} from "react-router-dom";
 
 const {Content} = Layout
 
@@ -13,9 +14,33 @@ const CreateGame: FC = () => {
   const navigate = useNavigate()
   const {mutate} = useCreate()
 
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken()
+  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+  React.useEffect(() => {
+    setHeaderActions(
+        <div className="flex justify-between w-full">
+          <CreateButton
+              type="primary"
+              className="antbutton"
+              onClick={() => navigate('/games')}
+              icon={<ArrowLeftOutlined/>}
+          >
+            Back
+          </CreateButton>
+          <Button
+              type="primary"
+              htmlType="submit"
+              className="antbutton"
+              form='create'
+              icon={<PlusSquareOutlined/>}
+          >
+            Submit
+          </Button>
+        </div>
+    );
+
+    return () => setHeaderActions(null);
+  }, [setHeaderActions, navigate]);
 
   const [imageUrl, setImageUrl] = React.useState<string | undefined>(undefined)
   const [imageFile, setImageFile] = React.useState<File | undefined>(undefined)
@@ -53,38 +78,8 @@ const CreateGame: FC = () => {
   }
 
   return (
-    <Layout className="h-screen overflow-y-hidden" style={{display: 'flex', flexDirection: 'row'}}>
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
-        <Form layout="vertical" onFinish={onFinish}>
-          <div className='sticky top-[19px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
-            <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/games')}
-              icon={<ArrowLeftOutlined/>}
-            >
-              Back
-            </CreateButton>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="antbutton"
-              icon={<PlusSquareOutlined/>}
-            >
-              Submit
-            </Button>
-          </div>
-          <Content
-            style={{
-              margin: '0px 14px',
-              padding: 24,
-              paddingBottom: 730,
-              marginTop: 38,
-              minHeight: 280,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
+    <>
+        <Form layout="vertical" onFinish={onFinish} id='create'>
             <Form.Item
               label={"Ime igre"}
               name={'name'}
@@ -99,10 +94,8 @@ const CreateGame: FC = () => {
               <Input type={'file'} onChange={uploadFile}/>
             </Form.Item>
             {imageUrl && <Avatar src={imageUrl} size={100}/>}
-          </Content>
         </Form>
-      </Layout>
-    </Layout>
+    </>
   )
 }
 

@@ -32,7 +32,7 @@ const ShowGames: FC = () => {
     );
 
     return () => setHeaderActions(null);
-  }, [searchTerm]);
+  }, [ setHeaderActions, navigate, searchTerm]);
 
   const {data, isLoading} = useList<any>({
     resource: "games",
@@ -76,13 +76,6 @@ const ShowGames: FC = () => {
               pageSize: 5,
               position: ['bottomCenter'],
             }}
-            onRow={(record) => ({
-              onClick: (event) => {
-                const target = event.target as HTMLElement;
-                if (target.closest('button')) return;
-                navigate(`/tournaments/${record.id}`);
-              },
-            })}
           />
     </>
   )

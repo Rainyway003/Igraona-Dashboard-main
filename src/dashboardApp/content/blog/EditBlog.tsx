@@ -4,7 +4,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import {CreateButton, useForm} from "@refinedev/antd";
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
-import {useNavigate} from 'react-router';
+import {useNavigate, useOutletContext} from 'react-router';
 import '../../../App.css'
 import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
 import {storage} from '../../providers/firebase';
@@ -54,6 +54,33 @@ const EditBlog = () => {
   const navigate = useNavigate();
   const [value, setValue] = useState('');
 
+  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+  React.useEffect(() => {
+    setHeaderActions(
+        <div className="flex justify-between w-full">
+          <CreateButton
+              type="primary"
+              className="antbutton"
+              onClick={() => navigate('/blog')}
+              icon={<ArrowLeftOutlined/>}
+          >
+            Back
+          </CreateButton>
+
+          <Button
+              type="primary"
+              htmlType="submit"
+              className="antbutton"
+              form='edit'
+              icon={<PlusSquareOutlined/>}
+          >
+            Submit
+          </Button>
+        </div>
+    );
+  }, [navigate, setHeaderActions ]);
+
   useEffect(() => {
     if (formProps.initialValues?.blog) {
       setValue(formProps.initialValues.blog);
@@ -74,43 +101,9 @@ const EditBlog = () => {
 
 
   return (
-    <Layout className="h-screen" style={{display: 'flex', flexDirection: 'row', overflow: 'hidden'}}>
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
-
-        <Form layout="vertical" {...formProps} onFinish={onFinish}>
-          <div className='sticky top-[19px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
-            <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/blog')}
-              icon={<ArrowLeftOutlined/>}
-            >
-              Back
-            </CreateButton>
-
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="antbutton"
-              icon={<PlusSquareOutlined/>}
-            >
-              Submit
-            </Button>
-
-          </div>
-
-          <Content
-            style={{
-              margin: '0px 14px',
-              padding: 24,
-              paddingBottom: 600,
-              marginTop: 38,
-              minHeight: 280,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
-            <Form.Item label={'Title'} name="title" rules={[{required: true}]}>
+    <>
+        <Form layout="vertical" {...formProps} onFinish={onFinish} id='edit'>
+      <Form.Item label={'Title'} name="title" rules={[{required: true}]}>
               <Input placeholder="Title"/>
             </Form.Item>
             <Form.Item name="blog" rules={[{required: true}]}>
@@ -118,10 +111,8 @@ const EditBlog = () => {
                 style={{height: '300px', minWidth: '100%'}}
                 theme="snow" value={value} onChange={setValue} modules={modules}/>
             </Form.Item>
-          </Content>
         </Form>
-      </Layout>
-    </Layout>
+    </>
   )
 }
 

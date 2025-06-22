@@ -4,6 +4,7 @@ import {useCreate} from "@refinedev/core";
 import {useNavigate} from "react-router";
 import {CreateButton} from "@refinedev/antd";
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
+import {useOutletContext} from "react-router-dom";
 
 const {Content} = Layout
 
@@ -11,9 +12,31 @@ const CreateBan: FC = () => {
   const navigate = useNavigate()
   const {mutate} = useCreate()
 
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
+    const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+
+    React.useEffect(() => {
+        setHeaderActions(
+            <div className="flex justify-between w-full">
+                <CreateButton
+                    type="primary"
+                    className="antbutton"
+                    onClick={() => navigate('/banned')}
+                    icon={<ArrowLeftOutlined/>}
+                >
+                    Back
+                </CreateButton>
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                    className="antbutton"
+                    form='create'
+                    icon={<PlusSquareOutlined/>}
+                >
+                    Submit
+                </Button>
+            </div>
+        );
+    }, [navigate, setHeaderActions ]);
 
   const onFinish = (values: { name: string; imageUrl: string }) => {
     mutate({
@@ -28,40 +51,8 @@ const CreateBan: FC = () => {
   }
 
   return (
-    <Layout className="h-screen overflow-hidden" style={{display: 'flex', flexDirection: 'row'}}>
-      <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>
-
-        <Form layout="vertical" onFinish={onFinish}>
-          <div className='sticky top-[19px] pr-[14px] pl-[14px] z-10 flex justify-between mb-4'>
-            <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/banned')}
-              icon={<ArrowLeftOutlined/>}
-            >
-              Back
-            </CreateButton>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="antbutton"
-              icon={<PlusSquareOutlined/>}
-            >
-              Submit
-            </Button>
-          </div>
-
-          <Content
-            style={{
-              margin: '0px 14px',
-              padding: 24,
-              paddingBottom: 836,
-              marginTop: 38,
-              minHeight: 280,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
+    <>
+        <Form layout="vertical" onFinish={onFinish} id='create'>
             <Form.Item
               label={"Ime igrača"}
               name={'name'}
@@ -74,12 +65,10 @@ const CreateBan: FC = () => {
               name={'reason'}
               rules={[{required: true}]}
             >
-              <Input placeholder={'Ime igrača'}/>
+              <Input placeholder={'Razlog bana'}/>
             </Form.Item>
-          </Content>
         </Form>
-      </Layout>
-    </Layout>
+    </>
   )
 }
 
