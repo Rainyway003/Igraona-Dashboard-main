@@ -14,6 +14,7 @@ import {
   doc,
   DocumentData,
   getDoc,
+  setDoc,
   getDocs,
   query,
   orderBy,
@@ -71,6 +72,8 @@ const dataProvider: DataProvider = {
 
     const constraints: any[] = [];
 
+    console.log(filters)
+
     if (filters && filters.length > 0) {
       filters.forEach((filter: any) => {
         const {field, operator, value} = filter;
@@ -102,15 +105,14 @@ const dataProvider: DataProvider = {
   },
 
   create: async <TData = any, TVariables = DocumentData>(
-    {resource, variables}: CreateParams<TVariables>
+    {resource, variables, meta}: CreateParams<TVariables>
   ): Promise<CreateResponse<TData>> => {
     if (
       resource === "tournaments" ||
       resource === "blog" ||
       resource === "rules" ||
       resource === "banned" ||
-      resource === "games" ||
-      resource === "reserve"
+      resource === "games"
     ) {
       const docRef = await addDoc(
         collection(db, resource),
@@ -139,6 +141,19 @@ const dataProvider: DataProvider = {
       return {
         data: {
           id: docRef.id,
+          ...variables,
+        } as TData,
+      };
+    }
+
+    if(resource === "reserve"){
+      const id = meta?.id || (variables as any).id;
+
+      await setDoc(doc(db, resource, id), variables as WithFieldValue<DocumentData>);
+
+      return {
+        data: {
+          id,
           ...variables,
         } as TData,
       };
@@ -204,7 +219,8 @@ const dataProvider: DataProvider = {
       resource === "tournaments" ||
       resource === "games" ||
       resource === "rules" ||
-      resource === "blog"
+      resource === "blog" ||
+      resource === "reserve"
     ) {
       const docRef = doc(db, resource, id as string);
       await deleteDoc(docRef);
@@ -215,6 +231,7 @@ const dataProvider: DataProvider = {
     }
 
     if (resource === "participants" && meta?.fieldToDelete && meta?.tournamentId) {
+      console.log(meta?.fieldToDelete);
       const docRef = doc(db, "tournaments", String(meta.tournamentId), resource, String(id));
       await updateDoc(docRef, {
         [meta.fieldToDelete]: deleteField(),
@@ -222,8 +239,10 @@ const dataProvider: DataProvider = {
       return {data: null};
     }
 
-    if (resource === "participants") {
-      const docRef = doc(db, "tournaments", String(meta?.tournamentId), resource, String(id));
+
+    if (resource === "participants" && !meta?.doNotDelete && meta?.tournamentId) {
+      console.log("CUAM")
+      const docRef = doc(db, "tournaments", String(meta?.tournamentId),  resource, String(id));
       const tournamentRef = doc(db, "tournaments", String(meta?.tournamentId));
       await updateDoc(tournamentRef, {
         numberOfParticipants: increment(-1),
@@ -231,13 +250,7 @@ const dataProvider: DataProvider = {
       await deleteDoc(docRef);
       return {data: {id} as TData};
     }
-
-    const docRef = doc(db, resource, String(id));
-    await deleteDoc(docRef);
-    return {data: null};
   },
-
-
   getOne: async ({
                    resource,
                    id,

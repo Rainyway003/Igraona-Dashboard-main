@@ -107,13 +107,14 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
     }
 
     const teamValues = {
-      name: values?.name,
-      number: values?.number,
+      name: values?.name || "",
+      number: values?.number || "",
       ...playerFields,
     };
 
-    formProps.onFinish?.(teamValues)
+    formProps.onFinish?.(teamValues);
   }
+
 
 
   const columns = [

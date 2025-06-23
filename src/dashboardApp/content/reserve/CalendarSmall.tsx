@@ -17,40 +17,22 @@ const CalendarSmall: React.FC<CalendarComponentProps> = ({
     resource: 'reserve',
   });
 
-
   const reservedDates = useMemo(() => {
     const list = (reservedData?.data || []).map((item) => {
       const dateObj = typeof item.vrijeme === 'object' && item.vrijeme?.toDate
         ? item.vrijeme.toDate()
         : new Date(item.vrijeme);
 
-      const formatted = dayjs(dateObj).startOf('day').format('YYYY-MM-DD');
-      return formatted;
+      return {
+        vrijeme: dayjs(dateObj).startOf('day').format('YYYY-MM-DD'),
+        name: item.name,
+      }
     });
 
-    console.log("Ev:", list);
     return list;
   }, [reservedData]);
 
-
-  const onSelect = (date: Dayjs) => {
-    const formatted = date.startOf("day").format("YYYY-MM-DD");
-
-    if (reservedDates.includes(formatted)) {
-      console.warn("⛔ Datum je rezerviran:", formatted);
-      return;
-    }
-
-    if (selectedDates.some((d) => d.isSame(date, 'day'))) {
-      setSelectedDates(selectedDates.filter((d) => !d.isSame(date, 'day')));
-    } else {
-      setSelectedDates([...selectedDates, date]);
-    }
-  };
-
-
-  console.log(reservedData?.data);
-
+  console.log(reservedDates)
 
   useEffect(() => {
     console.log(selectedDates);
@@ -70,18 +52,16 @@ const CalendarSmall: React.FC<CalendarComponentProps> = ({
         paddingRight: '100px',
         marginTop: '16px',
       }}
-
+      className="pointer-important"
       fullscreen={true}
-      onSelect={onSelect}
       value={undefined}
-      disabledDate={(date) => {
-        const formatted = date.startOf('day').format('YYYY-MM-DD');
-        return date.isBefore(now.startOf('day')) || reservedDates.includes(formatted);
-      }}
+      disabledDate={() => true}
       dateCellRender={(date) => {
         const formatted = date.startOf("day").format("YYYY-MM-DD");
-        const isReserved = reservedDates.includes(formatted);
+        const reservedEntry = reservedDates.find((d) => d.vrijeme === formatted);
+        const isReserved = !!reservedEntry;
         const isSelected = selectedDates.some((d) => d.isSame(date, 'day'));
+
 
         const style: React.CSSProperties = {
           width: '50%',
@@ -109,7 +89,7 @@ const CalendarSmall: React.FC<CalendarComponentProps> = ({
         );
 
         return isReserved ? (
-          <Tooltip title="Ovaj datum je već rezerviran">{cellContent}</Tooltip>
+          <Tooltip title={`Rezervirao : ${reservedEntry.name}`}>{cellContent}</Tooltip>
         ) : cellContent;
       }}
     />

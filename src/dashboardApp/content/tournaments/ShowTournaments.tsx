@@ -34,32 +34,10 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
   }, [searchTerm]);
 
 
-  const [selectedGame] = useState<string | undefined>(undefined);
-  const [sorters, setSorters] = useState([]);
-
-
-  const {selectProps} = useSelect({
-    resource: 'games',
-    optionLabel: "name",
-    optionValue: "name",
-  })
-
-  const tournamentId = window.location.pathname.split('/')[2]
-
-  const {data, isLoading} = useList<any>({
-    resource: "tournaments",
-    meta: {
-      tournamentId,
-    },
-    filters: [
-      ...(selectedGame ? [{field: "game", operator: "contains" as const, value: selectedGame}] : []),
-      ...(searchTerm ? [{field: "name", operator: "contains" as const, value: searchTerm}] : []),
-    ],
-    sorters: sorters,
-    queryOptions: {
-      queryKey: ["tournaments", selectedGame, searchTerm, sorters],
-    },
-  });
+  const [selectedGame, setSelectedGame] = useState<string | undefined>(undefined);
+  const [sorters, setSorters] = useState([
+    { field: "startingAt", order: "asc" },
+  ]);
 
   const {data: allGamesData} = useList({
     resource: "games",
@@ -72,6 +50,29 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
     acc[game.id] = game.name;
     return acc;
   }, {}) || {};
+
+  const {selectProps} = useSelect({
+    resource: 'games',
+    optionLabel: "name",
+    optionValue: "id",
+  })
+
+  const tournamentId = window.location.pathname.split('/')[2]
+
+  const {data, isLoading} = useList<any>({
+    resource: "tournaments",
+    meta: {
+      tournamentId,
+    },
+    filters: [
+      ...(selectedGame ? [{field: "game", operator: "eq", value: selectedGame}] : []),
+      ...(searchTerm ? [{field: "name", operator: "contains" as const, value: searchTerm}] : []),
+    ],
+    sorters: sorters,
+    queryOptions: {
+      queryKey: ["tournaments", selectedGame, searchTerm, sorters],
+    },
+  });
 
   const columns = [
     {
@@ -91,6 +92,12 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       title: 'Igra',
       dataIndex: 'game',
       key: 'game',
+      filters: selectProps.options?.map((option: any) => ({
+        text: option.label,
+        value: option.value,
+      })),
+      filterMultiple: false,
+      onFilter: (value, record) => record.game === value,
       render: (gameId: string) => gameIdToNameMap[gameId] || "Nepoznata igra",
     },
     {
@@ -184,14 +191,32 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
               position: ['bottomCenter'],
             }}
             onChange={(pagination, filters, sorter) => {
-              const sorterArray = Array.isArray(sorter) ? sorter : [sorter];
+              if (filters.game && filters.game.length > 0) {
+                setSelectedGame(filters.game[0]);  // jer filterMultiple = false
+              } else {
+                setSelectedGame(undefined);
+              }
+
+              let sorterArray = [];
+
+              if (Array.isArray(sorter)) {
+                sorterArray = sorter;
+              } else if (sorter && sorter.field) {
+                sorterArray = [sorter];
+              }
+
               const formattedSorters = sorterArray
-                .filter((s) => s.order)
-                .map((s) => ({
-                  field: s.field,
-                  order: s.order === "ascend" ? "asc" : "desc",
-                }));
-              setSorters(formattedSorters);
+                  .filter((s) => s.order)
+                  .map((s) => ({
+                    field: s.field,
+                    order: s.order === "ascend" ? "asc" : "desc",
+                  }));
+
+              if (formattedSorters.length === 0) {
+                setSorters([{ field: "startingAt", order: "asc" }]);
+              } else {
+                setSorters(formattedSorters);
+              }
             }}
           />
 

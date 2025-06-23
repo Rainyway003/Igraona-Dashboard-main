@@ -14,17 +14,24 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
   const { mutate: createBan } = useCreate();
   const { mutate: deleteFieldInTeam } = useDelete();
 
-  console.log(player, teamId, tournamentId, 'ENOOGAA')
-
   const handleBan = async () => {
 
     try {
-      createBan({
-        resource: "banned",
-        values: {
-          faceit: player,
-          timestamp: Timestamp.fromDate(new Date()),
-        },
+      // Sačekaj da se ban upiše
+      await new Promise((resolve, reject) => {
+        createBan(
+            {
+              resource: "banned",
+              values: {
+                faceit: player,
+                timestamp: Timestamp.fromDate(new Date()),
+              },
+            },
+            {
+              onSuccess: () => resolve(null),
+              onError: (error) => reject(error),
+            }
+        );
       });
 
       const teamRef = doc(db, "tournaments", tournamentId, "participants", teamId);
@@ -45,11 +52,6 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
         }
       }
 
-      if (!fieldToDelete) {
-        console.warn("Nema.");
-        return;
-      }
-
       deleteFieldInTeam({
         resource: "participants",
         id: teamId,
@@ -61,7 +63,7 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
 
       console.log(`Igrač ${player} banovan i polje ${fieldToDelete} obrisano.`);
     } catch (error) {
-      console.error("Greška:", error);
+      console.error("NEDAM TI ERROR");
     }
   };
 
