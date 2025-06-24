@@ -73,7 +73,7 @@ const CreateTeam = () => {
               onClick={() => navigate(`/tournaments/${id}`)}
               icon={<ArrowLeftOutlined/>}
             >
-              Back
+              Nazad
             </CreateButton>
 
             <Button
@@ -82,7 +82,7 @@ const CreateTeam = () => {
               className="antbutton"
               icon={<PlusSquareOutlined/>}
             >
-              Submit
+              Potvrdi
             </Button>
           </div>
 

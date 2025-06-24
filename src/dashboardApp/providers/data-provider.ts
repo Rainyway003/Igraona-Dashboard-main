@@ -241,7 +241,7 @@ const dataProvider: DataProvider = {
 
 
     if (resource === "participants" && !meta?.doNotDelete && meta?.tournamentId) {
-      console.log("CUAM")
+      console.log("C")
       const docRef = doc(db, "tournaments", String(meta?.tournamentId),  resource, String(id));
       const tournamentRef = doc(db, "tournaments", String(meta?.tournamentId));
       await updateDoc(tournamentRef, {
@@ -249,6 +249,15 @@ const dataProvider: DataProvider = {
       })
       await deleteDoc(docRef);
       return {data: {id} as TData};
+    }
+
+    if(resource === "banned"){
+      const docRef = doc(db, "tournaments", String(id), "participants", String(meta?.teamId));
+      await deleteDoc(docRef);
+
+      return {
+        data: {id} as TData,
+      };
     }
   },
   getOne: async ({

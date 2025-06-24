@@ -1,12 +1,9 @@
 import React, {FC, useState} from 'react'
-import {Button, Input, Layout, Space, Table, theme} from "antd";
+import { Input, Space, Table} from "antd";
 import {CreateButton, DeleteButton} from "@refinedev/antd";
 import {useNavigate} from 'react-router';
 import {useList} from "@refinedev/core";
 import {useOutletContext} from "react-router-dom";
-import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
-
-const {Content} = Layout;
 
 const ShowBanned: FC = () => {
   const navigate = useNavigate()
@@ -19,7 +16,7 @@ const ShowBanned: FC = () => {
         <div className="flex justify-between w-full">
           <Input
               rootClassName={'w-96'}
-              placeholder="Search bans"
+              placeholder="Pretraži izbačene"
               className='shadow-md'
               allowClear
               value={searchTerm}
@@ -29,7 +26,7 @@ const ShowBanned: FC = () => {
               className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
               resource="tournaments"
               onClick={() => navigate('/banned/new')}
-          />
+          >Stvori</CreateButton>
 
         </div>
     );
@@ -44,7 +41,7 @@ const ShowBanned: FC = () => {
 
   const columns = [
     {
-      title: 'Faceit Igrača',
+      title: 'Faceit igrača',
       dataIndex: 'faceit',
       key: 'faceit',
       render: (_: any, record: any) => (
@@ -54,7 +51,7 @@ const ShowBanned: FC = () => {
       ),
     },
     {
-      title: 'Razlog Bana',
+      title: 'Razlog',
       dataIndex: 'reason',
       key: 'reason',
     },

@@ -46,7 +46,7 @@ const EditTeam = () => {
                   onClick={() => navigate('/tournaments')}
                   icon={<ArrowLeftOutlined/>}
                 >
-                  Back
+                  Nazad
                 </CreateButton>
 
                 <Button
@@ -55,7 +55,7 @@ const EditTeam = () => {
                   className="antbutton"
                   icon={<PlusSquareOutlined/>}
                 >
-                  Submit
+                  Potvrdi
                 </Button>
 
               </div>

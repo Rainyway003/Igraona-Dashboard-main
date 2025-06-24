@@ -1,14 +1,13 @@
-import React, {PropsWithChildren, useEffect, useState} from 'react';
-import {Layout, theme, Table, Avatar, Space, Input, Form, Button} from 'antd';
-import {EyeOutlined, ArrowLeftOutlined, PlusSquareOutlined} from '@ant-design/icons';
-
-const {Content} = Layout;
+import React, { useState} from 'react';
+import { Table, Space, Input, Form, Button} from 'antd';
+import { ArrowLeftOutlined, PlusSquareOutlined} from '@ant-design/icons';
 
 import {useCreate, useList, useOne} from "@refinedev/core"
 import {CreateButton, DeleteButton} from '@refinedev/antd';
 import {useNavigate, useParams} from 'react-router';
 import ShowPlayers from "../players/ShowPlayers";
 import {useOutletContext} from "react-router-dom";
+import BanTeamButton from "./BanTeam";
 
 interface ShowPlayersProps {
   children?: React.ReactNode;
@@ -31,11 +30,11 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
               onClick={() => navigate('/tournaments')}
               icon={<ArrowLeftOutlined/>}
           >
-            Back
+            Nazad
           </CreateButton>
           <Input
               rootClassName={'w-96'}
-              placeholder="Search teams"
+              placeholder="Pretraži timove"
               className='shadow-md'
               allowClear
               value={searchTerm}
@@ -59,7 +58,6 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
   })
 
   const tournament = tournamentData?.data;
-  console.log(tournament)
 
   const {data, isLoading} = useList<any>({
     resource: "participants",
@@ -132,6 +130,9 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
                         meta={{
                           tournamentId: id
                         }}/>
+          <BanTeamButton  resource="participants"
+                          teamId={record.id}
+                          ></BanTeamButton>
         </Space>
       ),
     },

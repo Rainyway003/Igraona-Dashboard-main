@@ -64,7 +64,7 @@ const EditRule = () => {
               onClick={() => navigate('/rules')}
               icon={<ArrowLeftOutlined/>}
           >
-            Back
+            Nazad
           </CreateButton>
 
           <Button
@@ -74,7 +74,7 @@ const EditRule = () => {
               form='edit'
               icon={<PlusSquareOutlined/>}
           >
-            Submit
+            Potvrdi
           </Button>
         </div>
     );
@@ -99,8 +99,8 @@ const EditRule = () => {
     <>
         <Form layout="vertical" {...formProps} onFinish={onFinish} id='edit'>
 
-            <Form.Item label={'Ime pravila'} name="name" rules={[{required: true}]}>
-              <Input placeholder="Ime pravila"/>
+            <Form.Item label={'Naziv pravila'} name="name" rules={[{required: true}]}>
+              <Input placeholder="Naziv pravila"/>
             </Form.Item>
             <Form.Item name="rule" rules={[{required: true}]}>
               <ReactQuill

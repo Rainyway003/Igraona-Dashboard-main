@@ -108,13 +108,13 @@ const Sidebar = () => {
           {
             key: '3',
             icon: <AimOutlined/>,
-            label: 'Games',
+            label: 'Igre',
             onClick: () => handleNavigation('3')
           },
           {
             key: '4',
             icon: <DeleteOutlined/>,
-            label: 'Banned',
+            label: 'Izbačeni',
             onClick: () => handleNavigation('4')
           },
           {

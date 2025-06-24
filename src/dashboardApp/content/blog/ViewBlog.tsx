@@ -1,11 +1,10 @@
 import React from 'react';
-import {Input, Layout, theme, Typography} from "antd";
+import {Typography} from "antd";
 import {useNavigate, useOutletContext, useParams} from "react-router";
 import {useOne} from "@refinedev/core";
 import {CreateButton} from "@refinedev/antd";
 import {ArrowLeftOutlined} from "@ant-design/icons";
 
-const {Content} = Layout;
 const {Title} = Typography;
 
 const ViewBlog = () => {
@@ -23,7 +22,7 @@ const ViewBlog = () => {
                     onClick={() => navigate('/blog')}
                     icon={<ArrowLeftOutlined/>}
                 >
-                    Back
+                    Nazad
                 </CreateButton>
             </div>
         );

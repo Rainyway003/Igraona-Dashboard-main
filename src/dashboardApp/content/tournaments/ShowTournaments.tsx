@@ -16,7 +16,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
     setHeaderActions(
       <div className="flex justify-between w-full">
         <Input
-          placeholder="Search tournaments"
+          placeholder="Pretraži turnire"
           allowClear
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -26,7 +26,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
           resource="tournaments"
           onClick={() => navigate('/tournaments/new')}
           className="antbutton"
-        />
+        >Stvori</CreateButton>
       </div>
     );
 
@@ -82,7 +82,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       render: () => <Avatar icon={<AntDesignOutlined/>}/>,
     },
     {
-      title: 'Naziv turnira',
+      title: 'Naziv',
       dataIndex: 'name',
       key: 'name',
       sorter: true,
@@ -143,7 +143,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       ),
     },
     {
-      title: 'Početak Prijava',
+      title: 'Početak prijava',
       dataIndex: 'signUpStartingAt',
       key: 'signUpStartingAt',
       sorter: true,
@@ -154,7 +154,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       ),
     },
     {
-      title: 'Kraj Prijava',
+      title: 'Kraj prijava',
       dataIndex: 'signUpEndingAt',
       key: 'signUpEndingAt',
       sorter: true,

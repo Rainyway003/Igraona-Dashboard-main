@@ -23,7 +23,7 @@ const CreateBan: FC = () => {
                     onClick={() => navigate('/banned')}
                     icon={<ArrowLeftOutlined/>}
                 >
-                    Back
+                    Nazad
                 </CreateButton>
                 <Button
                     type="primary"
@@ -32,7 +32,7 @@ const CreateBan: FC = () => {
                     form='create'
                     icon={<PlusSquareOutlined/>}
                 >
-                    Submit
+                    Potvrdi
                 </Button>
             </div>
         );
@@ -61,11 +61,11 @@ const CreateBan: FC = () => {
               <Input placeholder={'Ime igrača'}/>
             </Form.Item>
             <Form.Item
-              label={"Razlog bana"}
+              label={"Razlog"}
               name={'reason'}
               rules={[{required: true}]}
             >
-              <Input placeholder={'Razlog bana'}/>
+              <Input placeholder={'Razlog izbacivanja'}/>
             </Form.Item>
         </Form>
     </>

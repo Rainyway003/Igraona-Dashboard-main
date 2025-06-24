@@ -65,7 +65,7 @@ const CreateRule = () => {
               onClick={() => navigate('/rules')}
               icon={<ArrowLeftOutlined/>}
           >
-            Back
+            Nazad
           </CreateButton>
           <Button
               type="primary"
@@ -74,7 +74,7 @@ const CreateRule = () => {
               form='create'
               icon={<PlusSquareOutlined/>}
           >
-            Submit
+            Potvrdi
           </Button>
         </div>
     );
@@ -94,8 +94,8 @@ const CreateRule = () => {
   return (
       <>
         <Form layout="vertical" onFinish={onFinish} id='create'>
-            <Form.Item label={'Ime pravila'} name="name" rules={[{required: true}]}>
-              <Input placeholder="Ime pravila"/>
+            <Form.Item label={'Naziv pravila'} name="name" rules={[{required: true}]}>
+              <Input placeholder="Naziv pravila"/>
             </Form.Item>
             <Form.Item name="rule" rules={[{required: true}]}>
               <ReactQuill

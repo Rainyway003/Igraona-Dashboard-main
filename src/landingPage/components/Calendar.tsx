@@ -21,8 +21,8 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
   const reservedDates = useMemo(() => {
     const list = (reservedData?.data || []).map((item) => {
       const dateObj = typeof item.vrijeme === 'object' && item.vrijeme?.toDate
-        ? item.vrijeme.toDate()
-        : new Date(item.vrijeme);
+          ? item.vrijeme.toDate()
+          : new Date(item.vrijeme);
 
       const formatted = dayjs(dateObj).startOf('day').format('YYYY-MM-DD');
       return formatted;
@@ -60,49 +60,49 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
   const now = dayjs()
 
   return (
-    <Calendar
-      fullscreen={true}
-      onSelect={onSelect}
-      value={undefined}
-      disabledDate={(date) => {
-        const formatted = date.startOf('day').format('YYYY-MM-DD');
-        return date.isBefore(now.startOf('day')) || reservedDates.includes(formatted);
-      }}
-      dateCellRender={(date) => {
-        const formatted = date.startOf("day").format("YYYY-MM-DD");
-        const isReserved = reservedDates.includes(formatted);
-        const isSelected = selectedDates.some((d) => d.isSame(date, 'day'));
+      <Calendar
+          fullscreen={true}
+          onSelect={onSelect}
+          value={undefined}
+          disabledDate={(date) => {
+            const formatted = date.startOf('day').format('YYYY-MM-DD');
+            return date.isBefore(now.startOf('day')) || reservedDates.includes(formatted);
+          }}
+          dateCellRender={(date) => {
+            const formatted = date.startOf("day").format("YYYY-MM-DD");
+            const isReserved = reservedDates.includes(formatted);
+            const isSelected = selectedDates.some((d) => d.isSame(date, 'day'));
 
-        let style: React.CSSProperties = {
-          width: '50%',
-          height: '40%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: '50%',
-          fontWeight: 'bold',
-          margin: '0 auto',
-        };
+            let style: React.CSSProperties = {
+              width: '50%',
+              height: '40%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              fontWeight: 'bold',
+              margin: '0 auto',
+            };
 
-        if (isReserved) {
-          style.backgroundColor = '#8D151F';
-          style.color = '#fff';
-        } else if (isSelected) {
-          style.backgroundColor = '#b5212d';
-          style.color = '#fff';
-        }
+            if (isReserved) {
+              style.backgroundColor = '#8D151F';
+              style.color = '#fff';
+            } else if (isSelected) {
+              style.backgroundColor = '#b5212d';
+              style.color = '#fff';
+            }
 
-        const cellContent = (
-          <div style={style}>
-            {isReserved ? '✖️' : isSelected ? '✔️' : null}
-          </div>
-        );
+            const cellContent = (
+                <div style={style}>
+                  {isReserved ? '✖️' : isSelected ? '✔️' : null}
+                </div>
+            );
 
-        return isReserved ? (
-          <Tooltip title="Ovaj datum je već rezerviran">{cellContent}</Tooltip>
-        ) : cellContent;
-      }}
-    />
+            return isReserved ? (
+                <Tooltip title="Ovaj datum je već rezerviran">{cellContent}</Tooltip>
+            ) : cellContent;
+          }}
+      />
   );
 };
 

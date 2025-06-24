@@ -1,11 +1,10 @@
 import React, {useState} from 'react'
-import {Input, Layout, Space, Table, theme} from "antd";
+import {Input, Space, Table, theme} from "antd";
 import {useNavigate, useOutletContext} from "react-router";
 import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useList} from "@refinedev/core";
-import {ArrowLeftOutlined, EyeOutlined} from "@ant-design/icons";
+import { EyeOutlined} from "@ant-design/icons";
 
-const {Content} = Layout;
 
 const ShowBlogs = () => {
   const navigate = useNavigate();
@@ -18,7 +17,7 @@ const ShowBlogs = () => {
             <div className="flex justify-between w-full">
                 <Input
                     rootClassName={'w-96'}
-                    placeholder="Search blogs"
+                    placeholder="Pretraži blogove"
                     className='shadow-md'
                     allowClear
                     value={searchTerm}
@@ -28,7 +27,7 @@ const ShowBlogs = () => {
                     className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
                     resource="tournaments"
                     onClick={() => navigate('/blog/new')}
-                />
+                >Stvori</CreateButton>
             </div>
         );
     }, [navigate, searchTerm, setHeaderActions ]);
@@ -40,18 +39,13 @@ const ShowBlogs = () => {
     ]
   });
 
-
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
-
   if (isLoading) {
     return <div>...Loading</div>;
   }
 
   const columns = [
     {
-      title: 'Title',
+      title: 'Naziv',
       dataIndex: 'title',
       key: 'title',
     },

@@ -39,7 +39,7 @@ const ShowReserve: FC = () => {
         <div className="flex w-full gap-4">
           <Input
               rootClassName={'w-96'}
-              placeholder="Search tournaments"
+              placeholder="Pretraži turnire"
               className='shadow-md'
               allowClear
               value={searchTerm}
@@ -74,7 +74,7 @@ const ShowReserve: FC = () => {
 
   const columns = [
     {
-      title: 'Ime i Prezime',
+      title: 'Ime i prezime',
       dataIndex: 'name',
       key: 'name',
     },

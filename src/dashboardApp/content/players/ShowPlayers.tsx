@@ -156,14 +156,14 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
               onClick={handleEditClick}
               icon={null}
             >
-              Cancel
+              Odustani
             </CreateButton>
             <Button
               type="primary"
               htmlType="submit"
               className="antbutton"
             >
-              Submit
+              Potvrdi
             </Button>
           </div>
           :
@@ -173,7 +173,7 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
             onClick={handleEditClick}
             icon={null}
           >
-            Edit
+            Uredi
           </CreateButton>
         }
       </Form.Item>,

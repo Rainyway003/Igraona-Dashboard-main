@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCreate, useDelete } from "@refinedev/core";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../dashboardApp/providers/firebase";
-import {Timestamp} from 'firebase/firestore';
+import { Timestamp } from "firebase/firestore";
+import {CreateButton, DeleteButton} from "@refinedev/antd";
+import { Modal, Input, Button, message } from "antd";
+import {UserDeleteOutlined, UsergroupDeleteOutlined} from "@ant-design/icons";
 
 interface BanPlayerProps {
   player: string;
@@ -14,10 +17,11 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
   const { mutate: createBan } = useCreate();
   const { mutate: deleteFieldInTeam } = useDelete();
 
-  const handleBan = async () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [banReason, setBanReason] = useState("");
 
+  const handleBan = async () => {
     try {
-      // Sačekaj da se ban upiše
       await new Promise((resolve, reject) => {
         createBan(
             {
@@ -25,6 +29,7 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
               values: {
                 faceit: player,
                 timestamp: Timestamp.fromDate(new Date()),
+                reason: banReason || 'Nije naveden',
               },
             },
             {
@@ -34,7 +39,7 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
         );
       });
 
-      const teamRef = doc(db, "tournaments", tournamentId, "participants", teamId);
+      const teamRef = doc(db, "tournaments", tournamentId!, "participants", teamId!);
       const teamSnap = await getDoc(teamRef);
       const teamData = teamSnap.data();
 
@@ -52,25 +57,56 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
         }
       }
 
-      deleteFieldInTeam({
+      await deleteFieldInTeam({
         resource: "participants",
-        id: teamId,
+        id: teamId!,
         meta: {
           tournamentId,
           fieldToDelete,
         },
       });
 
-      console.log(`Igrač ${player} banovan i polje ${fieldToDelete} obrisano.`);
+      message.success(`Igrač ${player} je izbačen.`);
+      setIsModalOpen(false);
+      setBanReason("");
     } catch (error) {
-      console.error("NEDAM TI ERROR");
+      console.error("Neće :", error);
     }
   };
 
   return (
-    <button onClick={handleBan} style={{ color: "red" }}>
-      Ban Player
-    </button>
+      <>
+        <CreateButton
+            hideText
+            icon={<UserDeleteOutlined />}
+            onClick={() => setIsModalOpen(true)}
+            size="small"
+            className="text-red-400 hover:!text-red-300 border border-red-500 hover:!border-red-300 bg-transparent transition"
+            style={{ background: 'transparent' }}
+        />
+
+        <Modal
+            title={`Izbaci igrača : ${player}`}
+            open={isModalOpen}
+            onCancel={() => setIsModalOpen(false)}
+            footer={[
+              <Button key="cancel" onClick={() => setIsModalOpen(false)}>
+                Odustani
+              </Button>,
+              <Button key="submit" type="primary" danger onClick={handleBan}>
+                Izbaci igrača
+              </Button>,
+            ]}
+        >
+          <p>Unesi razlog bana (opcionalno) :</p>
+          <Input.TextArea
+              rows={4}
+              value={banReason}
+              onChange={(e) => setBanReason(e.target.value)}
+              placeholder="Npr. pravio se pametan..."
+          />
+        </Modal>
+      </>
   );
 };
 

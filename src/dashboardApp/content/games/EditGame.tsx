@@ -25,7 +25,7 @@ const EditGame = () => {
               onClick={() => navigate('/games')}
               icon={<ArrowLeftOutlined/>}
           >
-            Back
+            Nazad
           </Button>
 
           <Button
@@ -35,7 +35,7 @@ const EditGame = () => {
               form="edit"
               icon={<PlusSquareOutlined />}
           >
-            Submit
+            Potvrdi
           </Button>
 
         </div>
@@ -81,8 +81,8 @@ const EditGame = () => {
   return (
     <>
         <Form layout="vertical" {...formProps} onFinish={handleFinish} id='edit'>
-            <Form.Item label="Ime igre" name="name" rules={[{required: true}]}>
-              <Input placeholder="Ime igre"/>
+            <Form.Item label="Naziv igre" name="name" rules={[{required: true}]}>
+              <Input placeholder="Naziv igre"/>
             </Form.Item>
 
             <Form.Item label="Slika igre">

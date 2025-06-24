@@ -17,7 +17,7 @@ const ShowGames: FC = () => {
       <div className="flex justify-between w-full">
         <Input
           rootClassName={'w-96'}
-          placeholder="Search games"
+          placeholder="Pretraži igre"
           className='shadow-md'
           allowClear
           value={searchTerm}
@@ -27,7 +27,7 @@ const ShowGames: FC = () => {
           className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
           resource="tournaments"
           onClick={() => navigate('/games/new')}
-        />
+        >Stvori</CreateButton>
       </div>
     );
 
@@ -49,7 +49,7 @@ const ShowGames: FC = () => {
       render: (_: any, record: any) => <Avatar src={record.imageUrl}/>,
     },
     {
-      title: 'Naziv Igre',
+      title: 'Naziv igre',
       dataIndex: 'name',
       key: 'name',
     },

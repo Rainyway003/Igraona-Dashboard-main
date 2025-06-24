@@ -66,7 +66,7 @@ const CreateBlog = () => {
               onClick={() => navigate('/blog')}
               icon={<ArrowLeftOutlined/>}
           >
-            Back
+            Nazad
           </CreateButton>
           <Button
               type="primary"
@@ -75,7 +75,7 @@ const CreateBlog = () => {
               form='create'
               icon={<PlusSquareOutlined/>}
           >
-            Submit
+            Potvrdi
           </Button>
         </div>
     );
@@ -94,8 +94,8 @@ const CreateBlog = () => {
   return (
     <>
         <Form layout="vertical" onFinish={onFinish} id='create'>
-            <Form.Item label={'Title'} name="title" rules={[{required: true}]}>
-              <Input placeholder="Title"/>
+            <Form.Item label={'Naziv'} name="title" rules={[{required: true}]}>
+              <Input placeholder="Naziv bloga"/>
             </Form.Item>
             <Form.Item name="blog" rules={[{required: true}]}>
               <ReactQuill

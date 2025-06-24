@@ -25,7 +25,7 @@ const CreateGame: FC = () => {
               onClick={() => navigate('/games')}
               icon={<ArrowLeftOutlined/>}
           >
-            Back
+            Nazad
           </CreateButton>
           <Button
               type="primary"
@@ -34,7 +34,7 @@ const CreateGame: FC = () => {
               form='create'
               icon={<PlusSquareOutlined/>}
           >
-            Submit
+            Potvrdi
           </Button>
         </div>
     );
@@ -81,11 +81,11 @@ const CreateGame: FC = () => {
     <>
         <Form layout="vertical" onFinish={onFinish} id='create'>
             <Form.Item
-              label={"Ime igre"}
+              label={"Naziv igre"}
               name={'name'}
               rules={[{required: true}]}
             >
-              <Input placeholder={'Ime igre'}/>
+              <Input placeholder={'Naziv igre'}/>
             </Form.Item>
             <Form.Item
               label={"Slika igre"}

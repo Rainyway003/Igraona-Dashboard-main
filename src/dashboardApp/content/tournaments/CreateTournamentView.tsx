@@ -43,7 +43,7 @@ const CreateTournamentView = () => {
           onClick={() => navigate("/tournaments")}
           icon={<ArrowLeftOutlined/>}
         >
-          Back
+          Nazad
         </Button>
         <div className={'flex gap-2'}>
           <Button
@@ -53,7 +53,7 @@ const CreateTournamentView = () => {
             icon={<PlusSquareOutlined/>}
             form="create"
           >
-            Submit
+            Potvrdi
           </Button>
         </div>
       </div>
@@ -90,11 +90,11 @@ const CreateTournamentView = () => {
 
 
             <Form.Item
-              label="Ime turnira"
+              label="Naziv turnira"
               name={'name'}
               rules={[{required: true}]}
             >
-              <Input placeholder="Ime turnira"/>
+              <Input placeholder="Naziv turnira"/>
             </Form.Item>
             <Form.Item
               label="Igra"
@@ -111,30 +111,55 @@ const CreateTournamentView = () => {
               />
             </Form.Item>
             <Form.List name="prizes">
-              {(fields, {add, remove}) => (
-                <>
-                  {fields.map(({key, name, ...restField}) => (
-                    <Space key={key} style={{display: 'flex', marginBottom: 8}} align="baseline">
-                      <Form.Item
-                        {...restField}
-                        name={name}
-                        rules={[{required: true}]}
-                        label={`${name + 1}. Mjesto`}
-                      >
-                        <Input placeholder={`${name + 1}`}/>
-                      </Form.Item>
-                      <MinusCircleOutlined onClick={() => remove(name)}/>
-                    </Space>
-                  ))}
-                  <Form.Item label={"Nagrade"} className={' w-48'}>
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
-                      Add field
-                    </Button>
-                  </Form.Item>
-                </>
-              )}
+                {(fields, { add, remove }) => (
+                    <>
+
+                        {fields.map(({ key, name, ...restField }) => (
+                            <div
+                                key={key}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    marginBottom: '6px',
+                                }}
+                            >
+                                <label style={{ minWidth: '80px' }}>{`${name + 1}. mjesto:`}</label>
+
+                                <Form.Item
+                                    {...restField}
+                                    name={name}
+                                    rules={[{ required: true, message: 'Unesite nagradu' }]}
+                                    style={{ margin: 0 }}
+                                >
+                                    <Input
+                                        placeholder="Nagrada"
+                                        style={{ width: '160px' }}
+                                    />
+                                </Form.Item>
+
+                                {name === fields[fields.length - 1].name && (
+                                    <MinusCircleOutlined
+                                        onClick={() => remove(name)}
+                                        style={{ color: 'red', cursor: 'pointer' }}
+                                    />
+                                )}
+                            </div>
+                        ))}
+                        <Form.Item label="Nagrade" style={{ marginTop: 20 }}>
+                            <Button
+                                type="dashed"
+                                onClick={() => add()}
+                                icon={<PlusOutlined />}
+                                style={{ width: 'fit-content', padding: '0 12px' }}
+                            >
+                                Dodaj nagradu
+                            </Button>
+                        </Form.Item>
+                    </>
+                )}
             </Form.List>
-            <div className={'flex justify-evenly'}>
+            <div className={'flex mt-8 gap-9'}>
               <Form.Item
                 label="Broj ljudi u timu"
                 name={'teamSizeRequired'}
@@ -143,18 +168,18 @@ const CreateTournamentView = () => {
                 <Input placeholder="Broj ljudi u timu" type="number"/>
               </Form.Item>
               <Form.Item
-                label="Broj ljudi u timu"
+                label="Broj rezervi"
                 name={'teamSizeOptional'}
               >
-                <Input placeholder="Broj ljudi u timu" type="number"/>
+                <Input placeholder="Broj rezervi" type="number"/>
               </Form.Item>
             </div>
             <Form.Item
-              label="Broj timova"
-              name={'maxNumberOfParticipants'}
-              rules={[{required: true}]}
+                label="Maksimalan broj timova"
+                name={'maxNumberOfParticipants'}
+                rules={[{required: true}]}
             >
-              <Input placeholder="Broj timova" type="number"/>
+                <Input placeholder="Maksimalan broj timova" type="number" className='w-[404px]'/>
             </Form.Item>
             <Form.Item
               label="Traje od"
@@ -166,7 +191,7 @@ const CreateTournamentView = () => {
                 disabledDate={disablePastDates}/>
             </Form.Item>
             <Form.Item
-              label="Trajanje Prijava"
+              label="Trajanje prijava"
               name={'signUpStartingAt'}
               rules={[{required: true}]}
             >
@@ -177,7 +202,6 @@ const CreateTournamentView = () => {
             <Form.Item
               label="Pravila"
               name={'rule'}
-              rules={[{required: true}]}
               className='flex flex-col'
             >
               <Select

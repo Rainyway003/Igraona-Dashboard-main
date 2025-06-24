@@ -29,7 +29,7 @@ const ShowRules: FC = () => {
         <div className="flex justify-between w-full">
           <Input
               rootClassName={'w-96'}
-              placeholder="Search rules"
+              placeholder="Pretraži pravila"
               className='shadow-md'
               allowClear
               value={searchTerm}
@@ -39,7 +39,7 @@ const ShowRules: FC = () => {
               className="antbutton bg-[#8D151F] hover:bg-[#6e1018] text-white border-none !hover:!bg-[#6e1018] !hover:!border-none"
               resource="tournaments"
               onClick={() => navigate('/rules/new')}
-          />
+          >Stvori</CreateButton>
         </div>
     );
   }, [navigate, searchTerm, setHeaderActions ]);
@@ -50,7 +50,7 @@ const ShowRules: FC = () => {
 
   const columns = [
     {
-      title: 'Ime pravila',
+      title: 'Naziv pravila',
       dataIndex: 'name',
       key: 'name',
     },
