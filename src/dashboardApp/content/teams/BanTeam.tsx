@@ -96,44 +96,44 @@ const BanTeamButton: React.FC<BanTeamButtonProps> = ({ teamId, resource}) => {
     };
 
     return (
-    <>
-        <CreateButton
-            hideText
-            icon={<UsergroupDeleteOutlined />}
-            onClick={() => {
-                getTeamName();
-                setIsModalOpen(true);
-            }}
-            size="small"
-            className="text-red-400 hover:!text-red-300 border border-red-500 hover:!border-red-300 bg-transparent transition"
-            style={{ background: 'transparent' }}
-        />
-
-        <Modal
-            title={`Izbaciti tim ${teamName} ?`}
-            open={isModalOpen}
-            onCancel={() => setIsModalOpen(false)}
-            footer={[
-                <Button key="cancel" onClick={() => setIsModalOpen(false)}>
-                    Odustani
-                </Button>,
-                <Button key="submit" type="primary" danger onClick={() => {
-                    handleBanTeam();
-                    setIsModalOpen(false);
-                }}>
-                    Izbaci tim
-                </Button>,
-            ]}
-        >
-            <p>Unesi razlog bana (opcionalno) :</p>
-            <Input.TextArea
-                rows={4}
-                value={banReason}
-                onChange={(e) => setBanReason(e.target.value)}
-                placeholder="Npr. pravio se pametan..."
+        <>
+            <CreateButton
+                hideText
+                icon={<UsergroupDeleteOutlined />}
+                onClick={() => {
+                    getTeamName();
+                    setIsModalOpen(true);
+                }}
+                size="small"
+                className="text-red-400 hover:!text-red-300 border border-red-500 hover:!border-red-300 bg-transparent transition"
+                style={{ background: 'transparent' }}
             />
-        </Modal>
-    </>
+
+            <Modal
+                title={`Izbaciti tim ${teamName} ?`}
+                open={isModalOpen}
+                onCancel={() => setIsModalOpen(false)}
+                footer={[
+                    <Button key="cancel" onClick={() => setIsModalOpen(false)}>
+                        Odustani
+                    </Button>,
+                    <Button key="submit" type="primary" danger onClick={() => {
+                        handleBanTeam();
+                        setIsModalOpen(false);
+                    }}>
+                        Izbaci tim
+                    </Button>,
+                ]}
+            >
+                <p>Unesi razlog bana (opcionalno) :</p>
+                <Input.TextArea
+                    rows={4}
+                    value={banReason}
+                    onChange={(e) => setBanReason(e.target.value)}
+                    placeholder="Npr. pravio se pametan..."
+                />
+            </Modal>
+        </>
     );
 };
 

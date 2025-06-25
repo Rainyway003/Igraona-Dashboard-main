@@ -5,45 +5,46 @@ import {useNavigate} from "react-router";
 import {CreateButton} from "@refinedev/antd";
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import {useOutletContext} from "react-router-dom";
-
-const {Content} = Layout
+import {Timestamp} from "firebase/firestore";
 
 const CreateBan: FC = () => {
   const navigate = useNavigate()
-  const {mutate} = useCreate()
+  const {mutate, isLoading} = useCreate()
 
-    const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+  const {setHeaderActions} = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
-    React.useEffect(() => {
-        setHeaderActions(
-            <div className="flex justify-between w-full">
-                <CreateButton
-                    type="primary"
-                    className="antbutton"
-                    onClick={() => navigate('/banned')}
-                    icon={<ArrowLeftOutlined/>}
-                >
-                    Nazad
-                </CreateButton>
-                <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="antbutton"
-                    form='create'
-                    icon={<PlusSquareOutlined/>}
-                >
-                    Potvrdi
-                </Button>
-            </div>
-        );
-    }, [navigate, setHeaderActions ]);
+  React.useEffect(() => {
+    setHeaderActions(
+      <div className="flex justify-between w-full">
+        <CreateButton
+          type="primary"
+          className="antbutton"
+          onClick={() => navigate('/banned')}
+          icon={<ArrowLeftOutlined/>}
+        >
+          Nazad
+        </CreateButton>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className="antbutton"
+          form='create'
+          disabled={isLoading}
+          icon={<PlusSquareOutlined/>}
+        >
+          Potvrdi
+        </Button>
+      </div>
+    );
+  }, [navigate, setHeaderActions, isLoading,]);
 
-  const onFinish = (values: { name: string; imageUrl: string }) => {
+  const onFinish = (values: { name: string; imageUrl: string; reason: string }) => {
     mutate({
         resource: 'banned',
         values: {
-          name: values.name,
-          imageUrl: values.imageUrl,
+          faceit: values.faceit,
+            reason: values.reason,
+            timestamp: Timestamp.fromDate(new Date()),
         },
       }
     )
@@ -52,22 +53,22 @@ const CreateBan: FC = () => {
 
   return (
     <>
-        <Form layout="vertical" onFinish={onFinish} id='create'>
-            <Form.Item
-              label={"Ime igrača"}
-              name={'name'}
-              rules={[{required: true}]}
-            >
-              <Input placeholder={'Ime igrača'}/>
-            </Form.Item>
-            <Form.Item
-              label={"Razlog"}
-              name={'reason'}
-              rules={[{required: true}]}
-            >
-              <Input placeholder={'Razlog izbacivanja'}/>
-            </Form.Item>
-        </Form>
+      <Form layout="vertical" onFinish={onFinish} id='create'>
+        <Form.Item
+          label={"Ime igrača"}
+          name={'faceit'}
+          rules={[{required: true}]}
+        >
+          <Input placeholder={'Ime igrača'}/>
+        </Form.Item>
+        <Form.Item
+          label={"Razlog"}
+          name={'reason'}
+          rules={[{required: true}]}
+        >
+          <Input placeholder={'Razlog izbacivanja'}/>
+        </Form.Item>
+      </Form>
     </>
   )
 }

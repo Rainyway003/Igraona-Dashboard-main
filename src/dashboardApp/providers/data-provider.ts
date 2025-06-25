@@ -56,6 +56,12 @@ const dataProvider: DataProvider = {
         });
       }
 
+      if (sorters && sorters.length > 0) {
+        sorters.forEach((sorter: any) => {
+          constraints.push(orderBy(sorter.field, sorter.order || "asc"));
+        });
+      }
+
       const teamsQuery = constraints.length > 0 ? query(teamsCollection, ...constraints) : teamsCollection;
       const teamsSnap = await getDocs(teamsQuery);
 
@@ -146,7 +152,7 @@ const dataProvider: DataProvider = {
       };
     }
 
-    if(resource === "reserve"){
+    if (resource === "reserve") {
       const id = meta?.id || (variables as any).id;
 
       await setDoc(doc(db, resource, id), variables as WithFieldValue<DocumentData>);
@@ -218,7 +224,6 @@ const dataProvider: DataProvider = {
     if (
       resource === "tournaments" ||
       resource === "games" ||
-      resource === "rules" ||
       resource === "blog" ||
       resource === "reserve"
     ) {
@@ -242,7 +247,7 @@ const dataProvider: DataProvider = {
 
     if (resource === "participants" && !meta?.doNotDelete && meta?.tournamentId) {
       console.log("C")
-      const docRef = doc(db, "tournaments", String(meta?.tournamentId),  resource, String(id));
+      const docRef = doc(db, "tournaments", String(meta?.tournamentId), resource, String(id));
       const tournamentRef = doc(db, "tournaments", String(meta?.tournamentId));
       await updateDoc(tournamentRef, {
         numberOfParticipants: increment(-1),
@@ -251,9 +256,24 @@ const dataProvider: DataProvider = {
       return {data: {id} as TData};
     }
 
-    if(resource === "banned"){
+    if (resource === "rules") {
+      const bannedRef = doc(db, resource, String(meta.bannedId));
+      await deleteDoc(bannedRef);
+
+      return {
+        data: {id} as TData,
+      };
+    }
+
+    if (resource === "banned") {
       const docRef = doc(db, "tournaments", String(id), "participants", String(meta?.teamId));
       await deleteDoc(docRef);
+
+      if (meta?.bannedId) {
+        const bannedRef = doc(db, resource, String(meta.bannedId));
+        await deleteDoc(bannedRef);
+      }
+
 
       return {
         data: {id} as TData,

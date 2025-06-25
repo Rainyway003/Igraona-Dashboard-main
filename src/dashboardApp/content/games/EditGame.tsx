@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Avatar, Button, Form, Input, Layout, } from 'antd'
+import {Avatar, Button, Form, Input, Layout,} from 'antd'
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons"
 import {useNavigate} from "react-router"
 import {useForm} from "@refinedev/antd"
@@ -8,39 +8,40 @@ import {ref, uploadBytes, getDownloadURL} from 'firebase/storage'
 import {useOutletContext} from "react-router-dom";
 
 const EditGame = () => {
-  const {formProps, queryResult, saveButtonProps} = useForm({
+  const {formProps, queryResult, formLoading} = useForm({
     resource: 'games',
   });
 
   const navigate = useNavigate()
 
-  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+  const {setHeaderActions} = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
   React.useEffect(() => {
     setHeaderActions(
-        <div className="flex justify-between w-full">
-          <Button
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/games')}
-              icon={<ArrowLeftOutlined/>}
-          >
-            Nazad
-          </Button>
+      <div className="flex justify-between w-full">
+        <Button
+          type="primary"
+          className="antbutton"
+          onClick={() => navigate('/games')}
+          icon={<ArrowLeftOutlined/>}
+        >
+          Nazad
+        </Button>
 
-          <Button
-              type="primary"
-              htmlType="submit"
-              className="antbutton"
-              form="edit"
-              icon={<PlusSquareOutlined />}
-          >
-            Potvrdi
-          </Button>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className="antbutton"
+          form="edit"
+          disabled={formLoading}
+          icon={<PlusSquareOutlined/>}
+        >
+          Potvrdi
+        </Button>
 
-        </div>
+      </div>
     );
-  }, [navigate, setHeaderActions]);
+  }, [navigate, setHeaderActions, formLoading]);
 
   const [imageUrl, setImageUrl] = useState<string | undefined>()
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -80,17 +81,17 @@ const EditGame = () => {
 
   return (
     <>
-        <Form layout="vertical" {...formProps} onFinish={handleFinish} id='edit'>
-            <Form.Item label="Naziv igre" name="name" rules={[{required: true}]}>
-              <Input placeholder="Naziv igre"/>
-            </Form.Item>
+      <Form layout="vertical" {...formProps} onFinish={handleFinish} id='edit'>
+        <Form.Item label="Naziv igre" name="name" rules={[{required: true}]}>
+          <Input placeholder="Naziv igre"/>
+        </Form.Item>
 
-            <Form.Item label="Slika igre">
-              <Input type="file" onChange={uploadFile}/>
-            </Form.Item>
+        <Form.Item label="Slika igre">
+          <Input type="file" onChange={uploadFile}/>
+        </Form.Item>
 
-            {imageUrl && <Avatar src={imageUrl} size={100}/>}
-        </Form>
+        {imageUrl && <Avatar src={imageUrl} size={100}/>}
+      </Form>
     </>
   )
 }

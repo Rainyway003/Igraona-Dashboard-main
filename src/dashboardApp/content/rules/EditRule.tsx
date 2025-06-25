@@ -48,37 +48,38 @@ function imageHandler(this: any) {
 }
 
 const EditRule = () => {
-  const {formProps} = useForm();
+  const {formProps, formLoading} = useForm();
 
   const navigate = useNavigate()
   const [value, setValue] = useState('');
 
-  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+  const {setHeaderActions} = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
   React.useEffect(() => {
     setHeaderActions(
-        <div className="flex justify-between w-full">
-          <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/rules')}
-              icon={<ArrowLeftOutlined/>}
-          >
-            Nazad
-          </CreateButton>
+      <div className="flex justify-between w-full">
+        <CreateButton
+          type="primary"
+          className="antbutton"
+          onClick={() => navigate('/rules')}
+          icon={<ArrowLeftOutlined/>}
+        >
+          Nazad
+        </CreateButton>
 
-          <Button
-              type="primary"
-              htmlType="submit"
-              className="antbutton"
-              form='edit'
-              icon={<PlusSquareOutlined/>}
-          >
-            Potvrdi
-          </Button>
-        </div>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className="antbutton"
+          form='edit'
+          disabled={formLoading}
+          icon={<PlusSquareOutlined/>}
+        >
+          Potvrdi
+        </Button>
+      </div>
     );
-  }, [navigate, setHeaderActions ]);
+  }, [navigate, setHeaderActions, formLoading]);
 
   useEffect(() => {
     if (formProps.initialValues?.rule) {
@@ -97,17 +98,17 @@ const EditRule = () => {
 
   return (
     <>
-        <Form layout="vertical" {...formProps} onFinish={onFinish} id='edit'>
+      <Form layout="vertical" {...formProps} onFinish={onFinish} id='edit'>
 
-            <Form.Item label={'Naziv pravila'} name="name" rules={[{required: true}]}>
-              <Input placeholder="Naziv pravila"/>
-            </Form.Item>
-            <Form.Item name="rule" rules={[{required: true}]}>
-              <ReactQuill
-                style={{height: '300px', minWidth: '100%'}}
-                theme="snow" value={value} onChange={setValue} modules={modules}/>
-            </Form.Item>
-        </Form>
+        <Form.Item label={'Naziv pravila'} name="name" rules={[{required: true}]}>
+          <Input placeholder="Naziv pravila"/>
+        </Form.Item>
+        <Form.Item name="rule" rules={[{required: true}]}>
+          <ReactQuill
+            style={{height: '300px', minWidth: '100%'}}
+            theme="snow" value={value} onChange={setValue} modules={modules}/>
+        </Form.Item>
+      </Form>
     </>
   )
 }

@@ -58,7 +58,9 @@ const ShowBlogs = () => {
                       recordItemId={record.id}
                       onClick={() => navigate(`/blog/${record.id}`)}></EditButton>
           <EditButton hideText size="small" resource="blog" recordItemId={record.id}/>
-          <DeleteButton hideText size="small" resource="blog" recordItemId={record.id}></DeleteButton>
+            <DeleteButton hideText size="small" recordItemId={record.id} resource="blog" meta={{
+                bannedId: record.id
+            }}></DeleteButton>
         </Space>
       ),
     },

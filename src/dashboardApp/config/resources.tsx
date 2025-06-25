@@ -39,6 +39,12 @@ export const resources: IResourceItem[] = [
     edit: '/blog/edit/:id'
   },
   {
+    name: 'reservation',
+    list: '/reservation',
+    create: '/reservation/new',
+    edit: '/reservation/edit/:id'
+  },
+  {
     name: 'rules',
     list: '/rules',
     create: '/rules/new',

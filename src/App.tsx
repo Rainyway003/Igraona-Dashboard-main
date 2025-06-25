@@ -25,8 +25,6 @@ import LandingApp from "./landingPage/LandingApp"
 import SignUpScreen from "./landingPage/landingTournaments/SignUpScreen";
 import ShowTLanding from "./landingPage/landingTournaments/ShowTLanding";
 import ShowPlayers from "./dashboardApp/content/players/ShowPlayers";
-import CreateTeam from "./dashboardApp/content/teams/CreateTeam";
-import EditTeam from "./dashboardApp/content/teams/EditTeam";
 import ShowGames from "./dashboardApp/content/games/ShowGames";
 import CreateGame from "./dashboardApp/content/games/CreateGame";
 import ShowBanned from "./dashboardApp/content/banned/ShowBanned";
@@ -41,6 +39,7 @@ import CreateRule from "./dashboardApp/content/rules/CreateRule";
 import EditGame from "./dashboardApp/content/games/EditGame";
 import EditRule from "./dashboardApp/content/rules/EditRule";
 import EditBlog from "./dashboardApp/content/blog/EditBlog";
+import ViewRule from "./dashboardApp/content/rules/ViewRule";
 
 function App() {
   return (
@@ -74,14 +73,12 @@ function App() {
                   <Route path='edit/:id' element={<EditBlog/>}/>
                 </Route>
                 <Route path="/tournaments">
-                  <Route index element={<ShowTournaments/>} />
+                  <Route index element={<ShowTournaments/>}/>
                   <Route path="new" element={<CreateTournamentView/>}/>
                   <Route path="edit/:id" element={<EditTournament/>}/>
                 </Route>
                 <Route path="/tournaments/:id">
                   <Route index element={<ShowTeams/>}/>
-                  <Route path="new" element={<CreateTeam/>}/>
-                  <Route path="edit" element={<EditTeam/>}/>
                 </Route>
                 <Route path="/tournaments/:id/:name">
                   <Route index element={<ShowPlayers/>}/>
@@ -96,6 +93,7 @@ function App() {
                   <Route index element={<ShowRules/>}/>
                   <Route path={'new'} element={<CreateRule/>}/>
                   <Route path={'edit/:id'} element={<EditRule/>}/>
+                  <Route path={':id'} element={<ViewRule/>}/>
                 </Route>
                 <Route path="/banned">
                   <Route index element={<ShowBanned/>}/>

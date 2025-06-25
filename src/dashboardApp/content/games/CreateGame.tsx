@@ -12,35 +12,35 @@ const {Content} = Layout
 
 const CreateGame: FC = () => {
   const navigate = useNavigate()
-  const {mutate} = useCreate()
-
-  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+  const {mutate, isLoading} = useCreate()
+  const {setHeaderActions} = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
   React.useEffect(() => {
     setHeaderActions(
-        <div className="flex justify-between w-full">
-          <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/games')}
-              icon={<ArrowLeftOutlined/>}
-          >
-            Nazad
-          </CreateButton>
-          <Button
-              type="primary"
-              htmlType="submit"
-              className="antbutton"
-              form='create'
-              icon={<PlusSquareOutlined/>}
-          >
-            Potvrdi
-          </Button>
-        </div>
+      <div className="flex justify-between w-full">
+        <CreateButton
+          type="primary"
+          className="antbutton"
+          onClick={() => navigate('/games')}
+          icon={<ArrowLeftOutlined/>}
+        >
+          Nazad
+        </CreateButton>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className="antbutton"
+          form='create'
+          disabled={isLoading}
+          icon={<PlusSquareOutlined/>}
+        >
+          Potvrdi
+        </Button>
+      </div>
     );
 
     return () => setHeaderActions(null);
-  }, [setHeaderActions, navigate]);
+  }, [setHeaderActions, navigate, isLoading,]);
 
   const [imageUrl, setImageUrl] = React.useState<string | undefined>(undefined)
   const [imageFile, setImageFile] = React.useState<File | undefined>(undefined)
@@ -79,22 +79,22 @@ const CreateGame: FC = () => {
 
   return (
     <>
-        <Form layout="vertical" onFinish={onFinish} id='create'>
-            <Form.Item
-              label={"Naziv igre"}
-              name={'name'}
-              rules={[{required: true}]}
-            >
-              <Input placeholder={'Naziv igre'}/>
-            </Form.Item>
-            <Form.Item
-              label={"Slika igre"}
-              rules={[{required: true}]}
-            >
-              <Input type={'file'} onChange={uploadFile}/>
-            </Form.Item>
-            {imageUrl && <Avatar src={imageUrl} size={100}/>}
-        </Form>
+      <Form layout="vertical" onFinish={onFinish} id='create'>
+        <Form.Item
+          label={"Naziv igre"}
+          name={'name'}
+          rules={[{required: true}]}
+        >
+          <Input placeholder={'Naziv igre'}/>
+        </Form.Item>
+        <Form.Item
+          label={"Slika igre"}
+          rules={[{required: true}]}
+        >
+          <Input type={'file'} onChange={uploadFile}/>
+        </Form.Item>
+        {imageUrl && <Avatar src={imageUrl} size={100}/>}
+      </Form>
     </>
   )
 }

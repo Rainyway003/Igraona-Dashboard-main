@@ -1,5 +1,5 @@
 import React, {PropsWithChildren, useState} from 'react';
-import { Table, Avatar, Space, Progress, Input} from 'antd';
+import {Table, Avatar, Space, Progress, Input} from 'antd';
 import {AntDesignOutlined, EyeOutlined} from '@ant-design/icons';
 
 import {useList} from "@refinedev/core"
@@ -10,7 +10,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+  const {setHeaderActions} = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
   React.useEffect(() => {
     setHeaderActions(
@@ -36,7 +36,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
 
   const [selectedGame, setSelectedGame] = useState<string | undefined>(undefined);
   const [sorters, setSorters] = useState([
-    { field: "startingAt", order: "asc" },
+    {field: "startingAt", order: "asc"},
   ]);
 
   const {data: allGamesData} = useList({
@@ -172,7 +172,6 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
           <EditButton hideText size="small" resource="tournaments" icon={<EyeOutlined/>}
                       recordItemId={record.id}
                       onClick={() => navigate(`/tournaments/${record.id}`)}></EditButton>
-          <EditButton hideText size="small" resource="tournaments" recordItemId={record.id}/>
           <DeleteButton hideText size="small" resource="tournaments" recordItemId={record.id}/>
         </Space>
       ),
@@ -181,46 +180,46 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
 
   return (
     <>
-          <Table
-            loading={isLoading}
-            dataSource={data?.data}
-            columns={columns}
-            rowKey="id"
-            pagination={{
-              pageSize: 10,
-              position: ['bottomCenter'],
-            }}
-            onChange={(pagination, filters, sorter) => {
-              if (filters.game && filters.game.length > 0) {
-                setSelectedGame(filters.game[0]);  // jer filterMultiple = false
-              } else {
-                setSelectedGame(undefined);
-              }
+      <Table
+        loading={isLoading}
+        dataSource={data?.data}
+        columns={columns}
+        rowKey="id"
+        pagination={{
+          pageSize: 10,
+          position: ['bottomCenter'],
+        }}
+        onChange={(pagination, filters, sorter) => {
+          if (filters.game && filters.game.length > 0) {
+            setSelectedGame(filters.game[0]);
+          } else {
+            setSelectedGame(undefined);
+          }
 
-              let sorterArray = [];
+          let sorterArray = [];
 
-              if (Array.isArray(sorter)) {
-                sorterArray = sorter;
-              } else if (sorter && sorter.field) {
-                sorterArray = [sorter];
-              }
+          if (Array.isArray(sorter)) {
+            sorterArray = sorter;
+          } else if (sorter && sorter.field) {
+            sorterArray = [sorter];
+          }
 
-              const formattedSorters = sorterArray
-                  .filter((s) => s.order)
-                  .map((s) => ({
-                    field: s.field,
-                    order: s.order === "ascend" ? "asc" : "desc",
-                  }));
+          const formattedSorters = sorterArray
+            .filter((s) => s.order)
+            .map((s) => ({
+              field: s.field,
+              order: s.order === "ascend" ? "asc" : "desc",
+            }));
 
-              if (formattedSorters.length === 0) {
-                setSorters([{ field: "startingAt", order: "asc" }]);
-              } else {
-                setSorters(formattedSorters);
-              }
-            }}
-          />
+          if (formattedSorters.length === 0) {
+            setSorters([{field: "startingAt", order: "asc"}]);
+          } else {
+            setSorters(formattedSorters);
+          }
+        }}
+      />
 
-          {children}
+      {children}
     </>
   )
 }

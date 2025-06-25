@@ -7,7 +7,7 @@ import {useOutletContext} from "react-router-dom";
 
 const ShowBanned: FC = () => {
   const navigate = useNavigate()
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState('https://www.faceit.com/en/players/')
 
   const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
@@ -60,7 +60,9 @@ const ShowBanned: FC = () => {
       key: 'actions',
       render: (_: any, record: any) => (
         <Space>
-          <DeleteButton hideText size="small" resource="banned" recordItemId={record.id}></DeleteButton>
+          <DeleteButton hideText size="small" recordItemId={record.id} resource="banned" meta={{
+              bannedId: record.id
+          }}></DeleteButton>
         </Space>
       ),
     },

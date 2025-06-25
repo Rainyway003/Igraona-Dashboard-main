@@ -50,36 +50,37 @@ function imageHandler(this: any) {
 }
 
 const CreateBlog = () => {
-  const {mutate} = useCreate();
+  const {mutate, isLoading} = useCreate();
 
   const navigate = useNavigate();
   const [value, setValue] = useState('');
 
-  const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
+  const {setHeaderActions} = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
   React.useEffect(() => {
     setHeaderActions(
-        <div className="flex justify-between w-full">
-          <CreateButton
-              type="primary"
-              className="antbutton"
-              onClick={() => navigate('/blog')}
-              icon={<ArrowLeftOutlined/>}
-          >
-            Nazad
-          </CreateButton>
-          <Button
-              type="primary"
-              htmlType="submit"
-              className="antbutton"
-              form='create'
-              icon={<PlusSquareOutlined/>}
-          >
-            Potvrdi
-          </Button>
-        </div>
+      <div className="flex justify-between w-full">
+        <CreateButton
+          type="primary"
+          className="antbutton"
+          onClick={() => navigate('/blog')}
+          icon={<ArrowLeftOutlined/>}
+        >
+          Nazad
+        </CreateButton>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className="antbutton"
+          form='create'
+          disabled={isLoading}
+          icon={<PlusSquareOutlined/>}
+        >
+          Potvrdi
+        </Button>
+      </div>
     );
-  }, [navigate, setHeaderActions ]);
+  }, [navigate, setHeaderActions, isLoading]);
 
   const onFinish = (values: any) => {
     mutate({
@@ -93,16 +94,16 @@ const CreateBlog = () => {
 
   return (
     <>
-        <Form layout="vertical" onFinish={onFinish} id='create'>
-            <Form.Item label={'Naziv'} name="title" rules={[{required: true}]}>
-              <Input placeholder="Naziv bloga"/>
-            </Form.Item>
-            <Form.Item name="blog" rules={[{required: true}]}>
-              <ReactQuill
-                style={{height: '300px', minWidth: '100%'}}
-                theme="snow" value={value} onChange={setValue} modules={modules}/>
-            </Form.Item>
-        </Form>
+      <Form layout="vertical" onFinish={onFinish} id='create'>
+        <Form.Item label={'Naziv'} name="title" rules={[{required: true}]}>
+          <Input placeholder="Naziv bloga"/>
+        </Form.Item>
+        <Form.Item name="blog" rules={[{required: true}]}>
+          <ReactQuill
+            style={{height: '300px', minWidth: '100%'}}
+            theme="snow" value={value} onChange={setValue} modules={modules}/>
+        </Form.Item>
+      </Form>
     </>
   )
 }
