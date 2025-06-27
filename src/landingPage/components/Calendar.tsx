@@ -20,9 +20,9 @@ const CalendarComponent: React.FC<CalendarComponentProps> = ({
 
   const reservedDates = useMemo(() => {
     const list = (reservedData?.data || []).map((item) => {
-      const dateObj = typeof item.vrijeme === 'object' && item.vrijeme?.toDate
-          ? item.vrijeme.toDate()
-          : new Date(item.vrijeme);
+      const dateObj = typeof item.date === 'object' && item.date?.toDate
+          ? item.date.toDate()
+          : new Date(item.date);
 
       const formatted = dayjs(dateObj).startOf('day').format('YYYY-MM-DD');
       return formatted;

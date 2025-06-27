@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Input, Space, Table, theme} from "antd";
+import {Input, notification, Space, Table, theme} from "antd";
 import {useNavigate, useOutletContext} from "react-router";
 import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useList} from "@refinedev/core";
@@ -58,9 +58,17 @@ const ShowBlogs = () => {
                       recordItemId={record.id}
                       onClick={() => navigate(`/blog/${record.id}`)}></EditButton>
           <EditButton hideText size="small" resource="blog" recordItemId={record.id}/>
-            <DeleteButton hideText size="small" recordItemId={record.id} resource="blog" meta={{
+            <DeleteButton hideText size="small" confirmCancelText={"Odustani"} confirmOkText={"Izbriši"} confirmTitle={"Jeste li sigurni?"} resource="blog" recordItemId={record.id}  meta={{
                 bannedId: record.id
-            }}></DeleteButton>
+            }}
+                          successNotification={false}
+                          onSuccess={() => {
+                              notification.success({
+                                  message: "Blog je uspješno izbrisan.",
+                                  description: "Uspješno!",
+                              });
+                          }}
+            />
         </Space>
       ),
     },

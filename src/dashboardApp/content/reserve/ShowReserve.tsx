@@ -7,6 +7,8 @@ import {Dayjs} from "dayjs";
 import {useNavigate, useOutletContext} from "react-router";
 import { DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import { useDelete } from "@refinedev/core";
+import { notification } from "antd";
 
 
 const ShowReserve: FC = () => {
@@ -14,10 +16,13 @@ const ShowReserve: FC = () => {
   const navigate = useNavigate()
 
   const [sorters, setSorters] = useState([
-      { field: "vrijeme", order: "asc" },
+      { field: "date", order: "asc" },
   ]);
+
   const [selectedDates, setSelectedDates] = useState<Dayjs[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+
+    const { mutate: deleteReserve } = useDelete();
 
   const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
@@ -26,13 +31,15 @@ const ShowReserve: FC = () => {
     const items: MenuProps['items'] = [
         {
             key: '1',
-            label: 'Tablica',
+            label: 'Tabela',
         },
         {
             key: '2',
             label: 'Kalendar',
         },
     ];
+
+    const selectedLabel = items?.find((item) => item?.key === show)?.label;
 
   React.useEffect(() => {
     setHeaderActions(
@@ -50,18 +57,19 @@ const ShowReserve: FC = () => {
                     items,
                     selectable: true,
                     defaultSelectedKeys: ['1'],
-                    onSelect: (item: MenuProps['items']) => {setShow(item.key)}
+                    onSelect: ({ key }) => setShow(key),
                 }}
             >
                 <Button>
                     <Space>
+                        {selectedLabel}
                         <DownOutlined />
                     </Space>
                 </Button>
             </Dropdown>
         </div>
     );
-  }, [navigate, searchTerm, setHeaderActions ]);
+  }, [navigate, searchTerm, setHeaderActions, show ]);
 
   const {data, isLoading} = useList<any>({
     resource: "reserve",
@@ -80,17 +88,17 @@ const ShowReserve: FC = () => {
     },
     {
       title: 'Kontakt',
-      dataIndex: 'number',
-      key: 'number',
+      dataIndex: 'contact',
+      key: 'contact',
     },
     {
-      title: 'Vrijeme',
-      dataIndex: 'vrijeme',
-      key: 'vrijeme',
+      title: 'Datum',
+      dataIndex: 'date',
+      key: 'date',
       sorter: true,
       render: (_: any, record: any) => (
         <Space>
-          {record.vrijeme.toDate().toLocaleString()}
+          {record.date.toDate().toLocaleString()}
         </Space>
       ),
     },
@@ -98,20 +106,29 @@ const ShowReserve: FC = () => {
       title: 'Akcije',
       key: 'actions',
       render: (_: any, record: any) => (
-        <Space>
-          <DeleteButton
-            hideText
-            size="small"
-            resource="reserve"
-            recordItemId={record.id}
-            onClick={() => console.log("Deleting record ID:", record.id)}
-          />
-        </Space>
+          <Space>
+              <DeleteButton
+                  hideText
+                  size="small"
+                  resource="reserve"
+                  recordItemId={record.id}
+                  successNotification={false}
+                  onSuccess={() => {
+                      notification.success({
+                          message: "Rezervacija je uspješno izbrisana.",
+                          description: "Uspješno!",
+                      });
+                  }}
+                  confirmCancelText="Odustani"
+                  confirmOkText="Izbriši"
+                  confirmTitle="Jeste li sigurni?"
+              />
+          </Space>
       )
     },
   ];
 
-  return (
+    return (
     <>
         {show === '1' ? (
         <Table
@@ -154,7 +171,8 @@ const ShowReserve: FC = () => {
                     },
                     components: {
                         Calendar: {
-                            fullBg: '#dfdede'
+                            fullBg: '#dfdede',
+                            controlItemBgHover: 'transparent'
                         }
                     }
                 }}

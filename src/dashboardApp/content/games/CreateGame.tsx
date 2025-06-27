@@ -1,5 +1,5 @@
 import React, {FC} from 'react'
-import {Avatar, Button, Form, Input, Layout, theme} from 'antd'
+import {Avatar, Button, Form, Input} from 'antd'
 import {useCreate} from "@refinedev/core"
 import {useNavigate} from "react-router"
 import {CreateButton} from "@refinedev/antd"
@@ -8,11 +8,11 @@ import {storage} from '../../providers/firebase'
 import {ref, uploadBytes, getDownloadURL} from 'firebase/storage'
 import {useOutletContext} from "react-router-dom";
 
-const {Content} = Layout
-
 const CreateGame: FC = () => {
   const navigate = useNavigate()
-  const {mutate, isLoading} = useCreate()
+  const {mutate, isLoading} = useCreate({
+    successNotification: false,
+  })
   const {setHeaderActions} = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
   React.useEffect(() => {
@@ -69,6 +69,16 @@ const CreateGame: FC = () => {
           name: values.name,
           imageUrl: downloadURL,
         },
+        successNotification: () => ({
+          message: "Igra je uspješno kreirana.",
+          description: "Uspješno!",
+          type: "success",
+        }),
+        errorNotification: (error) => ({
+          message: "Došlo je do greške pri kreiranju igre.",
+          description: "Greška!",
+          type: "error",
+        }),
       })
 
       navigate('/games')

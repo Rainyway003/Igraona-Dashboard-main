@@ -78,8 +78,6 @@ const dataProvider: DataProvider = {
 
     const constraints: any[] = [];
 
-    console.log(filters)
-
     if (filters && filters.length > 0) {
       filters.forEach((filter: any) => {
         const {field, operator, value} = filter;
@@ -172,7 +170,6 @@ const dataProvider: DataProvider = {
     {resource, id, variables, meta}: UpdateParams<TVariables>
   ): Promise<CreateResponse<TData>> => {
     if (resource === "participants") {
-      console.log(meta)
       const teamRef = doc(db, "tournaments", String(meta?.tournamentId), "participants", String(id));
       const teamSnap = await getDoc(teamRef);
       const oldData = teamSnap.data();
@@ -236,7 +233,6 @@ const dataProvider: DataProvider = {
     }
 
     if (resource === "participants" && meta?.fieldToDelete && meta?.tournamentId) {
-      console.log(meta?.fieldToDelete);
       const docRef = doc(db, "tournaments", String(meta.tournamentId), resource, String(id));
       await updateDoc(docRef, {
         [meta.fieldToDelete]: deleteField(),
@@ -246,7 +242,6 @@ const dataProvider: DataProvider = {
 
 
     if (resource === "participants" && !meta?.doNotDelete && meta?.tournamentId) {
-      console.log("C")
       const docRef = doc(db, "tournaments", String(meta?.tournamentId), resource, String(id));
       const tournamentRef = doc(db, "tournaments", String(meta?.tournamentId));
       await updateDoc(tournamentRef, {
@@ -298,8 +293,6 @@ const dataProvider: DataProvider = {
 
       const teamSnap = await getDoc(teamRef);
 
-      console.log(id, 'zim')
-
       const data = {
         id: teamSnap.id,
         ...(teamSnap.data() as DocumentData),
@@ -346,7 +339,6 @@ const dataProvider: DataProvider = {
           data.teams = teams;
         }
       } else {
-        console.log("Nema timova.");
         data.teams = [];
       }
     }

@@ -1,5 +1,5 @@
 import React, {FC, useState} from 'react'
-import { Input, Space, Table} from "antd";
+import {Input, notification, Space, Table} from "antd";
 import {CreateButton, DeleteButton} from "@refinedev/antd";
 import {useNavigate} from 'react-router';
 import {useList} from "@refinedev/core";
@@ -7,7 +7,7 @@ import {useOutletContext} from "react-router-dom";
 
 const ShowBanned: FC = () => {
   const navigate = useNavigate()
-  const [searchTerm, setSearchTerm] = useState('https://www.faceit.com/en/players/')
+  const [searchTerm, setSearchTerm] = useState('')
 
   const { setHeaderActions } = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
@@ -16,7 +16,7 @@ const ShowBanned: FC = () => {
         <div className="flex justify-between w-full">
           <Input
               rootClassName={'w-96'}
-              placeholder="Pretraži izbačene"
+              placeholder="Pretraži banove"
               className='shadow-md'
               allowClear
               value={searchTerm}
@@ -60,9 +60,18 @@ const ShowBanned: FC = () => {
       key: 'actions',
       render: (_: any, record: any) => (
         <Space>
-          <DeleteButton hideText size="small" recordItemId={record.id} resource="banned" meta={{
-              bannedId: record.id
-          }}></DeleteButton>
+            <DeleteButton hideText size="small" confirmCancelText={"Odustani"} confirmOkText={"Izbriši"} confirmTitle={"Jeste li sigurni?"} resource="banned" recordItemId={record.id} meta={{
+                bannedId: record.id
+            }}
+                          successNotification={false}
+                          onSuccess={() => {
+                              notification.success({
+                                  message: "Banana osoba je uspješno izbrisana.",
+                                  description: "Uspješno!",
+                              });
+                          }}
+            />
+
         </Space>
       ),
     },

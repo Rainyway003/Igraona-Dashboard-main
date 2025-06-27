@@ -1,5 +1,5 @@
 import React, {FC} from 'react'
-import {Button, Form, Input, Layout, theme} from 'antd'
+import {Button, Form, Input, Layout, notification, theme} from 'antd'
 import {useCreate} from "@refinedev/core";
 import {useNavigate} from "react-router";
 import {CreateButton} from "@refinedev/antd";
@@ -9,7 +9,9 @@ import {Timestamp} from "firebase/firestore";
 
 const CreateBan: FC = () => {
   const navigate = useNavigate()
-  const {mutate, isLoading} = useCreate()
+  const {mutate, isLoading} = useCreate({
+      successNotification: false,
+  })
 
   const {setHeaderActions} = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
@@ -46,6 +48,16 @@ const CreateBan: FC = () => {
             reason: values.reason,
             timestamp: Timestamp.fromDate(new Date()),
         },
+        successNotification: () => ({
+            message: "Ban je uspješno kreiran.",
+            description: "Uspješno!",
+            type: "success",
+        }),
+        errorNotification: (error) => ({
+            message: "Došlo je do greške pri kreiranju bana.",
+            description: "Greška!",
+            type: "error",
+        }),
       }
     )
     navigate('/banned')
@@ -66,7 +78,7 @@ const CreateBan: FC = () => {
           name={'reason'}
           rules={[{required: true}]}
         >
-          <Input placeholder={'Razlog izbacivanja'}/>
+          <Input placeholder={'Razlog bana'}/>
         </Form.Item>
       </Form>
     </>

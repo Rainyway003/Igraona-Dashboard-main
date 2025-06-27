@@ -50,7 +50,9 @@ function imageHandler(this: any) {
 }
 
 const CreateBlog = () => {
-  const {mutate, isLoading} = useCreate();
+  const {mutate, isLoading} = useCreate({
+    successNotification: false,
+  });
 
   const navigate = useNavigate();
   const [value, setValue] = useState('');
@@ -88,6 +90,16 @@ const CreateBlog = () => {
       values: {
         ...values
       },
+      successNotification: () => ({
+        message: "Blog je uspješno kreiran.",
+        description: "Uspješno!",
+        type: "success",
+      }),
+      errorNotification: (error) => ({
+        message: "Došlo je do greške pri kreiranju bloga.",
+        description: "Greška!",
+        type: "error",
+      }),
     })
     navigate('/blog')
   }

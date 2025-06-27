@@ -49,7 +49,9 @@ function imageHandler(this: any) {
 }
 
 const CreateRule = () => {
-  const {mutate, isLoading} = useCreate();
+  const {mutate, isLoading} = useCreate({
+    successNotification: false,
+  });
 
   const navigate = useNavigate()
   const [value, setValue] = useState('');
@@ -87,7 +89,19 @@ const CreateRule = () => {
       values: {
         ...values
       },
+        successNotification: () => ({
+      message: "Pravilo je uspješno kreirano.",
+      description: "Uspješno!",
+      type: "success",
+    }),
+        errorNotification: (error) => ({
+      message: "Došlo je do greške pri kreiranju pravila.",
+      description: "Greška!",
+      type: "error",
+    }),
+
     })
+
     navigate('/rules')
   }
 

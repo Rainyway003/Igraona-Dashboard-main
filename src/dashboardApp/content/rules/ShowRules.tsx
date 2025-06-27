@@ -1,13 +1,10 @@
 import React, {FC, useState} from 'react'
-import {Input, Layout, Space, Table, theme} from "antd";
+import {Input, notification, Space, Table} from "antd";
 import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useNavigate} from 'react-router';
 import {useList} from "@refinedev/core";
-import ShowRuleView from "./ShowRuleView";
 import {useOutletContext} from "react-router-dom";
 import {EyeOutlined} from "@ant-design/icons";
-
-const {Content} = Layout;
 
 const ShowRules: FC = () => {
   const navigate = useNavigate();
@@ -64,9 +61,17 @@ const ShowRules: FC = () => {
                       recordItemId={record.id}
                       onClick={() => navigate(`/rules/${record.id}`)}></EditButton>
           <EditButton hideText size="small" resource="rules" recordItemId={record.id}/>
-            <DeleteButton hideText size="small" recordItemId={record.id} resource="rules" meta={{
+            <DeleteButton hideText size="small" confirmCancelText={"Odustani"} confirmOkText={"Izbriši"} confirmTitle={"Jeste li sigurni?"} resource="rules" recordItemId={record.id}  meta={{
                 bannedId: record.id
-            }}></DeleteButton>
+            }}
+                          successNotification={false}
+                          onSuccess={() => {
+                              notification.success({
+                                  message: "Pravilo je uspješno izbrisano.",
+                                  description: "Uspješno!",
+                              });
+                          }}
+            />
         </Space>
       ),
     },

@@ -14,8 +14,12 @@ interface BanPlayerProps {
 }
 
 const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) => {
-  const { mutate: createBan } = useCreate();
-  const { mutate: deleteFieldInTeam } = useDelete();
+  const { mutate: createBan } = useCreate({
+      successNotification: false,
+  });
+  const { mutate: deleteFieldInTeam } = useDelete({
+      successNotification: false,
+  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [banReason, setBanReason] = useState("");
@@ -33,8 +37,8 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
               },
             },
             {
-              onSuccess: () => resolve(null),
-              onError: (error) => reject(error),
+                onSuccess: () => resolve(null),
+                onError: (error) => reject(error),
             }
         );
       });
@@ -64,9 +68,19 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
           tournamentId,
           fieldToDelete,
         },
+          successNotification: () => ({
+              message: "Igrač je uspješno banan.",
+              description: "Uspješno!",
+              type: "success",
+          }),
+          errorNotification: (error) => ({
+              message: "Došlo je do greške pri bananju igrača.",
+              description: "Greška!",
+              type: "error",
+          }),
       });
 
-      message.success(`Igrač ${player} je izbačen.`);
+      message.success(`Igrač ${player} je banan.`);
       setIsModalOpen(false);
       setBanReason("");
     } catch (error) {
@@ -86,7 +100,7 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
         />
 
         <Modal
-            title={`Izbaci igrača : ${player}`}
+            title={`Banaj igrača : ${player}`}
             open={isModalOpen}
             onCancel={() => setIsModalOpen(false)}
             footer={[
@@ -94,7 +108,7 @@ const BanPlayer: React.FC<BanPlayerProps> = ({ player, teamId, tournamentId }) =
                 Odustani
               </Button>,
               <Button key="submit" type="primary" danger onClick={handleBan}>
-                Izbaci igrača
+                Banaj igrača
               </Button>,
             ]}
         >

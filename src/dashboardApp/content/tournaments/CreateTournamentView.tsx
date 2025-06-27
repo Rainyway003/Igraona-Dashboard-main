@@ -67,8 +67,8 @@ const CreateTournamentView = () => {
     Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
 
   const onFinish = (values: any) => {
-    console.log(values)
-    mutate({
+    mutate(
+        {
       resource: 'tournaments',
       values: cleanObject({
         ...values,
@@ -81,7 +81,18 @@ const CreateTournamentView = () => {
         signUpEndingAt: values.signUpStartingAt[1].$d,
         visible: visible,
       }),
-    })
+            successNotification: () => ({
+                message: "Turnir je uspješno kreiran.",
+                description: "Uspješno!",
+                type: "success",
+            }),
+            errorNotification: (error) => ({
+                message: "Došlo je do greške pri kreiranju turnira.",
+                description: "Greška!",
+                type: "error",
+            }),
+        },
+    )
     navigate('/tournaments')
   }
 

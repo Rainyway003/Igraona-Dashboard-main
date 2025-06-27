@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {Avatar, Button, Form, Input, Layout,} from 'antd'
+import {Avatar, Button, Form, Input, Layout, notification,} from 'antd'
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons"
 import {useNavigate} from "react-router"
 import {useForm} from "@refinedev/antd"
@@ -10,6 +10,7 @@ import {useOutletContext} from "react-router-dom";
 const EditGame = () => {
   const {formProps, queryResult, formLoading} = useForm({
     resource: 'games',
+    successNotification: false,
   });
 
   const navigate = useNavigate()
@@ -18,28 +19,28 @@ const EditGame = () => {
 
   React.useEffect(() => {
     setHeaderActions(
-      <div className="flex justify-between w-full">
-        <Button
-          type="primary"
-          className="antbutton"
-          onClick={() => navigate('/games')}
-          icon={<ArrowLeftOutlined/>}
-        >
-          Nazad
-        </Button>
+        <div className="flex justify-between w-full">
+          <Button
+              type="primary"
+              className="antbutton"
+              onClick={() => navigate('/games')}
+              icon={<ArrowLeftOutlined/>}
+          >
+            Nazad
+          </Button>
 
-        <Button
-          type="primary"
-          htmlType="submit"
-          className="antbutton"
-          form="edit"
-          disabled={formLoading}
-          icon={<PlusSquareOutlined/>}
-        >
-          Potvrdi
-        </Button>
+          <Button
+              type="primary"
+              htmlType="submit"
+              className="antbutton"
+              form="edit"
+              disabled={formLoading}
+              icon={<PlusSquareOutlined/>}
+          >
+            Potvrdi
+          </Button>
 
-      </div>
+        </div>
     );
   }, [navigate, setHeaderActions, formLoading]);
 
@@ -73,11 +74,19 @@ const EditGame = () => {
         values.imageUrl = record?.imageUrl || ''
       }
 
-      formProps?.onFinish?.(values)
-    } catch (error) {
-      console.error(error)
+      await formProps?.onFinish?.(values);
+
+      notification.success({
+        message: "Igra je uspješno ažurirana.",
+        description: "Uspješno!",
+      });
+    } catch (error: any) {
+      notification.error({
+        message: "Došlo je do greške prilikom ažuriranja igre.",
+        description: error?.message || "Molimo pokušajte ponovo ili provjerite podatke.",
+      });
     }
-  }
+  };
 
   return (
     <>

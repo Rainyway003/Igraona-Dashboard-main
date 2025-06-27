@@ -25,7 +25,6 @@ export default function Login() {
   const screens = useBreakpoint();
 
   const onFinish = (data: any) => {
-    console.log(data);
     const {email, password} = data;
     mutate({email, password});
     navigate('/dashboard')

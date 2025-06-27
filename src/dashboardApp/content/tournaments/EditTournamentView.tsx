@@ -1,5 +1,5 @@
 import {useForm, useSelect} from "@refinedev/antd";
-import {Button, DatePicker, Form, Input, Select} from "antd";
+import {Button, DatePicker, Form, Input, notification, Select} from "antd";
 import {ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import React from "react";
 import {useNavigate} from "react-router";
@@ -11,7 +11,9 @@ const {RangePicker} = DatePicker;
 const EditTournament = () => {
   const {id} = useParams()
   const navigate = useNavigate();
-  const {formProps, query, formLoading} = useForm();
+  const {formProps, query, formLoading} = useForm({
+    successNotification: false,
+  });
   const {setHeaderActions} = useOutletContext<{ setHeaderActions: (node: React.ReactNode) => void }>();
 
   React.useEffect(() => {
@@ -81,6 +83,7 @@ const EditTournament = () => {
       return;
     }
 
+    try {
     const cleanValues = cleanObject({
       ...values,
       teamSizeRequired: Number(values.teamSizeRequired) || 0,
@@ -92,7 +95,19 @@ const EditTournament = () => {
       signUpEndingAt: signUpRange[1]?.toDate(),
     })
 
-    await formProps.onFinish?.(cleanValues)
+
+      await formProps.onFinish?.(cleanValues)
+
+    notification.success({
+      message: "Turnir je uspješno ažuriran.",
+      description: "Uspješno!",
+    });
+  } catch (error) {
+    notification.error({
+      message: "Došlo je do greške prilikom ažuriranja turnira.",
+      description: "Greška!",
+    });
+  }
   }
 
 

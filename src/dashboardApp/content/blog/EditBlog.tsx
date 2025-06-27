@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {Button, Form, Input, Layout, theme} from "antd";
+import {Button, Form, Input, Layout, notification, theme} from "antd";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import {CreateButton, useForm} from "@refinedev/antd";
@@ -49,7 +49,9 @@ function imageHandler(this: any) {
 }
 
 const EditBlog = () => {
-  const {formProps, formLoading} = useForm();
+  const {formProps, formLoading} = useForm({
+    successNotification: false,
+  });
 
   const navigate = useNavigate();
   const [value, setValue] = useState('');
@@ -88,18 +90,26 @@ const EditBlog = () => {
     }
   }, [formProps.initialValues?.blog]);
 
-  const {
-    token: {colorBgContainer, borderRadiusLG},
-  } = theme.useToken();
-
   const onFinish = async (values: any) => {
-    await formProps.onFinish?.({
-      ...values,
-      blog: value,
-    });
-    navigate('/blog');
-  };
+    try {
+      await formProps.onFinish?.({
+        ...values,
+        blog: value,
+      });
 
+      notification.success({
+        message: "Blog je uspješno ažuriran.",
+        description: "Uspješno!",
+      });
+
+      navigate('/blog');
+    } catch (error: any) {
+      notification.error({
+        message: "Došlo je do greške prilikom ažuriranja bloga.",
+        description: error?.message || "Greška!",
+      });
+    }
+  };
 
   return (
     <>

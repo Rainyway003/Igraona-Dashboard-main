@@ -9,7 +9,6 @@ export const authProvider: AuthProvider = {
     },
     login: async ({ email, password }): Promise<{ success: boolean, user?: any }> => {
         const auth = getAuth()
-        console.log(email, password, 'EVO')
         const userCredential = await signInWithEmailAndPassword(auth, email, password)
         if (userCredential) {
             const user = userCredential.user

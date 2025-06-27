@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {useCreate} from '@refinedev/core';
-import {Form} from 'antd';
+import {Form, notification} from 'antd';
 import Pozadina from '../../assets/10i.png';
 import '../../../App.css';
 import '../../index.css';
@@ -12,7 +12,9 @@ import {Dayjs} from 'dayjs';
 import CalendarComponent from '../Calendar'
 
 function Playstation() {
-  const {mutate, isLoading: loading} = useCreate();
+  const {mutate, isLoading: loading} = useCreate({
+      successNotification: false,
+  });
 
   const [rules, setRules] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,44 +27,56 @@ function Playstation() {
   };
 
   const onFinish = async (values: { name: string; number: string }) => {
-    if (selectedDates.length === 0) {
-      setError('Molimo odaberite barem jedan datum');
-      return;
-    }
+      if (selectedDates.length === 0) {
+          setError('Molimo odaberite barem jedan datum');
+          return;
+      }
 
-    try {
-      const sortedDates = [...selectedDates].sort((a, b) => a.diff(b));
+      try {
+          const sortedDates = [...selectedDates].sort((a, b) => a.diff(b));
 
-      await Promise.all(
-          sortedDates.map(async (date) => {
-            const newId = generateUniqueId(date);
-            await mutate(
-                {
-                  resource: 'reserve',
-                  values: {
-                    id: newId,
-                    name: values.name,
-                    number: values.number,
-                    vrijeme: date.startOf('day').toDate(),
-                  },
-                },
-                {
-                  meta: {
-                    id: newId,
-                  },
-                }
-            );
-          })
-      );
+          await Promise.all(
+              sortedDates.map(async (date) => {
+                  const newId = generateUniqueId(date);
+                  await mutate(
+                      {
+                          resource: "reserve",
+                          values: {
+                              id: newId,
+                              name: values.name,
+                              contact: values.number,
+                              date: date.startOf("day").toDate(),
+                          },
+                          meta: {
+                              id: newId,
+                          },
+                      },
+                      {
+                          onSuccess: () => {
+                              notification.success({
+                                  message: "Rezervacija je uspješno kreirana.",
+                                  description: "Uspješno!",
+                              });
+                          },
+                          onError: (error) => {
+                              notification.error({
+                                  message: "Došlo je do greške pri kreiranju rezervacije.",
+                                  description: error?.message || "Greška!",
+                              });
+                          },
+                      }
+                  );
+              })
+          );
 
-      form.resetFields();
-      setSelectedDates([]);
-      setError(null);
-      setComplete('Uspješno!');
-    } catch (err) {
-      setError('Došlo je do greške prilikom rezervacije');
-    }
-  };
+          form.resetFields();
+          setSelectedDates([]);
+          setError(null);
+          setComplete("Uspješno!");
+      } catch (err) {
+          setError("Došlo je do greške prilikom rezervacije");
+      }
+  }
 
   return (
       <>

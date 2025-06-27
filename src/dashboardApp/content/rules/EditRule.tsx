@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {Button, Form, Input, Layout, theme} from 'antd'
+import {Button, Form, Input, notification} from 'antd'
 import {CreateButton, useForm} from "@refinedev/antd";
 import {ArrowLeftOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import {useNavigate} from "react-router";
@@ -7,8 +7,6 @@ import ReactQuill from "react-quill";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage} from "../../providers/firebase";
 import {useOutletContext} from "react-router-dom";
-
-const {Content} = Layout
 
 const modules = {
   toolbar: {
@@ -48,7 +46,9 @@ function imageHandler(this: any) {
 }
 
 const EditRule = () => {
-  const {formProps, formLoading} = useForm();
+  const {formProps, formLoading} = useForm({
+    successNotification: false,
+  });
 
   const navigate = useNavigate()
   const [value, setValue] = useState('');
@@ -88,11 +88,22 @@ const EditRule = () => {
   }, [formProps.initialValues?.rule]);
 
   const onFinish = async (values: any) => {
-    await formProps.onFinish?.({
-      ...values,
-      rule: value,
-    });
-    navigate('/rule');
+    try {
+      await formProps.onFinish?.({
+        ...values,
+        rule: value,
+      });
+      notification.success({
+        message: "Pravilo je uspješno ažurirano.",
+        description: "Uspješno!",
+      });
+      navigate('/rules');
+    } catch (error) {
+      notification.error({
+        message: "Došlo je do greške prilikom ažuriranja pravila.",
+        description: "Greška!",
+      });
+    }
   };
 
 

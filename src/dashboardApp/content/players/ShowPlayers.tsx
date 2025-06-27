@@ -22,8 +22,6 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
 
   const {mutate} = useDelete()
 
-  console.log(teamId, 'JPOO')
-
   const {data: tData,} = useOne({
     resource: 'tournaments',
     id: id ?? "",
@@ -41,6 +39,16 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
       setIsEdit(false);
       setIsCreate(false);
     },
+    successNotification: () => ({
+      message: "Tim je uspješno ažuriran.",
+      description: "Uspješno!",
+      type: "success",
+    }),
+    errorNotification: (error) => ({
+      message: "Došlo je do greške pri ažuriranju tima.",
+      description: "Greška!",
+      type: "error",
+    }),
   });
 
 
@@ -73,7 +81,6 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
   }
 
   const team = data?.data
-  console.log(team?.player1)
   const handleEditClick = () => {
     if (isCreate && team?.player1 === "") {
       mutate({
@@ -82,7 +89,6 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
         meta: {
           tournamentId: id,
         },
-        successNotification: () => false,
       })
       setIsCreate(false);
       setIsEdit(false);
@@ -96,8 +102,6 @@ const ShowPlayers: React.FC<PropsWithChildren<ShowPlayersProps>> = ({children, t
   }
 
   const onFinish = async (values: any) => {
-    console.log("onFinish values:", values);
-    console.log("tournament:", tournament);
 
     const numberOfPlayers = Number(tournament?.teamSizeOptional ?? 0) + Number(tournament?.teamSizeRequired ?? 0);
 

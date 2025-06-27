@@ -1,5 +1,5 @@
 import React, {PropsWithChildren, useState} from 'react';
-import {Table, Avatar, Space, Progress, Input} from 'antd';
+import {Table, Avatar, Space, Progress, Input, notification} from 'antd';
 import {AntDesignOutlined, EyeOutlined} from '@ant-design/icons';
 
 import {useList} from "@refinedev/core"
@@ -172,7 +172,22 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
           <EditButton hideText size="small" resource="tournaments" icon={<EyeOutlined/>}
                       recordItemId={record.id}
                       onClick={() => navigate(`/tournaments/${record.id}`)}></EditButton>
-          <DeleteButton hideText size="small" resource="tournaments" recordItemId={record.id}/>
+          <DeleteButton
+              hideText
+              size="small"
+              confirmCancelText={"Odustani"}
+              confirmOkText={"Izbriši"}
+              confirmTitle={"Jeste li sigurni?"}
+              resource="tournaments"
+              recordItemId={record.id}
+              successNotification={false}
+              onSuccess={() => {
+                notification.success({
+                  message: "Turnir je uspješno izbrisan.",
+                  description: "Uspješno!",
+                });
+              }}
+          />
         </Space>
       ),
     },

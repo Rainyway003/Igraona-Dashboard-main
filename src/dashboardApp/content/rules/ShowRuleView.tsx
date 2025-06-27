@@ -12,8 +12,6 @@ const ShowRuleView: FC<ShowRuleViewProps> = ({rule}) => {
     token: {colorBgContainer, borderRadiusLG},
   } = theme.useToken();
 
-  console.log(rule)
-
   return (
     <Layout className="h-fit" style={{display: 'flex', flexDirection: 'row'}}>
       <Layout style={{flex: 1, backgroundColor: '#f0f2f5'}}>

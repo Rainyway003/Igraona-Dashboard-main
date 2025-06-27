@@ -39,6 +39,7 @@ const AppLayout: React.FC = () => {
             borderRadius: 8,
             height: "calc(100vh - 95px)",
             overflowY: "auto",
+              overflowX: "hidden",
           }}
         >
           <Outlet context={{setHeaderActions}}/>

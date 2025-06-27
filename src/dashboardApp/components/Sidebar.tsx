@@ -114,7 +114,7 @@ const Sidebar = () => {
           {
             key: '4',
             icon: <DeleteOutlined/>,
-            label: 'Izbačeni',
+            label: 'Banovi',
             onClick: () => handleNavigation('4')
           },
           {

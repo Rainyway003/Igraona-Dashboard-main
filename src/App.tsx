@@ -1,15 +1,18 @@
 import {Authenticated, Refine} from "@refinedev/core";
 import {RefineKbar, RefineKbarProvider} from "@refinedev/kbar";
 
-import {useNotificationProvider} from "@refinedev/antd";
+import type { NotificationProvider } from "@refinedev/core";
 import "@refinedev/antd/dist/reset.css";
 
 import routerBindings, {
   DocumentTitleHandler,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-import {App as AntdApp} from "antd";
+import {App as AntdApp, ConfigProvider} from "antd";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
+
+import { notification } from "antd";
+import hrHR from "antd/es/locale/hr_HR";
 
 import dataProvider from './dashboardApp/providers/data-provider'
 import ShowTournaments from "./dashboardApp/content/tournaments/ShowTournaments";
@@ -41,15 +44,53 @@ import EditRule from "./dashboardApp/content/rules/EditRule";
 import EditBlog from "./dashboardApp/content/blog/EditBlog";
 import ViewRule from "./dashboardApp/content/rules/ViewRule";
 
+
+
 function App() {
+
+  const customNotificationProvider: NotificationProvider = {
+    open: ({ message, description, type }) => {
+      let translatedMessage = message;
+      let translatedDescription = description;
+
+      if (message === "Success") {
+        translatedMessage = "Uspješno";
+      }
+
+      if (typeof description === "string") {
+        if (description.includes("Successfully deleted a tournament")) {
+          translatedDescription = "Turnir je uspješno izbrisan.";
+        } else if (description.includes("Successfully updated")) {
+          translatedDescription = "Podaci su uspješno ažurirani.";
+        } else if (description.includes("Successfully created")) {
+          translatedDescription = "Podaci su uspješno dodani.";
+        } else if (description.includes("Successfully deleted")) {
+          translatedDescription = "Podaci su uspješno izbrisani.";
+        }
+      }
+
+      if (message === "Successfully deleted a participant") {
+        return;
+      }
+
+      notification[type || "info"]({
+        message: translatedMessage,
+        description: translatedDescription,
+      });
+    },
+    close: () => notification.destroy(),
+  };
+
+
   return (
     <BrowserRouter>
       <RefineKbarProvider>
         <AntdApp>
+          <ConfigProvider locale={hrHR}>
           <Refine
             dataProvider={dataProvider}
             authProvider={authProvider}
-            notificationProvider={useNotificationProvider}
+            notificationProvider={customNotificationProvider}
             routerProvider={routerBindings}
             resources={resources}
             options={{
@@ -108,6 +149,7 @@ function App() {
             <UnsavedChangesNotifier/>
             <DocumentTitleHandler/>
           </Refine>
+          </ConfigProvider>
         </AntdApp>
       </RefineKbarProvider>
     </BrowserRouter>

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Table, Space, Input, Form, Button, Card, Progress} from 'antd';
+import {Table, Space, Input, Form, Button, Card, Progress, notification} from 'antd';
 import {ArrowLeftOutlined, PlusSquareOutlined} from '@ant-design/icons';
 
 import {useCreate, useList, useOne, useUpdate} from "@refinedev/core"
@@ -200,13 +200,24 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
       key: 'actions',
       render: (_: any, record: any) => (
         <Space>
-          <DeleteButton hideText
-                        size="small"
+          <DeleteButton hideText size="small"
+                        confirmCancelText={"Odustani"}
+                        confirmOkText={"Izbriši"}
+                        confirmTitle={"Jeste li sigurni?"}
                         resource="participants"
                         recordItemId={record.id}
                         meta={{
                           tournamentId: id
-                        }}/>
+                        }}
+                        successNotification={false}
+                        onSuccess={() => {
+                          notification.success({
+                            message: "Tim je uspješno izbrisan.",
+                            description: "Uspješno!",
+                          });
+                        }}
+          />
+
           <BanTeamButton resource="participants"
                          teamId={record.id}
           ></BanTeamButton>

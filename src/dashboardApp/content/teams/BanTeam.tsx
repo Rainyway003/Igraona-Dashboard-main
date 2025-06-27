@@ -16,8 +16,14 @@ interface BanTeamButtonProps {
 const BanTeamButton: React.FC<BanTeamButtonProps> = ({ teamId, resource}) => {
     const {id} = useParams()
 
-    const { mutate: createBan } = useCreate();
-    const { mutate: deleteTeam } = useDelete();
+    const { mutate: createBan } = useCreate({
+        successNotification: false,
+        errorNotification: false,
+    });
+    const { mutate: deleteTeam } = useDelete({
+        successNotification: false,
+        errorNotification: false,
+    });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [banReason, setBanReason] = useState("");
@@ -39,7 +45,7 @@ const BanTeamButton: React.FC<BanTeamButtonProps> = ({ teamId, resource}) => {
             const teamSnap = await getDoc(teamRef);
 
             if (!teamSnap.exists()) {
-                message.error("Nema");
+                message.error("Tim nije pronađen.");
                 return;
             }
 
@@ -53,45 +59,49 @@ const BanTeamButton: React.FC<BanTeamButtonProps> = ({ teamId, resource}) => {
                 }
             }
 
-            await Promise.all(
-                players.map((player) =>
-                    new Promise((resolve, reject) => {
-                        createBan(
-                            {
-                                resource: "banned",
-                                values: {
-                                    faceit: player,
-                                    timestamp: Timestamp.fromDate(new Date()),
-                                    reason: banReason || 'Nije naveden',
-                                },
+            for (const player of players) {
+                await new Promise((resolve, reject) => {
+                    createBan(
+                        {
+                            resource: "banned",
+                            values: {
+                                faceit: player,
+                                timestamp: Timestamp.fromDate(new Date()),
+                                reason: banReason || "Nije naveden",
                             },
-                            {
-                                onSuccess: () => resolve(null),
-                                onError: (error) => reject(error),
-                            }
-                        );
-                        deleteTeam(
-                            {
-                                resource: "banned",
-                                id: id,
-                                meta: {
-                                    teamId: teamId
-                                }
-                            },
-                            {
-                                onSuccess: () => resolve(null),
-                                onError: (error) => reject(error),
-                            }
-                        );
-                    })
-                )
-            );
+                        },
+                        {
+                            onSuccess: () => resolve(null),
+                            onError: (error) => reject(error),
+                            successNotification: false,
+                            errorNotification: false,
+                        }
+                    );
+                });
+            }
 
-            message.success(`Tim ${teamName} je izbačen.`);
+            await new Promise((resolve, reject) => {
+                deleteTeam(
+                    {
+                        resource: "participants",
+                        id: teamId,
+                        meta: { tournamentId: id },
+                    },
+                    {
+                        onSuccess: () => resolve(null),
+                        onError: (error) => reject(error),
+                        successNotification: false,
+                        errorNotification: false,
+                    }
+                );
+            });
+
+            message.success(`Tim ${teamName} je uspješno banan.`);
             setIsModalOpen(false);
             setBanReason("");
         } catch (error) {
-            console.error("Neće :", error);
+            console.error("Greška pri banovanju:", error);
+            message.error("Dogodila se greška pri banovanju tima.");
         }
     };
 
@@ -110,7 +120,7 @@ const BanTeamButton: React.FC<BanTeamButtonProps> = ({ teamId, resource}) => {
             />
 
             <Modal
-                title={`Izbaciti tim ${teamName} ?`}
+                title={`Banaj tim ${teamName} ?`}
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 footer={[
@@ -121,7 +131,7 @@ const BanTeamButton: React.FC<BanTeamButtonProps> = ({ teamId, resource}) => {
                         handleBanTeam();
                         setIsModalOpen(false);
                     }}>
-                        Izbaci tim
+                        Banaj tim
                     </Button>,
                 ]}
             >

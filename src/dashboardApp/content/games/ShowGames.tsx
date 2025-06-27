@@ -1,5 +1,5 @@
 import React, {FC, useState} from 'react'
-import {Avatar, Input, Layout, Space, Table, theme} from "antd";
+import {Avatar, Input, Layout, notification, Space, Table, theme} from "antd";
 import {CreateButton, DeleteButton, EditButton} from "@refinedev/antd";
 import {useNavigate, useOutletContext} from 'react-router';
 import {useList} from "@refinedev/core";
@@ -59,7 +59,15 @@ const ShowGames: FC = () => {
       render: (_: any, record: any) => (
         <Space>
           <EditButton hideText size="small" resource="games" recordItemId={record.id}/>
-          <DeleteButton hideText size="small" resource="games" recordItemId={record.id}/>
+            <DeleteButton hideText size="small" confirmCancelText={"Odustani"} confirmOkText={"Izbriši"} confirmTitle={"Jeste li sigurni?"}  resource="games" recordItemId={record.id}
+                          successNotification={false}
+                          onSuccess={() => {
+                              notification.success({
+                                  message: "Igra je uspješno izbrisana.",
+                                  description: "Uspješno!",
+                              });
+                          }}
+            />
         </Space>
       ),
     },
