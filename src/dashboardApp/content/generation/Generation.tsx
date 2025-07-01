@@ -6,7 +6,7 @@ import {useList} from "@refinedev/core"
 import {CreateButton, DeleteButton, EditButton, useSelect} from '@refinedev/antd';
 import {useNavigate, useOutletContext} from 'react-router';
 
-const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
+const Generation: React.FC<PropsWithChildren> = ({children}) => {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -14,20 +14,20 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
 
   React.useEffect(() => {
     setHeaderActions(
-      <div className="flex justify-between w-full">
-        <Input
-          placeholder="Pretraži turnire"
-          allowClear
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-96 shadow-md"
-        />
-        <CreateButton
-          resource="tournaments"
-          onClick={() => navigate('/tournaments/new')}
-          className="antbutton"
-        >Stvori</CreateButton>
-      </div>
+        <div className="flex justify-between w-full">
+          <Input
+              placeholder="Pretraži turnire"
+              allowClear
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-96 shadow-md"
+          />
+          <CreateButton
+              resource="tournaments"
+              onClick={() => navigate('/generation/brackets')}
+              className="antbutton"
+          >Stvori</CreateButton>
+        </div>
     );
 
     return () => setHeaderActions(null);
@@ -106,9 +106,9 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       key: 'numberOfParticipants',
       sorter: true,
       render: (_: any, record: any) => (
-        <Space>
-          {record.numberOfParticipants || 0} / {record.maxNumberOfParticipants || 0}
-        </Space>
+          <Space>
+            {record.numberOfParticipants || 0} / {record.maxNumberOfParticipants || 0}
+          </Space>
       ),
     },
     {
@@ -116,8 +116,8 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       dataIndex: 'numberOfParticipants',
       key: 'numberOfParticipants',
       render: (_: any, record: any) => (
-        <Progress
-          percent={Math.floor(record.numberOfParticipants / record.maxNumberOfParticipants * 100)}></Progress>
+          <Progress
+              percent={Math.floor(record.numberOfParticipants / record.maxNumberOfParticipants * 100)}></Progress>
       ),
     },
     {
@@ -126,9 +126,9 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       key: 'startingAt',
       sorter: true,
       render: (_: any, record: any) => (
-        <Space>
-          {record.startingAt.toDate().toLocaleString()}
-        </Space>
+          <Space>
+            {record.startingAt.toDate().toLocaleString()}
+          </Space>
       ),
     },
     {
@@ -137,9 +137,9 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       key: 'endingAt',
       sorter: true,
       render: (_: any, record: any) => (
-        <Space>
-          {record.endingAt.toDate().toLocaleString()}
-        </Space>
+          <Space>
+            {record.endingAt.toDate().toLocaleString()}
+          </Space>
       ),
     },
     {
@@ -148,9 +148,9 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       key: 'signUpStartingAt',
       sorter: true,
       render: (_: any, record: any) => (
-        <Space>
-          {record.signUpStartingAt.toDate().toLocaleString()}
-        </Space>
+          <Space>
+            {record.signUpStartingAt.toDate().toLocaleString()}
+          </Space>
       ),
     },
     {
@@ -159,87 +159,84 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
       key: 'signUpEndingAt',
       sorter: true,
       render: (_: any, record: any) => (
-        <Space>
-          {record.signUpEndingAt.toDate().toLocaleString()}
-        </Space>
+          <Space>
+            {record.signUpEndingAt.toDate().toLocaleString()}
+          </Space>
       ),
     },
     {
       title: 'Akcije',
       key: 'actions',
       render: (_: any, record: any) => (
-        <Space>
-          <EditButton hideText size="small" resource="tournaments" icon={<EyeOutlined/>}
-                      recordItemId={record.id}
-                      onClick={() => navigate(`/tournaments/${record.id}`)}></EditButton>
-          <DeleteButton
-              hideText
-              size="small"
-              confirmCancelText={"Odustani"}
-              confirmOkText={"Izbriši"}
-              confirmTitle={"Jeste li sigurni?"}
-              resource="tournaments"
-              recordItemId={record.id}
-              successNotification={false}
-              onSuccess={() => {
-                notification.success({
-                  message: "Turnir je uspješno izbrisan.",
-                  description: "Uspješno!",
-                });
-              }}
-          />
-          <EditButton hideText size="small" resource="tournaments" icon={<EyeOutlined/>}
-                      recordItemId={record.id}
-                      onClick={() => navigate(`/generation`)}></EditButton>
-        </Space>
+          <Space>
+            <EditButton hideText size="small" resource="tournaments" icon={<EyeOutlined/>}
+                        recordItemId={record.id}
+                        onClick={() => navigate(`/generation/${record.id}`)}></EditButton>
+            <DeleteButton
+                hideText
+                size="small"
+                confirmCancelText={"Odustani"}
+                confirmOkText={"Izbriši"}
+                confirmTitle={"Jeste li sigurni?"}
+                resource="tournaments"
+                recordItemId={record.id}
+                successNotification={false}
+                onSuccess={() => {
+                  notification.success({
+                    message: "Turnir je uspješno izbrisan.",
+                    description: "Uspješno!",
+                  });
+                }}
+            />
+          </Space>
       ),
     },
   ];
 
   return (
-    <>
-      <Table
-        loading={isLoading}
-        dataSource={data?.data}
-        columns={columns}
-        rowKey="id"
-        pagination={{
-          pageSize: 10,
-          position: ['bottomCenter'],
-        }}
-        onChange={(pagination, filters, sorter) => {
-          if (filters.game && filters.game.length > 0) {
-            setSelectedGame(filters.game[0]);
-          } else {
-            setSelectedGame(undefined);
-          }
+      <>
+        <Table
+            loading={isLoading}
+            dataSource={data?.data}
+            columns={columns}
+            rowKey="id"
+            pagination={{
+              pageSize: 10,
+              position: ['bottomCenter'],
+            }}
+            onChange={(pagination, filters, sorter) => {
+              if (filters.game && filters.game.length > 0) {
+                setSelectedGame(filters.game[0]);
+              } else {
+                setSelectedGame(undefined);
+              }
 
-          let sorterArray = [];
+              let sorterArray = [];
 
-          if (Array.isArray(sorter)) {
-            sorterArray = sorter;
-          } else if (sorter && sorter.field) {
-            sorterArray = [sorter];
-          }
+              if (Array.isArray(sorter)) {
+                sorterArray = sorter;
+              } else if (sorter && sorter.field) {
+                sorterArray = [sorter];
+              }
 
-          const formattedSorters = sorterArray
-            .filter((s) => s.order)
-            .map((s) => ({
-              field: s.field,
-              order: s.order === "ascend" ? "asc" : "desc",
-            }));
+              const formattedSorters = sorterArray
+                  .filter((s) => s.order)
+                  .map((s) => ({
+                    field: s.field,
+                    order: s.order === "ascend" ? "asc" : "desc",
+                  }));
 
-          if (formattedSorters.length === 0) {
-            setSorters([{field: "startingAt", order: "asc"}]);
-          } else {
-            setSorters(formattedSorters);
-          }
-        }}
-      />
+              if (formattedSorters.length === 0) {
+                setSorters([{field: "startingAt", order: "asc"}]);
+              } else {
+                setSorters(formattedSorters);
+              }
+            }}
+        />
 
-      {children}
-    </>
+        {children}
+      </>
   )
 }
 
-export default ShowTournaments;
+export default Generation;

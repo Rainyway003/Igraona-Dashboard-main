@@ -1,5 +1,5 @@
 import {useForm, useSelect} from "@refinedev/antd";
-import {Button, DatePicker, Form, Input, notification, Select} from "antd";
+import {Button, DatePicker, Form, Input, InputNumber, notification, Select} from "antd";
 import {ArrowLeftOutlined, MinusCircleOutlined, PlusOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import React from "react";
 import {useNavigate} from "react-router";
@@ -84,30 +84,30 @@ const EditTournament = () => {
     }
 
     try {
-    const cleanValues = cleanObject({
-      ...values,
-      teamSizeRequired: Number(values.teamSizeRequired) || 0,
-      teamSizeOptional: Number(values.teamSizeOptional) || 0,
-      maxNumberOfParticipants: Number(values.maxNumberOfParticipants) || 0,
-      startingAt: range[0]?.toDate(),
-      endingAt: range[1]?.toDate(),
-      signUpStartingAt: signUpRange[0]?.toDate(),
-      signUpEndingAt: signUpRange[1]?.toDate(),
-    })
+      const cleanValues = cleanObject({
+        ...values,
+        teamSizeRequired: Number(values.teamSizeRequired) || 0,
+        teamSizeOptional: Number(values.teamSizeOptional) || 0,
+        maxNumberOfParticipants: Number(values.maxNumberOfParticipants) || 0,
+        startingAt: range[0]?.toDate(),
+        endingAt: range[1]?.toDate(),
+        signUpStartingAt: signUpRange[0]?.toDate(),
+        signUpEndingAt: signUpRange[1]?.toDate(),
+      })
 
 
       await formProps.onFinish?.(cleanValues)
 
-    notification.success({
-      message: "Turnir je uspješno ažuriran.",
-      description: "Uspješno!",
-    });
-  } catch (error) {
-    notification.error({
-      message: "Došlo je do greške prilikom ažuriranja turnira.",
-      description: "Greška!",
-    });
-  }
+      notification.success({
+        message: "Turnir je uspješno ažuriran.",
+        description: "Uspješno!",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Došlo je do greške prilikom ažuriranja turnira.",
+        description: "Greška!",
+      });
+    }
   }
 
 
@@ -191,13 +191,13 @@ const EditTournament = () => {
             name={'teamSizeRequired'}
             rules={[{required: true}]}
           >
-            <Input placeholder="Broj ljudi u timu" type="number"/>
+            <InputNumber placeholder="Broj ljudi u timu" min={1} precision={0} className={'w-[140px]'}/>
           </Form.Item>
           <Form.Item
             label="Broj rezervi"
             name={'teamSizeOptional'}
           >
-            <Input placeholder="Broj rezervi" type="number"/>
+            <InputNumber placeholder="Broj rezervi" min={0} precision={0} className={'w-[140px]'}/>
           </Form.Item>
         </div>
         <Form.Item
@@ -205,7 +205,7 @@ const EditTournament = () => {
           name={'maxNumberOfParticipants'}
           rules={[{required: true}]}
         >
-          <Input placeholder="Maksimalan broj timova" type="number" className='w-[404px]'/>
+          <InputNumber placeholder="Maksimalan broj timova" min={1} precision={0} className='w-[404px]'/>
         </Form.Item>
         {range && (
           <Form.Item label={'Traje od'} rules={[{required: true}]}>

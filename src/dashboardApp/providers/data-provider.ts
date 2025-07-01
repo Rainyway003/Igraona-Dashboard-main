@@ -28,11 +28,11 @@ import {db} from "./firebase";
 
 const dataProvider: DataProvider = {
   getList: async ({
-                    resource,
-                    meta,
-                    sorters,
-                    filters
-                  }: {
+    resource,
+    meta,
+    sorters,
+    filters
+  }: {
     resource: string,
     meta?: any,
     sorters?: any,
@@ -150,7 +150,7 @@ const dataProvider: DataProvider = {
       };
     }
 
-    if (resource === "reserve") {
+    if (resource === "reservations") {
       const id = meta?.id || (variables as any).id;
 
       await setDoc(doc(db, resource, id), variables as WithFieldValue<DocumentData>);
@@ -222,7 +222,7 @@ const dataProvider: DataProvider = {
       resource === "tournaments" ||
       resource === "games" ||
       resource === "blog" ||
-      resource === "reserve"
+      resource === "reservations"
     ) {
       const docRef = doc(db, resource, id as string);
       await deleteDoc(docRef);
@@ -276,10 +276,10 @@ const dataProvider: DataProvider = {
     }
   },
   getOne: async ({
-                   resource,
-                   id,
-                   meta
-                 }: {
+    resource,
+    id,
+    meta
+  }: {
     resource: string,
     id: any,
     meta?: any

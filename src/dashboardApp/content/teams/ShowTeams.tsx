@@ -31,6 +31,8 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
 
   const tournament = tournamentData?.data;
 
+  console.log(tournament, 'ev')
+
   const handlePublish = () => {
     mutateEdit({
       resource: "tournaments",
@@ -45,47 +47,39 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
     if (!tournament) return;
 
     setHeaderActions(
-        <div className="flex w-full justify-between">
-          <div className={'flex gap-4'}>
-            <CreateButton
-                type="primary"
-                className="antbutton"
-                onClick={() => navigate('/tournaments')}
-                icon={<ArrowLeftOutlined />}
-            >
-              Nazad
-            </CreateButton>
-            <Input
-                rootClassName={'w-96'}
-                placeholder="Pretraži timove"
-                className="shadow-md"
-                allowClear
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className={'flex gap-4'}>
-            <CreateButton
-                type="primary"
-                className="antbutton"
-                onClick={() => navigate(`/tournaments/edit/${id}`)}
-            >
-              Uredi turnir
-            </CreateButton>
-            <CreateButton
-                type="primary"
-                className="antbutton"
-                disabled={editLoading}
-                onClick={handlePublish}
-            >
-              {tournament.visible ? "Sakrij turnir" : "Objavi"}
-            </CreateButton>
-          </div>
+      <div className="flex w-full justify-between">
+        <div className={'flex gap-4'}>
+          <CreateButton
+            type="primary"
+            className="antbutton"
+            onClick={() => navigate('/tournaments')}
+            icon={<ArrowLeftOutlined/>}
+          >
+            Nazad
+          </CreateButton>
         </div>
+        <div className={'flex gap-4'}>
+          <CreateButton
+            type="primary"
+            className="antbutton"
+            onClick={() => navigate(`/tournaments/edit/${id}`)}
+          >
+            Uredi turnir
+          </CreateButton>
+          <CreateButton
+            type="primary"
+            className="antbutton"
+            disabled={editLoading}
+            onClick={handlePublish}
+          >
+            {tournament.visible ? "Sakrij turnir" : "Objavi"}
+          </CreateButton>
+        </div>
+      </div>
     );
 
     return () => setHeaderActions(null);
-  }, [tournament, searchTerm, setHeaderActions, navigate, editLoading]);
+  }, [tournament, setHeaderActions, navigate, editLoading]);
 
 
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
@@ -142,7 +136,7 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
       ...(searchTerm ? [{field: "name", operator: "contains" as const, value: searchTerm}] : []),
     ],
     sorters: [
-      { field: "createdAt", order: "desc" }
+      {field: "createdAt", order: "desc"}
     ]
   })
 
@@ -185,7 +179,15 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
       key: 'number',
     },
     {
-      title: <Form className={'flex justify-end'} onFinish={onFinish}>
+      title: <Form className={'flex justify-end gap-4'} onFinish={onFinish}>
+        <Input
+          rootClassName={'w-96'}
+          placeholder="Pretraži timove"
+          className="shadow-md"
+          allowClear
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         <Button
           type="primary"
           htmlType="submit"
@@ -269,7 +271,7 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
           <Card style={{width: '100%', height: '135px'}}>
             {tournament?.prizes?.length ? (
               tournament.prizes.map((prize, index) => (
-                <p key={index}>{prize}</p>
+                <p key={index}>{index + 1}. mjesto: {prize}</p>
               ))
             ) : (
               <p>Nema nagradi</p>
@@ -280,8 +282,10 @@ const ShowTeams: React.FC<ShowPlayersProps> = ({children}) => {
             style={{width: '100%', height: '290px'}}>
             <Progress
               type={'circle'}
-              size={250}
+              size={240}
               percent={Math.floor(tournament?.numberOfParticipants / tournament?.maxNumberOfParticipants * 100)}/>
+            <div
+              className={'text-center mt-4'}>Prijavljenih: {tournament?.numberOfParticipants} / {tournament?.maxNumberOfParticipants}</div>
           </Card>
         </Space>
       </div>

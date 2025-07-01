@@ -32,6 +32,7 @@ const Sidebar = () => {
       '5': '/plejke',
       '6': '/blog',
       '7': '/rules',
+        '8': '/generation',
     };
 
     const targetRoute = routes[key];
@@ -51,6 +52,7 @@ const Sidebar = () => {
     if (currentPath.includes('/plejke')) return '5';
     if (currentPath.includes('/blog')) return '6';
     if (currentPath.includes('/rules')) return '7';
+      if (currentPath.includes('/generation')) return '8';
     return '1';
   };
 
@@ -135,6 +137,12 @@ const Sidebar = () => {
             label: 'Pravila',
             onClick: () => handleNavigation('7')
           },
+            {
+                key: '8',
+                icon: <ExceptionOutlined />,
+                label: 'Generator',
+                onClick: () => handleNavigation('8')
+            },
         ]}
       />
 

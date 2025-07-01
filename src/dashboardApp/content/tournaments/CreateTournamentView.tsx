@@ -1,4 +1,4 @@
-import {Button, DatePicker, Form, Input, Select, Space} from 'antd'
+import {Button, DatePicker, Form, Input, InputNumber, Select, Space} from 'antd'
 import {useNavigate, useOutletContext} from 'react-router-dom'
 import React, {useState} from 'react';
 import {useCreate} from '@refinedev/core';
@@ -68,30 +68,30 @@ const CreateTournamentView = () => {
 
   const onFinish = (values: any) => {
     mutate(
-        {
-      resource: 'tournaments',
-      values: cleanObject({
-        ...values,
-        teamSizeRequired: Number(values.teamSizeRequired) || 0,
-        teamSizeOptional: Number(values.teamSizeOptional) || 0,
-        maxNumberOfParticipants: Number(values.maxNumberOfParticipants) || 0,
-        startingAt: values.startingAt[0].$d,
-        endingAt: values.startingAt[1].$d,
-        signUpStartingAt: values.signUpStartingAt[0].$d,
-        signUpEndingAt: values.signUpStartingAt[1].$d,
-        visible: visible,
-      }),
-            successNotification: () => ({
-                message: "Turnir je uspješno kreiran.",
-                description: "Uspješno!",
-                type: "success",
-            }),
-            errorNotification: (error) => ({
-                message: "Došlo je do greške pri kreiranju turnira.",
-                description: "Greška!",
-                type: "error",
-            }),
-        },
+      {
+        resource: 'tournaments',
+        values: cleanObject({
+          ...values,
+          teamSizeRequired: Number(values.teamSizeRequired) || 0,
+          teamSizeOptional: Number(values.teamSizeOptional) || 0,
+          maxNumberOfParticipants: Number(values.maxNumberOfParticipants) || 0,
+          startingAt: values.startingAt[0].$d,
+          endingAt: values.startingAt[1].$d,
+          signUpStartingAt: values.signUpStartingAt[0].$d,
+          signUpEndingAt: values.signUpStartingAt[1].$d,
+          visible: visible,
+        }),
+        successNotification: () => ({
+          message: "Turnir je uspješno kreiran.",
+          description: "Uspješno!",
+          type: "success",
+        }),
+        errorNotification: (error) => ({
+          message: "Došlo je do greške pri kreiranju turnira.",
+          description: "Greška!",
+          type: "error",
+        }),
+      },
     )
     navigate('/tournaments')
   }
@@ -177,13 +177,13 @@ const CreateTournamentView = () => {
           name={'teamSizeRequired'}
           rules={[{required: true}]}
         >
-          <Input placeholder="Broj ljudi u timu" type="number"/>
+          <InputNumber placeholder="Broj ljudi u timu" min={1} precision={0} className={'w-[140px]'}/>
         </Form.Item>
         <Form.Item
           label="Broj rezervi"
           name={'teamSizeOptional'}
         >
-          <Input placeholder="Broj rezervi" type="number"/>
+          <InputNumber placeholder="Broj rezervi" min={0} precision={0} className={'w-[140px]'}/>
         </Form.Item>
       </div>
       <Form.Item
@@ -191,7 +191,7 @@ const CreateTournamentView = () => {
         name={'maxNumberOfParticipants'}
         rules={[{required: true}]}
       >
-        <Input placeholder="Maksimalan broj timova" type="number" className='w-[404px]'/>
+        <InputNumber placeholder="Maksimalan broj timova" min={1} precision={0} className='w-[404px]'/>
       </Form.Item>
       <Form.Item
         label="Traje od"

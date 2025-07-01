@@ -43,6 +43,8 @@ import EditGame from "./dashboardApp/content/games/EditGame";
 import EditRule from "./dashboardApp/content/rules/EditRule";
 import EditBlog from "./dashboardApp/content/blog/EditBlog";
 import ViewRule from "./dashboardApp/content/rules/ViewRule";
+import Generation from "./dashboardApp/content/generation/Generation";
+import CreateBrackets from "./dashboardApp/content/generation/CreateBrackets";
 
 
 
@@ -142,6 +144,10 @@ function App() {
                 </Route>
                 <Route path="/plejke">
                   <Route index element={<ShowReserve/>}/>
+                </Route>
+                <Route path="/generation">
+                  <Route index element={<Generation />}/>
+                  <Route path={':id'} element={<CreateBrackets  />}/>
                 </Route>
               </Route>
             </Routes>
