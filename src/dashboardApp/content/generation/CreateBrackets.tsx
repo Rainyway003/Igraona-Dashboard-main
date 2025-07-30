@@ -6,6 +6,7 @@ import {useParams} from 'react-router';
 import {MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
 
 const CreateBrackets: React.FC<PropsWithChildren> = ({children}) => {
+  const [form] = Form.useForm();
   const [pairs, setPairs] = useState<any[]>([])
   const {mutate, isLoading} = useCreate()
   const {mutate: updateBracket} = useUpdate()
@@ -14,13 +15,23 @@ const CreateBrackets: React.FC<PropsWithChildren> = ({children}) => {
   const [winners, setWinners] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentBracket, setCurrentBracket] = useState(null);
-  const formRef = useRef();
 
   useEffect(() => {
     if (isModalOpen) {
-      formRef.current?.resetFields();
+      form.resetFields();
     }
   }, [isModalOpen, currentBracket]);
+
+  useEffect(() => {
+    if (currentBracket?.results?.length) {
+      const parsedResults = currentBracket.results.map((r) => {
+        const [first, second] = r.split("-").map(Number);
+        return {first, second};
+      });
+
+      form.setFieldsValue({results: parsedResults});
+    }
+  }, [currentBracket]);
 
   const maxNumberOfParticipants = 16
 
@@ -69,32 +80,6 @@ const CreateBrackets: React.FC<PropsWithChildren> = ({children}) => {
     const newWinner = teamData?.data[pairIndex];
     setWinners(prevWinners => [...prevWinners, newWinner])
   }
-
-  const handleChange = (pairIndex, team, game, value) => {
-    const updated = {...results};
-    if (!updated[pairIndex]) updated[pairIndex] = [[], []];
-    updated[pairIndex][team][game] = value;
-    setResults(updated);
-
-    const t1 = updated[pairIndex][0];
-    const t2 = updated[pairIndex][1];
-
-    if (t1.length === numberOfGames && t2.length === numberOfGames &&
-      !t1.includes(undefined) && !t2.includes(undefined)) {
-
-      const sum1 = t1.reduce((a, b) => a + b, 0);
-      const sum2 = t2.reduce((a, b) => a + b, 0);
-      if (sum1 > sum2) {
-        console.log(`Par ${pairIndex}: Team 1 pobjednik`);
-        checkWinner(pairIndex);
-      } else if (sum2 > sum1) {
-        console.log(`Par ${pairIndex}: Team 2 pobjednik`);
-        checkWinner(pairIndex);
-      } else {
-        console.log(`Par ${pairIndex}: Neriješeno`);
-      }
-    }
-  };
 
   const {data: tournamentData} = useOne({
     resource: "tournaments",
@@ -163,20 +148,110 @@ const CreateBrackets: React.FC<PropsWithChildren> = ({children}) => {
   }, {});
 
   const onFinish = (values) => {
+    let team1Win = 0;
+    let team2Win = 0;
     const results = values.results.map(result => `${result.first}-${result.second}`);
-    console.log(results);
-    console.log(currentBracket)
 
     updateBracket({
       resource: "brackets",
       id: currentBracket?.id,
-      meta: {
-        tournamentId: id,
-      },
-      values: {results}
-    })
+      meta: { tournamentId: id },
+      values: { results }
+    });
+
+    values.results.forEach(result => {
+      const first = Number(result.first);
+      const second = Number(result.second);
+
+      if (first > second) {
+        team1Win++;
+      } else if (first < second) {
+        team2Win++;
+      }
+    });
+
+    let winner = null;
+    if (team1Win > team2Win) {
+      winner = participantsMap[currentBracket.team1?.id || currentBracket.team1];
+      console.log('Team1 je pobjednik:', winner?.name);
+    } else if (team2Win > team1Win) {
+      winner = participantsMap[currentBracket.team2?.id || currentBracket.team2];
+      console.log('Team2 je pobjednik:', winner?.name);
+    }
+
+    if (winner) {
+      try {
+        const nextBracketNumber = getNextBracketNumber(currentBracket.number, maxNumberOfParticipants);
+
+        if (nextBracketNumber === null) {
+          console.log(' Tournament winner:', winner.name);
+        } else {
+          const nextBracket = bracketsData?.data?.find(b => b.number === nextBracketNumber);
+
+          if (nextBracket) {
+            const isTeam1Position = currentBracket.number % 2 === 0;
+
+            const updateValues = isTeam1Position
+                ? { team1: { id: winner.id, name: winner.name } }
+                : { team2: { id: winner.id, name: winner.name } };
+
+            updateBracket({
+              resource: "brackets",
+              id: nextBracket.id,
+              meta: { tournamentId: id },
+              values: updateValues
+            });
+
+            console.log(`Winner ${winner.name} advanced to bracket ${nextBracketNumber}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error advancing winner:', error);
+      }
+    }
+
     setIsModalOpen(false);
   };
+
+  function getNextBracketNumber(currentBracketNumber, maxParticipants = 16) {
+    const rounds = [];
+    let bracketIndex = 1;
+    let numMatches = maxParticipants / 2;
+
+    while (numMatches >= 1) {
+      const round = [];
+      for (let i = 0; i < numMatches; i++) {
+        round.push(bracketIndex++);
+      }
+      rounds.push(round);
+      numMatches = numMatches / 2;
+    }
+
+    let currentRound = -1;
+    let positionInRound = -1;
+
+    for (let r = 0; r < rounds.length; r++) {
+      const position = rounds[r].indexOf(currentBracketNumber);
+      if (position !== -1) {
+        currentRound = r;
+        positionInRound = position;
+        break;
+      }
+    }
+
+    if (currentRound === -1) {
+      throw new Error(`Bracket number ${currentBracketNumber} not found`);
+    }
+
+    if (currentRound === rounds.length - 1) {
+      return null;
+    }
+
+    const nextRound = currentRound + 1;
+    const nextPosition = Math.floor(positionInRound / 2);
+
+    return rounds[nextRound][nextPosition];
+  }
 
   return (
     <div className={'flex flex-col gap-6'}>
@@ -187,111 +262,111 @@ const CreateBrackets: React.FC<PropsWithChildren> = ({children}) => {
         disabled={isLoading}
       >Stvori</CreateButton>
       <Modal
-          open={isModalOpen}
-          onCancel={handleModal}
-          footer={null}
-          width={700}
+        open={isModalOpen}
+        onCancel={handleModal}
+        footer={null}
+        width={700}
       >
-        <Form ref={formRef} onFinish={onFinish}>
+        <Form form={form} onFinish={onFinish}>
           <div className="relative w-full mt-12 flex flex-col gap-1">
             <h1 className="font-bold text-5xl text-center justify-center mb-8">Rezultati</h1>
             <Form.List name="results">
-              {(fields, { add, remove }) => (
-                  <>
-                    <div className="flex flex-row gap-4 bg-red-900 w-full h-full p-6 rounded items-center">
-                      <span className="font-black text-white text-3xl">1</span>
-                      <p className="font-bold text-3xl text-white">{currentBracket?.team1?.name}</p>
-                      <div className="flex flex-row gap-2 ml-auto items-center">
-                        {fields.map(({ key, name, ...restField }, index) => (
-                            <div key={key} className="flex items-center gap-1">
-                              <Form.Item
-                                  {...restField}
-                                  name={[name, "first"]}
-                                  noStyle
-                                  rules={[{ required: true, message: "Unesite rezultat" }]}
-                              >
-                                <Input
-                                    placeholder={`Rezultat ${name + 1}`}
-                                    type="number"
-                                    style={{ width: 70, textAlign: "center" }}
-                                />
-                              </Form.Item>
+              {(fields, {add, remove}) => (
+                <>
+                  <div className="flex flex-row gap-4 bg-red-900 w-full h-full p-6 rounded items-center">
+                    <span className="font-black text-white text-3xl">1</span>
+                    <p className="font-bold text-3xl text-white">{currentBracket?.team1?.name}</p>
+                    <div className="flex flex-row gap-2 ml-auto items-center">
+                      {fields.map(({key, name, ...restField}, index) => (
+                        <div key={key} className="flex items-center gap-1">
+                          <Form.Item
+                            {...restField}
+                            name={[name, "first"]}
+                            noStyle
+                            rules={[{required: true, message: "Unesite rezultat"}]}
+                          >
+                            <Input
+                              placeholder={`Rezultat ${name + 1}`}
+                              type="number"
+                              style={{width: 70, textAlign: "center"}}
+                            />
+                          </Form.Item>
 
-                              {index === fields.length - 1 && fields.length > 0 && (
-                                  <MinusCircleOutlined
-                                      onClick={() => remove(name)}
-                                      className="text-white hover:text-red-600 cursor-pointer ml-1"
-                                      style={{ fontSize: 20 }}
-                                  />
-                              )}
-                            </div>
-                        ))}
-                      </div>
+                          {index === fields.length - 1 && fields.length > 0 && (
+                            <MinusCircleOutlined
+                              onClick={() => remove(name)}
+                              className="text-white hover:text-red-600 cursor-pointer ml-1"
+                              style={{fontSize: 20}}
+                            />
+                          )}
+                        </div>
+                      ))}
                     </div>
+                  </div>
 
-                    <div className="flex flex-row gap-4 bg-black w-full p-6 rounded items-center">
-                      <span className="font-black text-white text-3xl">2</span>
-                      <p className="font-bold text-white text-3xl">{currentBracket?.team2?.name}</p>
-                      <div className="flex flex-row gap-2 ml-auto items-center">
-                        {fields.map(({ key, name, ...restField }, index) => (
-                            <div key={key} className="flex items-center gap-1">
-                              <Form.Item
-                                  {...restField}
-                                  name={[name, "second"]}
-                                  noStyle
-                                  rules={[{ required: true, message: "Unesite rezultat" }]}
-                              >
-                                <Input
-                                    placeholder={`Rezultat ${name + 1}`}
-                                    type="number"
-                                    style={{ width: 70, textAlign: "center" }}
-                                />
-                              </Form.Item>
+                  <div className="flex flex-row gap-4 bg-black w-full p-6 rounded items-center">
+                    <span className="font-black text-white text-3xl">2</span>
+                    <p className="font-bold text-white text-3xl">{currentBracket?.team2?.name}</p>
+                    <div className="flex flex-row gap-2 ml-auto items-center">
+                      {fields.map(({key, name, ...restField}, index) => (
+                        <div key={key} className="flex items-center gap-1">
+                          <Form.Item
+                            {...restField}
+                            name={[name, "second"]}
+                            noStyle
+                            rules={[{required: true, message: "Unesite rezultat"}]}
+                          >
+                            <Input
+                              placeholder={`Rezultat ${name + 1}`}
+                              type="number"
+                              style={{width: 70, textAlign: "center"}}
+                            />
+                          </Form.Item>
 
-                              {index === fields.length - 1 && fields.length > 0 && (
-                                  <MinusCircleOutlined
-                                      onClick={() => remove(name)}
-                                      className="text-white hover:text-red-600 cursor-pointer ml-1"
-                                      style={{ fontSize: 20 }}
-                                  />
-                              )}
-                            </div>
-                        ))}
-                      </div>
+                          {index === fields.length - 1 && fields.length > 0 && (
+                            <MinusCircleOutlined
+                              onClick={() => remove(name)}
+                              className="text-white hover:text-red-600 cursor-pointer ml-1"
+                              style={{fontSize: 20}}
+                            />
+                          )}
+                        </div>
+                      ))}
                     </div>
+                  </div>
 
-                    <div className="flex justify-end">
+                  <div className="flex justify-end">
                     <Button
-                        type="dashed"
-                        onClick={() => add()}
-                        icon={<PlusOutlined />}
-                        className="font-bold ml-4 mb-2 mt-2 w-40 flex justify-end"
-                        style={{
-                          borderColor: "#7f1d1d",
-                          color: "#7f1d1d",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#7f1d1d";
-                          e.currentTarget.style.color = "white";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "transparent";
-                          e.currentTarget.style.color = "#7f1d1d";
-                        }}
+                      type="dashed"
+                      onClick={() => add()}
+                      icon={<PlusOutlined/>}
+                      className="font-bold ml-4 mb-2 mt-2 w-40 flex justify-end"
+                      style={{
+                        borderColor: "#7f1d1d",
+                        color: "#7f1d1d",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#7f1d1d";
+                        e.currentTarget.style.color = "white";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#7f1d1d";
+                      }}
                     >
                       Dodaj rezultat
                     </Button>
-                      </div>
-                  </>
+                  </div>
+                </>
               )}
             </Form.List>
 
 
             <Form.Item className="text-center justify-center">
               <Button
-                  type="primary"
-                  htmlType="submit"
-                  className="font-bold !bg-red-900 !hover:bg-red-950 w-60 h-12 text-xl"
+                type="primary"
+                htmlType="submit"
+                className="font-bold !bg-red-900 !hover:bg-red-950 w-60 h-12 text-xl"
               >
                 Potvrdi
               </Button>
@@ -300,55 +375,93 @@ const CreateBrackets: React.FC<PropsWithChildren> = ({children}) => {
         </Form>
       </Modal>
 
-      <div className="bg-gray-300 flex flex-row rounded-xl">
-        {groupBracketsByRound(bracketsData?.data || [], maxNumberOfParticipants).map((round, roundIndex) => (
-          <div key={roundIndex} className="flex flex-col items-center justify-center ">
-            {round.map((bracket, idx) => {
-              const team1 = participantsMap[bracket.team1?.id || bracket.team1];
-              const team2 = participantsMap[bracket.team2?.id || bracket.team2];
 
-              return (
+      <div className="bg-gray-300 rounded-xl p-6">
+        <div className="grid grid-cols-4 gap-8 min-h-screen items-start">
+          {groupBracketsByRound(bracketsData?.data || [], maxNumberOfParticipants).map((round, roundIndex) => {
+            const currentRoundMatches = round.length;
+
+            return (
+                <div
+                    key={roundIndex}
+                    className="flex flex-col items-center h-full"
+                >
+
                   <div
-                      onClick={() => handleModal(bracket)}
-                      key={bracket.id}
-                      className="flex flex-col bg-black m-4 ml-12 p-0 min-w-[300px] font-bold border-2 border-black divide-y-2 divide-red-900 rounded items-center text-center"
+                      className="grid grid-rows-8 gap-y-4 w-full h-full items-center justify-items-center"
+                      style={{
+                        minHeight: '500px'
+                      }}
                   >
+                    {round.map((bracket, idx) => {
+                      const team1 = participantsMap[bracket.team1?.id || bracket.team1];
+                      const team2 = participantsMap[bracket.team2?.id || bracket.team2];
 
+                      const BRACKET_POSITIONS = {
+                        8: [1, 2, 3, 4, 5, 6, 7, 8],
+                        4: [2, 3, 6, 7],
+                        2: [4, 5],
+                        1: [4.5]
+                      };
 
-                    <div className="flex flex-row justify-between items-center w-full min-h-12 p-2 bg-red-900 text-white">
-                      <span className="text-left flex-1">{team1?.name || "Pobjednik prošle runde"}</span>
-                      <div className="flex flex-row gap-2">
-                        {bracket.results?.map((val, i) => (
-                            <span
-                                key={i}
-                                className="w-12 text-white bg-gray-800 border border-gray-600 rounded text-center p-1"
-                            >
-    {val.split('-')[0]}
-  </span>
-                        ))}
-                      </div>
-                    </div>
+                      const gridRowPosition = BRACKET_POSITIONS[currentRoundMatches]?.[idx] || idx + 1;
 
-                    <div className="flex flex-row justify-between items-center w-full min-h-12 p-2">
-                      <span className="text-left flex-1 text-white">{team2?.name || "Pobjednik prošle runde"}</span>
-                      <div className="flex flex-row gap-2">
-                        {bracket.results?.map((val, i) => (
-                            <span
-                                key={i}
-                                className="w-12 text-white bg-gray-800 border border-gray-600 rounded text-center p-1"
-                            >
-    {val.split('-')[1]}
-  </span>
-                        ))}
-                      </div>
-                    </div>
+                      const getTransformOffset = () => {
+                        if (currentRoundMatches === 1) {
+                          return 'translateY(460px)';
+                        }
+                        return 'translateY(0px)';
+                      };
+
+                      return (
+                          <div
+                              onClick={() => handleModal(bracket)}
+                              key={bracket.id}
+                              className="flex flex-col bg-black min-w-[280px] max-w-[300px] w-full font-bold border-2 border-black divide-y-2 divide-red-900 rounded items-center text-center cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-200"
+                              style={{
+                                gridRow: `${gridRowPosition} / span 1`,
+                                transform: getTransformOffset()
+                              }}
+                          >
+                            <div className="flex flex-row justify-between items-center w-full min-h-[50px] p-3 bg-red-900 text-white">
+                    <span className="text-left flex-1  pr-2 text-sm font-semibold">
+                      {team1?.name || "Čeka pobjednika"}
+                    </span>
+                              <div className="flex flex-row gap-1">
+                                {bracket.results?.map((val, i) => (
+                                    <span
+                                        key={i}
+                                        className="w-7 h-7 text-xs text-white bg-gray-800 border border-gray-600 rounded flex items-center justify-center"
+                                    >
+                          {val.split('-')[0]}
+                        </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="flex flex-row justify-between items-center w-full min-h-[50px] p-3">
+                    <span className="text-left flex-1 text-white truncate pr-2 text-sm font-semibold">
+                      {team2?.name || "Čeka pobjednika"}
+                    </span>
+                              <div className="flex flex-row gap-1">
+                                {bracket.results?.map((val, i) => (
+                                    <span
+                                        key={i}
+                                        className="w-7 h-7 text-xs text-white bg-gray-800 border border-gray-600 rounded flex items-center justify-center"
+                                    >
+                          {val.split('-')[1]}
+                        </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                      );
+                    })}
                   </div>
-
-              );
-            })}
-          </div>
-        ))}
-
+                </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   )
