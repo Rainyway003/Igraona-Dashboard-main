@@ -73,6 +73,41 @@ const dataProvider: DataProvider = {
       return {data: teams, total: teams.length};
     }
 
+    if (resource === "brackets") {
+      const bracketsCollection = collection(db, "brackets", meta?.tournamentId, "pairs");
+
+      const constraints: any[] = [];
+
+      if (filters && filters.length > 0) {
+        filters.forEach((filter: any) => {
+          const {field, operator, value} = filter;
+
+          if (operator === "contains") {
+            constraints.push(where(field, ">=", value));
+            constraints.push(where(field, "<=", value + "\uf8ff"));
+          } else if (operator === "eq") {
+            constraints.push(where(field, "==", value));
+          }
+        });
+      }
+
+      if (sorters && sorters.length > 0) {
+        sorters.forEach((sorter: any) => {
+          constraints.push(orderBy(sorter.field, sorter.order || "asc"));
+        });
+      }
+
+      const bracketsQuery = constraints.length > 0 ? query(bracketsCollection, ...constraints) : bracketsCollection;
+      const bracketsSnap = await getDocs(bracketsQuery);
+
+      const brackets = bracketsSnap.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      return {data: brackets, total: brackets.length};
+    }
+
 
     const turnirDoc = collection(db, resource);
 
@@ -149,6 +184,19 @@ const dataProvider: DataProvider = {
         } as TData,
       };
     }
+    if (resource === "brackets") {
+      const docRef = await addDoc(
+        collection(db, resource, variables.tournamentId, "pairs"),
+        variables as WithFieldValue<DocumentData>
+      );
+
+      return {
+        data: {
+          id: docRef.id,
+          ...variables,
+        } as TData,
+      };
+    }
 
     if (resource === "reservations") {
       const id = meta?.id || (variables as any).id;
@@ -169,6 +217,18 @@ const dataProvider: DataProvider = {
   update: async <TData = any, TVariables = DocumentData>(
     {resource, id, variables, meta}: UpdateParams<TVariables>
   ): Promise<CreateResponse<TData>> => {
+    if (resource === "brackets") {
+      const docRef = doc(db, resource, meta?.tournamentId, "pairs", String(id));
+      await updateDoc(docRef, {...variables});
+
+      return {
+        data: {
+          id,
+          ...variables,
+        } as TData,
+      };
+    }
+
     if (resource === "participants") {
       const teamRef = doc(db, "tournaments", String(meta?.tournamentId), "participants", String(id));
       const teamSnap = await getDoc(teamRef);
