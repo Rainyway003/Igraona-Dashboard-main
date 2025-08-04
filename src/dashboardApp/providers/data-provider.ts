@@ -215,11 +215,23 @@ const dataProvider: DataProvider = {
   },
 
   update: async <TData = any, TVariables = DocumentData>(
-    {resource, id, variables, meta}: UpdateParams<TVariables>
+      {resource, id, variables, meta}: UpdateParams<TVariables>
   ): Promise<CreateResponse<TData>> => {
-    if (resource === "brackets") {
-      const docRef = doc(db, resource, meta?.tournamentId, "pairs", String(id));
-      await updateDoc(docRef, {...variables});
+
+    if (resource === "brackets" && meta?.number) {
+      const bracketRef = collection(db, "brackets", String(id), "pairs");
+      const pairNumber = meta.number;
+      const bracketQuery = query(
+          bracketRef,
+          where("number", "==", pairNumber)
+      );
+
+      const participantsSnap = await getDocs(bracketQuery);
+
+      participantsSnap.forEach(async (pairDoc) => {
+        const pairRef = doc(db, "brackets", String(id), "pairs", pairDoc.id);
+        await updateDoc(pairRef, variables);
+      });
 
       return {
         data: {
@@ -230,6 +242,7 @@ const dataProvider: DataProvider = {
     }
 
     if (resource === "participants") {
+      console.log("PARTICIPANTS - update");
       const teamRef = doc(db, "tournaments", String(meta?.tournamentId), "participants", String(id));
       const teamSnap = await getDoc(teamRef);
       const oldData = teamSnap.data();
@@ -253,7 +266,6 @@ const dataProvider: DataProvider = {
       }
 
       Object.assign(updates, variables);
-
       await updateDoc(teamRef, updates);
 
       return {
@@ -265,7 +277,7 @@ const dataProvider: DataProvider = {
     }
 
     const docRef = doc(db, resource, String(id));
-    await updateDoc(docRef, {...variables});
+    await updateDoc(docRef, variables);
 
     return {
       data: {
