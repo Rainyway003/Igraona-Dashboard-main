@@ -74,6 +74,8 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
     },
   });
 
+  console.log(data?.data)
+
   const columns = [
     {
       title: 'Avatar',
@@ -190,7 +192,7 @@ const ShowTournaments: React.FC<PropsWithChildren> = ({children}) => {
             />
             <EditButton hideText size="small" resource="tournaments" icon={<ApartmentOutlined />}
                         recordItemId={record.id}
-                        onClick={() => navigate(`/tournaments/generation/${record.id}`)}></EditButton>
+                        onClick={() => navigate(`/tournaments/generation/${record.id}/${record.type}`)}></EditButton>
           </Space>
       ),
     },

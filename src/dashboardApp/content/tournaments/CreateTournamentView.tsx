@@ -211,6 +211,26 @@ const CreateTournamentView = () => {
           showTime={{format: 'HH:mm'}}
           disabledDate={disablePastDates}/>
       </Form.Item>
+        <Form.Item
+            label="Vrsta"
+            name={'type'}
+            className='flex flex-col'
+            rules={[{required: true}]}
+        >
+            <Select
+                placeholder="Vrsta"
+                {...ruleProps}
+                options={[
+                    { value: 'single', label: 'Single Elimination' },
+                    { value: 'double', label: 'Double Elimination' },
+                    { value: 'group', label: 'Group Stage' },
+                    { value: 'robin', label: 'Round Robin' },
+                ]}
+                filterOption={(input, option) =>
+                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+            />
+        </Form.Item>
       <Form.Item
         label="Pravila"
         name={'rule'}

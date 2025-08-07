@@ -43,9 +43,10 @@ import EditGame from "./dashboardApp/content/games/EditGame";
 import EditRule from "./dashboardApp/content/rules/EditRule";
 import EditBlog from "./dashboardApp/content/blog/EditBlog";
 import ViewRule from "./dashboardApp/content/rules/ViewRule";
-import CreateBrackets from "./dashboardApp/content/generation/CreateBrackets";
+import SingleElimination from "./dashboardApp/content/generation/SingleElimination";
 import ShowPlayMonths from "./dashboardApp/content/plays/ShowPlayMonths";
 import ShowSubmissions from "./dashboardApp/content/plays/ShowSubmissions";
+import DoubleElimination from "./dashboardApp/content/generation/DoubleElimination";
 
 function App() {
 
@@ -118,7 +119,10 @@ function App() {
                     <Route index element={<ShowTournaments/>}/>
                     <Route path="new" element={<CreateTournamentView/>}/>
                     <Route path="edit/:id" element={<EditTournament/>}/>
-                    <Route path={'generation/:id'} element={<CreateBrackets/>}/>
+                    <Route path="generation/:id">
+                      <Route path={'single'} element={<SingleElimination/>}/>
+                      <Route path={'double'} element={<DoubleElimination/>}/>
+                    </Route>
                   </Route>
                   <Route path="/tournaments/:id">
                     <Route index element={<ShowTeams/>}/>
