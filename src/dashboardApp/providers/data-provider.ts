@@ -108,6 +108,93 @@ const dataProvider: DataProvider = {
       return {data: brackets, total: brackets.length};
     }
 
+    if (resource === "plays") {
+      if (meta?.monthId) {
+        const playsCollection = collection(db, "plays", meta.monthId, "submissions");
+
+        const constraints: any[] = [];
+
+        if (filters && filters.length > 0) {
+          filters.forEach((filter: any) => {
+            const {field, operator, value} = filter;
+
+            if (operator === "contains") {
+              constraints.push(where(field, ">=", value));
+              constraints.push(where(field, "<=", value + "\uf8ff"));
+            } else if (operator === "eq") {
+              constraints.push(where(field, "==", value));
+            }
+          });
+        }
+
+        if (sorters && sorters.length > 0) {
+          sorters.forEach((sorter: any) => {
+            constraints.push(orderBy(sorter.field, sorter.order || "asc"));
+          });
+        }
+
+        const playsQuery = constraints.length > 0 ? query(playsCollection, ...constraints) : playsCollection;
+        const playsSnap = await getDocs(playsQuery);
+
+        const plays = playsSnap.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+
+        return {data: plays, total: plays.length};
+      } else {
+        const playsCollection = collection(db, "plays");
+        const playsSnap = await getDocs(playsCollection);
+
+        let months = playsSnap.docs.map((doc) => ({
+          id: doc.id,
+          name: doc.id,
+          ...doc.data(),
+        }));
+
+        if (sorters && sorters.length > 0) {
+          sorters.forEach((sorter: any) => {
+            if (sorter.field === "id" || sorter.field === "date") {
+              months.sort((a, b) => {
+                const dateA = new Date(a.id + '-01');
+                const dateB = new Date(b.id + '-01');
+
+                if (sorter.order === "desc") {
+                  return dateB.getTime() - dateA.getTime();
+                } else {
+                  return dateA.getTime() - dateB.getTime();
+                }
+              });
+            }
+          });
+        } else {
+          months.sort((a, b) => {
+            const dateA = new Date(a.id + '-01');
+            const dateB = new Date(b.id + '-01');
+            return dateB.getTime() - dateA.getTime();
+          });
+        }
+
+        return {data: months, total: months.length};
+      }
+    }
+    if (resource === "submissions") {
+      const monthId = meta?.monthId;
+
+      if (!monthId) {
+        return {data: [], total: 0};
+      }
+
+      const submissionsCollection = collection(db, "plays", monthId, "submissions");
+      const submissionsSnap = await getDocs(submissionsCollection);
+
+      const submissions = submissionsSnap.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      return {data: submissions, total: submissions.length};
+    }
 
     const turnirDoc = collection(db, resource);
 
@@ -215,15 +302,15 @@ const dataProvider: DataProvider = {
   },
 
   update: async <TData = any, TVariables = DocumentData>(
-      {resource, id, variables, meta}: UpdateParams<TVariables>
+    {resource, id, variables, meta}: UpdateParams<TVariables>
   ): Promise<CreateResponse<TData>> => {
 
     if (resource === "brackets" && meta?.number) {
       const bracketRef = collection(db, "brackets", String(id), "pairs");
       const pairNumber = meta.number;
       const bracketQuery = query(
-          bracketRef,
-          where("number", "==", pairNumber)
+        bracketRef,
+        where("number", "==", pairNumber)
       );
 
       const participantsSnap = await getDocs(bracketQuery);
@@ -239,6 +326,22 @@ const dataProvider: DataProvider = {
           ...variables,
         } as TData,
       };
+    }
+
+    if (resource === "brackets") {
+      const docRef = doc(db, resource, meta?.tournamentId, "pairs", String(id));
+      await updateDoc(docRef, {...variables});
+
+      return {
+        data: {
+          id,
+          ...variables,
+        } as TData,
+      };
+    }
+    if (resource === "submissions") {
+      const docRef = doc(db, "plays", meta?.monthId, "submissions", String(id));
+      await updateDoc(docRef, {...variables});
     }
 
     if (resource === "participants") {
@@ -294,7 +397,8 @@ const dataProvider: DataProvider = {
       resource === "tournaments" ||
       resource === "games" ||
       resource === "blog" ||
-      resource === "reservations"
+      resource === "reservations" ||
+      resource === "plays"
     ) {
       const docRef = doc(db, resource, id as string);
       await deleteDoc(docRef);
@@ -302,6 +406,10 @@ const dataProvider: DataProvider = {
       return {
         data: {id} as TData,
       };
+    }
+    if (resource === "submissions") {
+      const docRef = doc(db, "plays", meta?.monthId, "submissions", id as string);
+      await deleteDoc(docRef);
     }
 
     if (resource === "participants" && meta?.fieldToDelete && meta?.tournamentId) {

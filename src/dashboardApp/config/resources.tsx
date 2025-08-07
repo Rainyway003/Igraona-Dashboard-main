@@ -50,4 +50,8 @@ export const resources: IResourceItem[] = [
     create: '/rules/new',
     edit: '/rules/edit/:id'
   },
+  {
+    name: 'plays',
+    list: '/plays',
+  },
 ]

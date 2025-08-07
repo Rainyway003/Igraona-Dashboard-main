@@ -1,7 +1,7 @@
 import {Authenticated, Refine} from "@refinedev/core";
 import {RefineKbar, RefineKbarProvider} from "@refinedev/kbar";
 
-import type { NotificationProvider } from "@refinedev/core";
+import type {NotificationProvider} from "@refinedev/core";
 import "@refinedev/antd/dist/reset.css";
 
 import routerBindings, {
@@ -11,7 +11,7 @@ import routerBindings, {
 import {App as AntdApp, ConfigProvider} from "antd";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 
-import { notification } from "antd";
+import {notification} from "antd";
 import hrHR from "antd/es/locale/hr_HR";
 
 import dataProvider from './dashboardApp/providers/data-provider'
@@ -44,11 +44,13 @@ import EditRule from "./dashboardApp/content/rules/EditRule";
 import EditBlog from "./dashboardApp/content/blog/EditBlog";
 import ViewRule from "./dashboardApp/content/rules/ViewRule";
 import CreateBrackets from "./dashboardApp/content/generation/CreateBrackets";
+import ShowPlayMonths from "./dashboardApp/content/plays/ShowPlayMonths";
+import ShowSubmissions from "./dashboardApp/content/plays/ShowSubmissions";
 
 function App() {
 
   const customNotificationProvider: NotificationProvider = {
-    open: ({ message, description, type }) => {
+    open: ({message, description, type}) => {
       let translatedMessage = message;
       let translatedDescription = description;
 
@@ -82,78 +84,81 @@ function App() {
 
 
   return (
-      <BrowserRouter>
-        <RefineKbarProvider>
-          <AntdApp>
-            <ConfigProvider locale={hrHR}>
-              <Refine
-                  dataProvider={dataProvider}
-                  authProvider={authProvider}
-                  notificationProvider={customNotificationProvider}
-                  routerProvider={routerBindings}
-                  resources={resources}
-                  options={{
-                    syncWithLocation: true,
-                    warnWhenUnsavedChanges: true,
-                    useNewQueryKeys: true,
-                    projectId: "4cEHo1-TlgDsX-WcifnB",
-                  }}
-              >
-                <Routes>
-                  <Route index element={<LandingApp/>}/>
-                  <Route path="/t" element={<ShowTLanding/>}/>
-                  <Route path="/t/:id" element={<SignUpScreen/>}/>
-                  <Route path="/rezerviraj" element={<Playstation/>}/>
-                  <Route element={<Authenticated key="protected"
-                                                 fallback={<Login></Login>}><AppLayout/></Authenticated>}>
-                    <Route path="/blog">
-                      <Route index element={<ShowBlogs/>}/>
-                      <Route path='new' element={<CreateBlog/>}/>
-                      <Route path=':id' element={<ViewBlog/>}/>
-                      <Route path='edit/:id' element={<EditBlog/>}/>
-                    </Route>
-                    <Route path="/tournaments">
-                      <Route index element={<ShowTournaments/>}/>
-                      <Route path="new" element={<CreateTournamentView/>}/>
-                      <Route path="edit/:id" element={<EditTournament/>}/>
-                      <Route path={'generation/:id'} element={<CreateBrackets  />}/>
-                    </Route>
-                    <Route path="/tournaments/:id">
-                      <Route index element={<ShowTeams/>}/>
-                    </Route>
-                    <Route path="/tournaments/:id/:name">
-                      <Route index element={<ShowPlayers/>}/>
-                    </Route>
-                    <Route path="/dashboard" element={<Home/>}/>
-                    <Route path="/games">
-                      <Route index element={<ShowGames/>}/>
-                      <Route path={'new'} element={<CreateGame/>}/>
-                      <Route path={'edit/:id'} element={<EditGame/>}/>
-                    </Route>
-                    <Route path="/rules">
-                      <Route index element={<ShowRules/>}/>
-                      <Route path={'new'} element={<CreateRule/>}/>
-                      <Route path={'edit/:id'} element={<EditRule/>}/>
-                      <Route path={':id'} element={<ViewRule/>}/>
-                    </Route>
-                    <Route path="/banned">
-                      <Route index element={<ShowBanned/>}/>
-                      <Route path={'new'} element={<CreateBan/>}/>
-                    </Route>
-                    <Route path="/plejke">
-                      <Route index element={<ShowReserve/>}/>
-                    </Route>
-
+    <BrowserRouter>
+      <RefineKbarProvider>
+        <AntdApp>
+          <ConfigProvider locale={hrHR}>
+            <Refine
+              dataProvider={dataProvider}
+              authProvider={authProvider}
+              notificationProvider={customNotificationProvider}
+              routerProvider={routerBindings}
+              resources={resources}
+              options={{
+                syncWithLocation: true,
+                warnWhenUnsavedChanges: true,
+                useNewQueryKeys: true,
+                projectId: "4cEHo1-TlgDsX-WcifnB",
+              }}
+            >
+              <Routes>
+                <Route index element={<LandingApp/>}/>
+                <Route path="/t" element={<ShowTLanding/>}/>
+                <Route path="/t/:id" element={<SignUpScreen/>}/>
+                <Route path="/rezerviraj" element={<Playstation/>}/>
+                <Route element={<Authenticated key="protected"
+                                               fallback={<Login></Login>}><AppLayout/></Authenticated>}>
+                  <Route path="/blog">
+                    <Route index element={<ShowBlogs/>}/>
+                    <Route path='new' element={<CreateBlog/>}/>
+                    <Route path=':id' element={<ViewBlog/>}/>
+                    <Route path='edit/:id' element={<EditBlog/>}/>
                   </Route>
-                </Routes>
-                <RefineKbar/>
-                <UnsavedChangesNotifier/>
-                <DocumentTitleHandler/>
-              </Refine>
-            </ConfigProvider>
-          </AntdApp>
-        </RefineKbarProvider>
-      </BrowserRouter>
+                  <Route path="/tournaments">
+                    <Route index element={<ShowTournaments/>}/>
+                    <Route path="new" element={<CreateTournamentView/>}/>
+                    <Route path="edit/:id" element={<EditTournament/>}/>
+                    <Route path={'generation/:id'} element={<CreateBrackets/>}/>
+                  </Route>
+                  <Route path="/tournaments/:id">
+                    <Route index element={<ShowTeams/>}/>
+                  </Route>
+                  <Route path="/tournaments/:id/:name">
+                    <Route index element={<ShowPlayers/>}/>
+                  </Route>
+                  <Route path="/dashboard" element={<Home/>}/>
+                  <Route path="/games">
+                    <Route index element={<ShowGames/>}/>
+                    <Route path={'new'} element={<CreateGame/>}/>
+                    <Route path={'edit/:id'} element={<EditGame/>}/>
+                  </Route>
+                  <Route path="/rules">
+                    <Route index element={<ShowRules/>}/>
+                    <Route path={'new'} element={<CreateRule/>}/>
+                    <Route path={'edit/:id'} element={<EditRule/>}/>
+                    <Route path={':id'} element={<ViewRule/>}/>
+                  </Route>
+                  <Route path="/banned">
+                    <Route index element={<ShowBanned/>}/>
+                    <Route path={'new'} element={<CreateBan/>}/>
+                  </Route>
+                  <Route path="/plejke">
+                    <Route index element={<ShowReserve/>}/>
+                  </Route>
+                  <Route path='/plays'>
+                    <Route index element={<ShowPlayMonths/>}/>
+                    <Route path={":id"} element={<ShowSubmissions/>}/>
+                  </Route>
+                </Route>
+              </Routes>
+              <RefineKbar/>
+              <UnsavedChangesNotifier/>
+              <DocumentTitleHandler/>
+            </Refine>
+          </ConfigProvider>
+        </AntdApp>
+      </RefineKbarProvider>
+    </BrowserRouter>
   );
 }
 
