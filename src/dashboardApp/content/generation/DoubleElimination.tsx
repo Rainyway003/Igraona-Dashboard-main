@@ -13,9 +13,6 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
   const {id} = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentBracket, setCurrentBracket] = useState(null);
-  const [skippedTeam, setSkippedTeam] = useState(null)
-  const [skippedBracket, setSkippedBracket] = useState(0)
-  const [shouldUpdateSkipped, setShouldUpdateSkipped] = useState(false);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -81,27 +78,6 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
 
   const maxNumberOfParticipants = tournament?.numberOfParticipants
 
-  const {mutate: updatePair} = useUpdate();
-
-  useEffect(() => {
-    if (!shouldUpdateSkipped || !skippedTeam || !id || !skippedBracket) {
-      console.log("Nema data");
-      return;
-    }
-
-    updatePair({
-      resource: 'brackets',
-      id: String(id),
-      values: {
-        team1: skippedTeam,
-      },
-      meta: {
-        number: Number(skippedBracket),
-      }
-    });
-
-    setShouldUpdateSkipped(false);
-  }, [skippedTeam, shouldUpdateSkipped]);
 
   function groupBracketsByRound(brackets: any[], maxTeams: number) {
     const rounds = [];
@@ -117,6 +93,23 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
 
     return rounds;
   }
+
+  function groupLosersBracket(brackets: any[]) {
+    const losers = brackets.filter(b => b.type === "losers");
+    const rounds = [];
+
+    let index = 0;
+    const numMatches = 2;
+
+    while (index < losers.length) {
+      const round = losers.slice(index, index + numMatches);
+      rounds.push(round);
+      index += numMatches;
+    }
+
+    return rounds;
+  }
+
 
   const handleModal = (bracket) => {
     if (!isModalOpen) {
@@ -134,7 +127,7 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
 
 
   const cleanObject = (obj: Record<string, any>) =>
-    Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
+      Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined));
 
   function createPairs(teams) {
     const shuffled = [...teams];
@@ -185,7 +178,43 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
         })
       }
     }
-    
+
+    const log2Teams = Math.log2(maxNumberOfParticipants)
+    const lowerRounds = 2 * (log2Teams - 1)
+    const matchCounts = []
+
+    let matchCount = maxNumberOfParticipants / 4
+
+    for (let i = 0; i < lowerRounds; i++) {
+      matchCounts.push(matchCount)
+      if (i % 2 === 1) {
+        matchCount = matchCount / 2
+      }
+    }
+
+    for (let i = 0; i < lowerRounds; i++) {
+      for (let j = 0; j < matchCounts[i]; j++) {
+        mutate({
+          resource: "brackets",
+          values: cleanObject({
+            tournamentId: id,
+            number: number++,
+            type: 'losers',
+          }),
+          successNotification: false
+        });
+      }
+    }
+
+    mutate({
+      resource: "brackets",
+      values: cleanObject({
+        tournamentId: id,
+        number: number++,
+        type: 'final',
+      }),
+      successNotification: false
+    })
 
 
     return pairs;
@@ -193,9 +222,9 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
 
   if (isLoading) {
     return (
-      <div className={'bg-gray-300 flex flex-col justify-center items-center w-full h-full'}>
-        <Spin size={'large'}/>
-      </div>
+        <div className={'bg-gray-300 flex flex-col justify-center items-center w-full h-full'}>
+          <Spin size={'large'}/>
+        </div>
     )
   }
 
@@ -228,17 +257,18 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
     });
 
     let winner = null;
+    let loser = null;
     if (team1Win > team2Win) {
       winner = participantsMap[currentBracket.team1?.id || currentBracket.team1];
-      console.log('Team1 je pobjednik:', winner?.name);
+      loser = participantsMap[currentBracket.team2?.id || currentBracket.team2];
     } else if (team2Win > team1Win) {
       winner = participantsMap[currentBracket.team2?.id || currentBracket.team2];
-      console.log('Team2 je pobjednik:', winner?.name);
+      loser = participantsMap[currentBracket.team1?.id || currentBracket.team1];
     }
 
     if (winner) {
       try {
-        const nextBracketNumber = getNextBracketNumber(currentBracket.number, maxNumberOfParticipants);
+        const nextBracketNumber = getNextBracketNumber(currentBracket.number, currentBracket.type);
 
         if (nextBracketNumber === null) {
           console.log(' Tournament winner:', winner.name);
@@ -249,8 +279,8 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
             const isTeam1Position = currentBracket.number % 2 === 1;
 
             const updateValues = isTeam1Position
-              ? {team1: {id: winner.id, name: winner.name}}
-              : {team2: {id: winner.id, name: winner.name}};
+                ? {team1: {id: winner.id, name: winner.name}}
+                : {team2: {id: winner.id, name: winner.name}};
 
             updateBracket({
               resource: "brackets",
@@ -267,11 +297,35 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
       }
     }
 
+    if (loser) {
+      const nextBracketNumber = getNextLoserMatchNumber(currentBracket.number, currentBracket.type);
+
+      const nextBracket = bracketsData?.data?.find(b => b.number === nextBracketNumber);
+
+      if (nextBracket) {
+        const isTeam1Position = currentBracket.number % 2 === 1;
+
+        const updateValues = isTeam1Position
+            ? {team1: {id: loser.id, name: loser.name}}
+            : {team2: {id: loser.id, name: loser.name}};
+
+        updateBracket({
+          resource: "brackets",
+          id: nextBracket.id,
+          meta: {tournamentId: id},
+          values: updateValues
+        });
+
+        console.log(`Loser ${loser.name} advanced to bracket ${nextBracketNumber}`);
+      }
+    }
+
     setIsModalOpen(false);
   };
 
-  function getNextBracketNumber(currentBracketNumber, maxParticipants = 16) {
-    const rounds = [];
+  function getNextBracketNumber(currentBracketNumber, maxParticipants = 16, currentBracketType) {
+    if (currentBracketType === 'winners') {
+      const rounds = [];
     let bracketIndex = 1;
     let numMatches = maxParticipants / 2;
 
@@ -308,7 +362,33 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
     const nextPosition = Math.floor(positionInRound / 2);
 
     return rounds[nextRound][nextPosition];
+  } else {
+      const winners = bracketsData?.data.filter(bracket => bracket.type === "winners").length;
+
+    const nextNumber = winners + Math.floor((currentBracketNumber - 1) / 2);
+console.log(currentBracketType, nextNumber)
+
+
+    return nextNumber
   }
+}
+
+  function getNextLoserMatchNumber(currentBracketNumber, currentBracketType) {
+    if(currentBracketType === "winners") {
+    const winners = bracketsData?.data.filter(bracket => bracket.type === "winners").length;
+
+    const losersStart = winners + 1;
+
+    const nextNumber = losersStart + Math.floor((currentBracketNumber - 1) / 2);
+console.log(nextNumber);
+
+
+    return nextNumber
+    } else {
+      return null
+    }
+  }
+
 
   return (
     <div className={'flex flex-col gap-6'}>
@@ -439,7 +519,6 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
 
         <div className="grid grid-cols-4 gap-8 min-h-screen items-start">
           {groupBracketsByRound(bracketsData?.data || [], maxNumberOfParticipants).map((round, roundIndex) => {
-            const currentRoundMatches = round.length;
 
             return (
               <div
@@ -447,13 +526,8 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
                 className="flex flex-col justify-around items-center h-full"
               >
 
-                {/*<div*/}
-                {/*  className="grid grid-rows-8 gap-y-4 w-full h-full items-center justify-items-center"*/}
-                {/*  style={{*/}
-                {/*    minHeight: '500px'*/}
-                {/*  }}*/}
-                {/*>*/}
-                {round.map((bracket, idx) => {
+
+                {round.filter(round => round.type === 'winners').map((bracket, idx) => {
                   const team1 = participantsMap[bracket.team1?.id || bracket.team1];
                   const team2 = participantsMap[bracket.team2?.id || bracket.team2];
 
@@ -498,8 +572,73 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
                     </div>
                   );
                 })}
-                {/*</div>*/}
+
+
               </div>
+
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-4 gap-8 pb-20 items-start mt-20">
+          {groupLosersBracket(bracketsData?.data || [], maxNumberOfParticipants).map((round, roundIndex) => {
+
+            return (
+                <div
+                    key={roundIndex}
+                    className="flex flex-col gap-40 items-center h-full"
+                >
+
+
+                  {round.filter(round => round.type === 'losers').map((bracket, idx) => {
+                    const team1 = participantsMap[bracket.team1?.id || bracket.team1];
+                    const team2 = participantsMap[bracket.team2?.id || bracket.team2];
+
+                    return (
+                        <div
+                            onClick={() => handleModal(bracket)}
+                            key={bracket.id}
+                            className="flex flex-col bg-black min-w-[280px] max-w-[300px] w-full font-bold border-2 border-black divide-y-2 divide-red-900 rounded items-center text-center cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-200"
+                        >
+                          <div
+                              className="flex flex-row justify-between items-center w-full min-h-[50px] p-3 bg-red-900 text-white">
+                    <span className="text-left flex-1  pr-2 text-sm font-semibold">
+                   {team1?.name}
+                    </span>
+                            <div className="flex flex-row gap-1">
+                              {bracket.results?.map((val, i) => (
+                                  <span
+                                      key={i}
+                                      className="w-7 h-7 text-xs text-white bg-gray-800 border border-gray-600 rounded flex items-center justify-center"
+                                  >
+                          {val.split('-')[0]}
+                        </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="flex flex-row justify-between items-center w-full min-h-[50px] p-3">
+                    <span className="text-left flex-1 text-white truncate pr-2 text-sm font-semibold">
+                                     {team2?.name}
+                    </span>
+                            <div className="flex flex-row gap-1">
+                              {bracket.results?.map((val, i) => (
+                                  <span
+                                      key={i}
+                                      className="w-7 h-7 text-xs text-white bg-gray-800 border border-gray-600 rounded flex items-center justify-center"
+                                  >
+                          {val.split('-')[1]}
+                        </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                    );
+                  })}
+
+
+                </div>
+
             );
           })}
         </div>
