@@ -47,6 +47,7 @@ import SingleElimination from "./dashboardApp/content/generation/SingleEliminati
 import ShowPlayMonths from "./dashboardApp/content/plays/ShowPlayMonths";
 import ShowSubmissions from "./dashboardApp/content/plays/ShowSubmissions";
 import DoubleElimination from "./dashboardApp/content/generation/DoubleElimination";
+import RoundRobin from "./dashboardApp/content/generation/RoundRobin";
 
 function App() {
 
@@ -122,6 +123,7 @@ function App() {
                     <Route path="generation/:id">
                       <Route path={'single'} element={<SingleElimination/>}/>
                       <Route path={'double'} element={<DoubleElimination/>}/>
+                      <Route path={'robin'} element={<RoundRobin/>}/>
                     </Route>
                   </Route>
                   <Route path="/tournaments/:id">

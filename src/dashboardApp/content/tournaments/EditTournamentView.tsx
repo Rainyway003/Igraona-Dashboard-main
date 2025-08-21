@@ -242,7 +242,7 @@ const EditTournament = () => {
               options={[
                 { value: 'single', label: 'Single Elimination' },
                 { value: 'double', label: 'Double Elimination' },
-                { value: 'group', label: 'Group Stage' },
+                { value: 'swiss', label: 'Swiss' },
                 { value: 'robin', label: 'Round Robin' },
               ]}
               filterOption={(input, option) =>
@@ -250,6 +250,8 @@ const EditTournament = () => {
               }
           />
         </Form.Item>
+
+
 
         <Form.Item
           label="Pravila"
