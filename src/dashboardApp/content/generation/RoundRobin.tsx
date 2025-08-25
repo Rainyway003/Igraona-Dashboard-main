@@ -1,5 +1,5 @@
 import React, {PropsWithChildren, useEffect, useRef, useState} from 'react';
-import {Button, Form, Input, InputNumber, Modal, Spin} from 'antd';
+import {Button, Form, Input, InputNumber, Modal, Spin, Table} from 'antd';
 import {useCreate, useList, useOne, useUpdate} from "@refinedev/core"
 import {CreateButton} from '@refinedev/antd';
 import {useParams} from 'react-router';
@@ -11,7 +11,30 @@ const RoundRobin: React.FC<PropsWithChildren> = ({children}) => {
     const {mutate, isLoading} = useCreate()
     const {mutate: updateBracket} = useUpdate()
     const {id} = useParams();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentBracket, setCurrentBracket] = useState<any>(null);
 
+    useEffect(() => {
+        if (isModalOpen) {
+            form.resetFields()
+            if (!currentBracket?.results?.length) {
+                form.setFieldsValue({results: [{}]})
+            }
+        }
+    }, [isModalOpen, currentBracket]);
+
+    useEffect(() => {
+        if (currentBracket?.results?.length) {
+            const parsedResults = currentBracket.results.map((r) => {
+                const [first, second] = r.split("-").map(Number)
+                return {first, second}
+            });
+
+            form.setFieldsValue({results: parsedResults})
+        } else if (isModalOpen) {
+            form.setFieldsValue({results: [{}]})
+        }
+    }, [currentBracket, isModalOpen])
 
     const {data: tournamentData} = useOne({
         resource: "tournaments",
@@ -39,7 +62,6 @@ const RoundRobin: React.FC<PropsWithChildren> = ({children}) => {
     });
 
     const tournament = tournamentData?.data;
-
     const maxNumberOfParticipants = tournament?.numberOfParticipants
 
     const cleanObject = (obj: Record<string, any>) =>
@@ -94,6 +116,98 @@ const RoundRobin: React.FC<PropsWithChildren> = ({children}) => {
         return rounds;
     };
 
+    const createStandingsTable = () => {
+        const participants = teamData?.data || [];
+        const brackets = bracketsData?.data || [];
+
+        const standings = participants.map(participant => {
+            let pobjede = 0;
+            let gubitci = 0;
+            let neriješeno = 0
+            let odigrane = 0;
+
+            brackets.forEach(bracket => {
+                if (bracket.results && bracket.results.length > 0) {
+                    const isTeam1 = bracket.team1?.id === participant.id || bracket.team1 === participant.id;
+                    const isTeam2 = bracket.team2?.id === participant.id || bracket.team2 === participant.id;
+
+                    if (isTeam1 || isTeam2) {
+                        let team1TotalScore = 0;
+                        let team2TotalScore = 0;
+
+                        bracket.results.forEach(result => {
+                            const [score1, score2] = result.split('-').map(Number);
+                            team1TotalScore += score1;
+                            team2TotalScore += score2;
+                        });
+
+                        if (isTeam1) {
+                            if (team1TotalScore > team2TotalScore) pobjede++;
+                            else if (team1TotalScore < team2TotalScore) gubitci++;
+                            else neriješeno++;
+                        } else if (isTeam2) {
+                            if (team2TotalScore > team1TotalScore) pobjede++;
+                            else if (team2TotalScore < team1TotalScore) gubitci++;
+                            else neriješeno++;
+                        }
+                        odigrane++;
+                    }
+                }
+            });
+
+            return {
+                key: participant.id,
+                name: participant.name,
+                odigrane,
+                pobjede,
+                neriješeno,
+                gubitci,
+            };
+        });
+
+        return standings.sort((a, b) => {
+            if (b.pobjede !== a.pobjede) return b.pobjede - a.pobjede;
+        });
+    };
+
+    const tableColumns = [
+        {
+            title: 'Pozicija',
+            key: 'position',
+            render: (text, record, index) => index + 1,
+            width: 80,
+        },
+        {
+            title: 'Tim',
+            dataIndex: 'name',
+            key: 'name',
+        },
+        {
+            title: 'Pobjede',
+            dataIndex: 'pobjede',
+            key: 'pobjede',
+            width: 80,
+        },
+        {
+            title: 'Neriješeno',
+            dataIndex: 'neriješeno',
+            key: 'neriješeno',
+            width: 80,
+        },
+        {
+            title: 'Porazi',
+            dataIndex: 'gubitci',
+            key: 'gubitci',
+            width: 80,
+        },
+        {
+            title: 'Odigrano',
+            dataIndex: 'odigrane',
+            key: 'odigrane',
+            width: 100,
+        },
+    ];
+
     if (isLoading) {
         return (
             <div className={'bg-gray-300 flex flex-col justify-center items-center w-full h-full'}>
@@ -108,8 +222,6 @@ const RoundRobin: React.FC<PropsWithChildren> = ({children}) => {
     }, {});
 
     const onFinish = (values) => {
-        let team1Win = 0;
-        let team2Win = 0;
         const results = values.results.map(result => `${result.first}-${result.second}`);
 
         updateBracket({
@@ -119,61 +231,23 @@ const RoundRobin: React.FC<PropsWithChildren> = ({children}) => {
             values: {results}
         });
 
-        values.results.forEach(result => {
-            const first = Number(result.first);
-            const second = Number(result.second);
-
-            if (first > second) {
-                team1Win++;
-            } else if (first < second) {
-                team2Win++;
-            }
-        });
-
-        let winner = null;
-        if (team1Win > team2Win) {
-            winner = participantsMap[currentBracket.team1?.id || currentBracket.team1];
-            console.log('Team1 je pobjednik:', winner?.name);
-        } else if (team2Win > team1Win) {
-            winner = participantsMap[currentBracket.team2?.id || currentBracket.team2];
-            console.log('Team2 je pobjednik:', winner?.name);
-        }
-
-        if (winner) {
-            try {
-                const nextBracketNumber = getNextBracketNumber(currentBracket.number, maxNumberOfParticipants);
-
-                if (nextBracketNumber === null) {
-                    console.log(' Tournament winner:', winner.name);
-                } else {
-                    const nextBracket = bracketsData?.data?.find(b => b.number === nextBracketNumber);
-
-                    if (nextBracket) {
-                        const isTeam1Position = currentBracket.number % 2 === 1;
-
-                        const updateValues = isTeam1Position
-                            ? {team1: {id: winner.id, name: winner.name}}
-                            : {team2: {id: winner.id, name: winner.name}};
-
-                        updateBracket({
-                            resource: "brackets",
-                            id: nextBracket.id,
-                            meta: {tournamentId: id},
-                            values: updateValues
-                        });
-
-                        console.log(`Winner ${winner.name} advanced to bracket ${nextBracketNumber}`);
-                    }
-                }
-            } catch (error) {
-                console.error('Error advancing winner:', error);
-            }
-        }
-
         setIsModalOpen(false);
     };
 
     const rounds = getRounds();
+
+    const handleModal = (bracket) => {
+        if (!isModalOpen) {
+            if (bracket.team1 && bracket.team2) {
+                setIsModalOpen(true);
+                setCurrentBracket(bracket);
+            }
+        } else {
+            setIsModalOpen(false);
+        }
+    };
+
+    const standingsData = createStandingsTable();
 
     return (
         <div className="flex flex-col gap-6">
@@ -185,6 +259,134 @@ const RoundRobin: React.FC<PropsWithChildren> = ({children}) => {
             >
                 Stvori
             </CreateButton>
+
+            <Modal
+                open={isModalOpen}
+                onCancel={handleModal}
+                footer={null}
+                width={700}
+            >
+                <Form form={form} onFinish={onFinish}>
+                    <div className="relative w-full mt-12 flex flex-col gap-1">
+                        <h1 className="font-bold text-5xl text-center justify-center mb-8">Rezultati</h1>
+                        <Form.List name="results">
+                            {(fields, {add, remove}) => (
+                                <>
+                                    <div className="flex flex-row gap-4 bg-red-900 w-full h-full p-6 rounded items-center">
+                                        <span className="font-black text-white text-3xl">1</span>
+                                        <p className="font-bold text-3xl text-white">{currentBracket?.team1?.name}</p>
+                                        <div className="flex flex-row gap-2 ml-auto items-center">
+                                            {fields.map(({key, name, ...restField}, index) => (
+                                                <div key={key} className="flex items-center gap-1">
+                                                    <Form.Item
+                                                        {...restField}
+                                                        name={[name, "first"]}
+                                                        noStyle
+                                                        rules={[{required: true, message: "Unesite rezultat"}]}
+                                                        initialValue={0}
+                                                    >
+                                                        <InputNumber
+                                                            placeholder={`Rezultat ${name + 1}`}
+                                                            min={0}
+                                                            style={{width: 70, textAlign: "center"}}
+                                                        />
+                                                    </Form.Item>
+
+                                                    {index === fields.length - 1 && fields.length > 0 && (
+                                                        <MinusCircleOutlined
+                                                            onClick={() => remove(name)}
+                                                            className="text-white hover:text-red-600 cursor-pointer ml-1"
+                                                            style={{fontSize: 20}}
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-row gap-4 bg-black w-full p-6 rounded items-center">
+                                        <span className="font-black text-white text-3xl">2</span>
+                                        <p className="font-bold text-white text-3xl">{currentBracket?.team2?.name}</p>
+                                        <div className="flex flex-row gap-2 ml-auto items-center">
+                                            {fields.map(({key, name, ...restField}, index) => (
+                                                <div key={key} className="flex items-center gap-1">
+                                                    <Form.Item
+                                                        {...restField}
+                                                        name={[name, "second"]}
+                                                        noStyle
+                                                        rules={[{required: true, message: "Unesite rezultat"}]}
+                                                        initialValue={0}
+                                                    >
+                                                        <InputNumber
+                                                            placeholder={`Rezultat ${name + 1}`}
+                                                            min={0}
+                                                            style={{width: 70, textAlign: "center"}}
+                                                        />
+                                                    </Form.Item>
+
+                                                    {index === fields.length - 1 && fields.length > 0 && (
+                                                        <MinusCircleOutlined
+                                                            onClick={() => remove(name)}
+                                                            className="text-white hover:text-red-600 cursor-pointer ml-1"
+                                                            style={{fontSize: 20}}
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end">
+                                        <Button
+                                            type="dashed"
+                                            onClick={() => add()}
+                                            icon={<PlusOutlined/>}
+                                            className="font-bold ml-4 mb-2 mt-2 w-40 flex justify-end"
+                                            style={{
+                                                borderColor: "#7f1d1d",
+                                                color: "#7f1d1d",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.backgroundColor = "#7f1d1d";
+                                                e.currentTarget.style.color = "white";
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.backgroundColor = "transparent";
+                                                e.currentTarget.style.color = "#7f1d1d";
+                                            }}
+                                        >
+                                            Dodaj rezultat
+                                        </Button>
+                                    </div>
+                                </>
+                            )}
+                        </Form.List>
+
+                        <Form.Item className="text-center justify-center">
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                className="font-bold !bg-red-900 !hover:bg-red-950 w-60 h-12 text-xl"
+                            >
+                                Potvrdi
+                            </Button>
+                        </Form.Item>
+                    </div>
+                </Form>
+            </Modal>
+
+            {bracketsData?.data?.length > 0 && (
+                <div className="bg-white rounded-xl p-6">
+                    <h2 className="text-2xl font-bold mb-4 text-center">Tablica rezultata</h2>
+                    <Table
+                        columns={tableColumns}
+                        dataSource={standingsData}
+                        pagination={false}
+                        size="small"
+                        className="rounded-lg"
+                    />
+                </div>
+            )}
 
             <div className="bg-gray-300 rounded-xl p-6 flex gap-6 overflow-x-auto">
                 {Object.keys(rounds).map(roundNum => (
@@ -232,7 +434,6 @@ const RoundRobin: React.FC<PropsWithChildren> = ({children}) => {
             </div>
         </div>
     );
-
 }
 
 export default RoundRobin;

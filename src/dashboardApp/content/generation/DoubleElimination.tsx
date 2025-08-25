@@ -114,14 +114,27 @@ const DoubleElimination: React.FC<PropsWithChildren> = ({children}) => {
 
     return rounds;
   }
-  function groupLosersBracket(brackets: any[]) {
-    const losers = brackets.filter(b => b.type === "losers");
-    const rounds = [];
 
-    const matchesPerRound = [2, 2, 1, 1];
+  function calculateLosersRounds(numTeams: number): number[] {
+    const rounds: number[] = [];
+    let matches = numTeams / 4;
+
+    while (matches >= 1) {
+      rounds.push(matches);
+      rounds.push(matches);
+      matches = matches / 2;
+    }
+
+    return rounds;
+  }
+
+  function groupLosersBracket(brackets: any[], numTeams: number) {
+    const losers = brackets.filter(b => b.type === "losers");
+    const rounds: any[] = [];
+
+    const matchesPerRound = calculateLosersRounds(numTeams);
 
     let index = 0;
-
     for (let i = 0; i < matchesPerRound.length && index < losers.length; i++) {
       const numMatches = matchesPerRound[i];
       const round = losers.slice(index, index + numMatches);
@@ -301,7 +314,7 @@ console.log(nextBracketNumber)
           const nextBracket = bracketsData?.data?.find(b => b.number === nextBracketNumber);
 
           if (nextBracket) {
-            const isTeam1Position = currentBracket.number % 2 === 0;
+            const isTeam1Position = currentBracket.number % 2 === 1;
 
             const updateValues = isTeam1Position
                 ? {team1: {id: winner.id, name: winner.name}}
@@ -328,7 +341,7 @@ console.log(nextBracketNumber)
       const nextBracket = bracketsData?.data?.find(b => b.number === nextBracketNumber);
 
       if (nextBracket) {
-        const isTeam1Position = currentBracket.number % 2 === 0;
+        const isTeam1Position = currentBracket.number % 2 === 1;
 
         const updateValues = isTeam1Position
             ? {team1: {id: loser.id, name: loser.name}}
@@ -399,9 +412,42 @@ console.log(nextBracketNumber)
   } else if (currentBracketType === 'losers' && currentBracketNumber !== srednjaRunda && currentBracketNumber !== zadnjaRunda) {
       const winners = bracketsData?.data.filter(bracket => bracket.type === "winners").length;
 
-    const nextNumber = winners + Math.floor((currentBracketNumber - 1) / 2);
+      const firstLoserNumber = winners + 1;
+      const losersPerRound = [];
 
-    return nextNumber
+      let matches = maxNumberOfParticipants / 4;
+      while (matches >= 1) {
+        losersPerRound.push(matches);
+        losersPerRound.push(matches);
+        matches = Math.floor(matches / 2);
+      }
+
+      let roundStart = firstLoserNumber
+      let roundIndex = -1;
+      for (let i = 0; i < losersPerRound.length; i++) {
+        const roundEnd = roundStart + losersPerRound[i] - 1;
+        if (currentBracketNumber >= roundStart && currentBracketNumber <= roundEnd) {
+          roundIndex = i;
+          break;
+        }
+        roundStart = roundEnd + 1;
+      }
+
+      if (roundIndex === -1) return null;
+
+      const nextRoundStart = firstLoserNumber + losersPerRound.slice(0, roundIndex + 1).reduce((a, b) => a + b, 0);
+
+      const positionInRound = currentBracketNumber - (firstLoserNumber + losersPerRound.slice(0, roundIndex).reduce((a, b) => a + b, 0));
+
+      let nextNumber: number;
+      if (roundIndex === 0) {
+        nextNumber = nextRoundStart + positionInRound;
+      } else {
+        nextNumber = nextRoundStart + Math.floor(positionInRound / 2);
+      }
+
+      console.log(nextNumber);
+      return nextNumber;
     } else if (currentBracketType === 'losers' && currentBracketNumber === srednjaRunda) {
       const winners = bracketsData?.data.filter(bracket => bracket.type === "winners").length;
 
@@ -427,7 +473,7 @@ console.log(nextBracketNumber)
     const losersStart = winners + 1;
 
       const nextNumber = losersStart + Math.floor((currentBracketNumber - 1) / 2);
-
+console.log('genj')
 
       return nextNumber
 
@@ -454,6 +500,7 @@ console.log(nextBracketNumber)
     }
   }
 
+  const loserRounds = groupLosersBracket(bracketsData?.data || [], maxNumberOfParticipants);
 
   return (
     <div className={'flex flex-col gap-6'}>
@@ -645,23 +692,27 @@ console.log(nextBracketNumber)
           })}
         </div>
 
-        <div className="grid grid-cols-4 gap-8 pb-20 items-start mt-20 justify-center">
-          {groupLosersBracket(bracketsData?.data || [], maxNumberOfParticipants).map((round, roundIndex) => {
-            return (
+        <div className="overflow-x-auto w-full">
+          <div
+              className="grid gap-4 pb-20 items-start mt-20"
+              style={{ gridTemplateColumns: `repeat(${loserRounds.length}, minmax(280px, 1fr))` }}
+          >
+            {loserRounds.map((round, roundIndex) => (
                 <div
                     key={roundIndex}
-                    className="flex flex-col gap-40 items-center h-full justify-center"
+                    className="flex flex-col gap-20 items-center h-full justify-center"
                 >
-                  {round.filter(round => round.type === 'losers').map((bracket, idx) => {
+                  {round.map((bracket, idx) => {
                     const team1 = participantsMap[bracket.team1?.id || bracket.team1];
                     const team2 = participantsMap[bracket.team2?.id || bracket.team2];
 
                     return (
                         <div
-                            onClick={() => handleModal(bracket)}
                             key={bracket.id}
+                            onClick={() => handleModal(bracket)}
                             className="flex flex-col bg-black min-w-[280px] max-w-[300px] w-full font-bold border-2 border-black divide-y-2 divide-red-900 rounded items-center text-center cursor-pointer hover:shadow-xl hover:scale-105 transition-all duration-200"
                         >
+
                           <div className="flex flex-row justify-between items-center w-full min-h-[50px] p-3 bg-red-900 text-white">
                 <span className="text-left flex-1 pr-2 text-sm font-semibold">
                   {team1?.name}
@@ -672,7 +723,7 @@ console.log(nextBracketNumber)
                                       key={i}
                                       className="w-7 h-7 text-xs text-white bg-gray-800 border border-gray-600 rounded flex items-center justify-center"
                                   >
-                      {val.split('-')[0]}
+                      {val.split("-")[0]}
                     </span>
                               ))}
                             </div>
@@ -688,7 +739,7 @@ console.log(nextBracketNumber)
                                       key={i}
                                       className="w-7 h-7 text-xs text-white bg-gray-800 border border-gray-600 rounded flex items-center justify-center"
                                   >
-                      {val.split('-')[1]}
+                      {val.split("-")[1]}
                     </span>
                               ))}
                             </div>
@@ -697,9 +748,11 @@ console.log(nextBracketNumber)
                     );
                   })}
                 </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
+
+
       </div>
     </div>
   )
